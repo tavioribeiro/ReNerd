@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toBitmap
@@ -99,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 
         this.goTo(EpisodesActivity::class.java)
         //getNerdcasts("2024-09-06%2000%3A00%3A00","2024-09-13%2000%3A00%3A00")

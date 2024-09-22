@@ -1,9 +1,15 @@
 package com.example.renerd.features.episodes
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.renerd.databinding.ActivityEpisodesBinding
+import com.example.renerd.features.episodes.adapters.EpisodesAdapter
 import com.example.renerd.view_models.EpisodeViewModel
+import core.extensions.styleBackground
+import core.extensions.toast
 import org.koin.android.ext.android.inject
 
 class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
@@ -16,28 +22,35 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         binding = ActivityEpisodesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        window.statusBarColor = Color.parseColor("#191919")
+
         presenter.attachView(this)
         presenter.loadEpisodes()
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
         presenter.detachView()
     }
 
-    override fun showEpisodes(episodes: List<EpisodeViewModel>) {
-        // Atualize a UI com a lista de episódios
+    override fun showEpisodes(episodes: MutableList<EpisodeViewModel>) {
+        binding.recyclerviewEpisodes.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        val adapter = EpisodesAdapter(this, episodes)
+        binding.recyclerviewEpisodes.adapter = adapter
     }
 
     override fun showError(message: String) {
-        // Exiba uma mensagem de erro
+        toast(message)
     }
 
     override fun showLoading() {
-        // Exiba um indicador de carregamento
+        binding.progressIndicator.visibility = View.VISIBLE
+        binding.recyclerviewEpisodes.visibility = View.GONE
     }
 
     override fun hideLoading() {
-        // Oculte o indicador de carregamento
+        binding.progressIndicator.visibility = View.GONE
+        binding.recyclerviewEpisodes.visibility = View.VISIBLE
     }
 }

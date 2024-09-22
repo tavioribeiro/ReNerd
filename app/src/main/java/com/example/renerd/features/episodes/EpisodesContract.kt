@@ -6,7 +6,7 @@ import com.example.renerd.view_models.EpisodeViewModel
 interface EpisodesContract {
 
     interface View {
-        fun showEpisodes(episodes: List<EpisodeViewModel>)
+        fun showEpisodes(episodes: MutableList<EpisodeViewModel>)
         fun showError(message: String)
         fun showLoading()
         fun hideLoading()
@@ -19,6 +19,6 @@ interface EpisodesContract {
     }
 
     interface Repository {
-        fun getEpisodes(): List<EpisodeViewModel>
+        suspend fun getEpisodes(): MutableList<EpisodeViewModel>
     }
 }

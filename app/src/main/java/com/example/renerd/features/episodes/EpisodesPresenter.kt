@@ -1,5 +1,10 @@
 package com.example.renerd.features.episodes
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class EpisodesPresenter(private val repository: EpisodesContract.Repository) : EpisodesContract.Presenter {
@@ -17,12 +22,13 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
     override fun loadEpisodes() {
         view?.showLoading()
         try {
-            val episodes = repository.getEpisodes()
-            view?.showEpisodes(episodes)
+            CoroutineScope(Dispatchers.Main).launch {
+                val episodes = repository.getEpisodes()
+                view?.showEpisodes(episodes)
+                view?.hideLoading()
+            }
         } catch (e: Exception) {
             view?.showError("Erro ao carregar episódios")
-        } finally {
-            view?.hideLoading()
         }
     }
 }

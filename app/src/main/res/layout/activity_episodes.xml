@@ -7,7 +7,31 @@
     android:id="@+id/background"
     android:background="#191919"
     android:orientation="vertical"
+    android:gravity="center"
     tools:context=".features.episodes.EpisodesActivity">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_episodes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressIndicator"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/white"
+            app:indicatorColor="@color/white"
+            android:indeterminate="true"/>
+
+
+
+
+    </FrameLayout>
 </LinearLayout>
