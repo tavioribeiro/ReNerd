@@ -1,8 +1,8 @@
-package com.example.renerd.network.model
+package com.example.renerd.core.network.model
 
 import com.google.gson.annotations.SerializedName
 
-data class PodcastModel(
+data class EpisodeModel(
     val id: Int,
     val url: String,
     @SerializedName("published_at") val publishedAt: String,

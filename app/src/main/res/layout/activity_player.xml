@@ -7,7 +7,7 @@
     android:id="@+id/background"
     android:background="#252525"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".app.MainActivity">
 
     <ImageView
         android:id="@+id/backgroundImage"

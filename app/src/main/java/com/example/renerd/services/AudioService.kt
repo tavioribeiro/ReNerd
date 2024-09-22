@@ -19,10 +19,10 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
-import com.example.renerd.MainActivity
+import com.example.renerd.app.MainActivity
 import com.example.renerd.R
-import com.example.renerd.extentions.loadBitmapFromUrl
-import com.example.renerd.utils.log
+import com.example.renerd.core.extentions.loadBitmapFromUrl
+import com.example.renerd.core.utils.log
 import kotlinx.coroutines.*
 import java.io.IOException
 

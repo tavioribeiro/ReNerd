@@ -1,4 +1,4 @@
-package com.example.renerd.extentions
+package com.example.renerd.core.extentions
 
 import android.content.Context
 import android.graphics.Bitmap
