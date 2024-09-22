@@ -6,9 +6,6 @@ import android.graphics.drawable.BitmapDrawable
 import coil.Coil
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import com.bumptech.glide.Glide
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 suspend fun loadBitmapFromUrl(url: String, context: Context): Bitmap? {
     return try {
