@@ -1,5 +1,6 @@
 package com.example.renerd.features.episodes
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -7,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.renerd.databinding.ActivityEpisodesBinding
 import com.example.renerd.features.episodes.adapters.EpisodesAdapter
+import com.example.renerd.features.player.PlayerActivity
 import com.example.renerd.view_models.EpisodeViewModel
 import core.extensions.styleBackground
 import core.extensions.toast
@@ -36,8 +38,20 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
     override fun showEpisodes(episodes: MutableList<EpisodeViewModel>) {
         binding.recyclerviewEpisodes.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        val adapter = EpisodesAdapter(this, episodes)
+        val adapter = EpisodesAdapter(
+            context = this,
+            episodes = episodes,
+            onClick = { it ->
+                this.goTo(it)
+            }
+        )
         binding.recyclerviewEpisodes.adapter = adapter
+    }
+
+    private fun goTo(episode: EpisodeViewModel){
+        val intent = Intent(this, PlayerActivity::class.java)
+        intent.putExtra("episode", episode)
+        startActivity(intent)
     }
 
     override fun showError(message: String) {

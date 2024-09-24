@@ -44,7 +44,10 @@
             android:exported="false">
         </activity>
 
-
+        <activity
+            android:name=".features.player.PlayerActivity"
+            android:exported="false">
+        </activity>
 
         <service
             android:name=".services.AudioService"

@@ -15,7 +15,8 @@ import core.extensions.styleBackground
 
 class EpisodesAdapter(
     private val context: Context,
-    private val episodes: MutableList<EpisodeViewModel>) :
+    private val episodes: MutableList<EpisodeViewModel>,
+    private val onClick: (EpisodeViewModel) -> Unit) :
     RecyclerView.Adapter<EpisodesAdapter.EpisodeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodeViewHolder {
@@ -44,6 +45,10 @@ class EpisodesAdapter(
 
         holder.texView_name.text = episodes[position].title
         holder.texView_info.text = episodes[position].category.toString()
+
+        holder.imageView_play_icon.setOnClickListener(){
+            onClick(episodes[position])
+        }
     }
 
     override fun getItemCount(): Int {

@@ -19,10 +19,10 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
-import com.example.renerd.app.MainActivity
 import com.example.renerd.R
 import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
+import com.example.renerd.features.player.PlayerActivity
 import kotlinx.coroutines.*
 import java.io.IOException
 
@@ -237,7 +237,7 @@ class AudioService : Service() {
 
     private fun createNotification(): Notification {
 
-        val intent = Intent(this, MainActivity::class.java) // Substitua ActivityX pela sua Activity
+        val intent = Intent(this, PlayerActivity::class.java) // Substitua ActivityX pela sua Activity
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         val mediaMetadata = MediaMetadataCompat.Builder()
