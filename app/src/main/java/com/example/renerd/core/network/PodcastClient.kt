@@ -1,6 +1,6 @@
-package com.example.renerd.network
+package com.example.renerd.core.network
 
-import com.example.renerd.network.api.PodcastApi
+import com.example.renerd.core.network.api.PodcastApi
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

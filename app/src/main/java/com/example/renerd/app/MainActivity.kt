@@ -1,6 +1,7 @@
-package com.example.renerd
+package com.example.renerd.app
 
 
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,18 +10,19 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toBitmap
 import coil.load
+import com.example.renerd.R
 import com.example.renerd.databinding.ActivityMainBinding
-import com.example.renerd.network.PodcastClient
-import com.example.renerd.network.api.PodcastApi
-import com.example.renerd.network.model.PodcastModel
+import com.example.renerd.core.network.PodcastClient
+import com.example.renerd.core.network.model.EpisodeModel
 import com.example.renerd.services.AudioService
-import com.example.renerd.utils.formatTime
-import com.example.renerd.utils.log
-import kotlinx.coroutines.DelicateCoroutinesApi
+import com.example.renerd.core.utils.formatTime
+import com.example.renerd.core.utils.log
+import com.example.renerd.features.episodes.EpisodesActivity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
@@ -68,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     fun getNerdcasts(after: String, before: String? = null) {
         GlobalScope.launch {
             try {
@@ -97,8 +101,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        this.goTo(EpisodesActivity::class.java)
         //getNerdcasts("2024-09-06%2000%3A00%3A00","2024-09-13%2000%3A00%3A00")
-        getNerdcasts("2000-01-01%2000%3A00%3A00", "2024-09-13%2000%3A00%3A00")
+
+
+
+        //getNerdcasts("2000-01-01%2000%3A00%3A00", "2024-09-13%2000%3A00%3A00")
 
 //        val call = PodcastClient.api.getNerdcasts(after = "2024-09-06%2000%3A00%3A00", before = "2024-09-13%2000%3A00%3A00")
 //        val url = call.request().url
@@ -109,8 +118,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun goTo(destiny: Class<EpisodesActivity>){
+        val intent = Intent(this, destiny)
+        startActivity(intent)
+    }
 
-    private fun setUpPodcast(podcast: PodcastModel){
+
+    private fun setUpPodcast(podcast: EpisodeModel){
         binding.backgroundImage.load(podcast.thumbnails.img4x3355x266) {
             target(
                 onSuccess = { drawable ->

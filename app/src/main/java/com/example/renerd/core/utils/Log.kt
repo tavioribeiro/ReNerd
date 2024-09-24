@@ -1,4 +1,4 @@
-package com.example.renerd.utils
+package com.example.renerd.core.utils
 
 import android.util.Log
 import com.example.renerd.BuildConfig

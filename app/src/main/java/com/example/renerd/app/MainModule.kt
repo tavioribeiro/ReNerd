@@ -1,4 +1,4 @@
-package com.example.renerd
+package com.example.renerd.app
 
 import com.example.renerd.features.episodes.di.EpisodesModule
 
