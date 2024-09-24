@@ -89,7 +89,7 @@ class AudioService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         extractTrackInfoFromIntent(intent)
         when (intent?.action) {
-            "PLAY" -> startPlaying(intent.getStringExtra("position")?.toInt() ?: 0)
+            "PLAY" -> startPlaying(intent.getStringExtra("position")?.toIntOrNull() ?: 0)
             "PAUSE" -> pausePlaying()
             "STOP" -> stopPlaying()
         }
@@ -110,7 +110,7 @@ class AudioService : Service() {
             "Media Playback",
             NotificationManager.IMPORTANCE_LOW
         )
-        getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -118,7 +118,7 @@ class AudioService : Service() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         requestAudioFocus()
 
-        if (audioManager.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        if (audioFocusRequest != null && audioManager.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             isPaused = false
             initializeMediaPlayer(position)
         } else {
@@ -154,24 +154,26 @@ class AudioService : Service() {
                     }
                 }
             } else {
-                player!!.start()
+                player?.start()
                 isPlaying = true
-                updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, player!!.currentPosition)
+                player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, it) }
                 showNotification()
             }
         } else {
-            player!!.seekTo(position)
+            player?.seekTo(position)
         }
     }
 
     private fun handleMediaPlayerPrepared(position: Int) {
-        player!!.start()
-        sendTotalTime(player!!.duration.toString())
-        startProgressUpdateJob()
-        player!!.seekTo(position)
-        isPlaying = true
-        updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, position)
-        showNotification()
+        player?.let {
+            it.start()
+            sendTotalTime(it.duration.toString())
+            startProgressUpdateJob()
+            it.seekTo(position)
+            isPlaying = true
+            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, position)
+            showNotification()
+        }
     }
 
 
@@ -179,11 +181,13 @@ class AudioService : Service() {
         job = CoroutineScope(Dispatchers.Default).launch {
             while (isActive) {
                 if (!isPaused) {
-                    val currentPosition = player!!.currentPosition
-                    sendCurrentTime(currentPosition.toString())
-                    sendTotalTime(player!!.duration.toString())
-                    sendPlay()
-                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentPosition)
+                    player?.let {
+                        val currentPosition = it.currentPosition
+                        sendCurrentTime(currentPosition.toString())
+                        sendTotalTime(it.duration.toString())
+                        sendPlay()
+                        updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentPosition)
+                    }
                 }
                 delay(1000L)
             }
@@ -194,7 +198,7 @@ class AudioService : Service() {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
             .setActions(
                 PlaybackStateCompat.ACTION_PLAY or
-                PlaybackStateCompat.ACTION_PAUSE
+                        PlaybackStateCompat.ACTION_PAUSE
             )
             .setState(state, position.toLong(), 1f)
 
@@ -233,7 +237,7 @@ class AudioService : Service() {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun handlePlayAction(position: String?)  = startPlaying(position?.toInt() ?: 0)
+    private fun handlePlayAction(position: String?)  = startPlaying(position?.toIntOrNull() ?: 0)
 
     private fun createNotification(): Notification {
 
@@ -253,7 +257,6 @@ class AudioService : Service() {
         return NotificationCompat.Builder(this, "media_playback_channel")
             .setContentTitle(title)
             .setContentText(artist)
-            .setProgress(player!!.duration, player!!.currentPosition, false)
             .setSmallIcon(R.drawable.ic_play)
             .setContentIntent(pendingIntent)
             .setStyle(
@@ -262,6 +265,11 @@ class AudioService : Service() {
                     .setShowActionsInCompactView(0)
             )
             .addAction(NotificationCompat.Action(notificationIcon, notificationActionTitle, playPausePendingIntent))
+            .apply {
+                player?.let {
+                    setProgress(it.duration, it.currentPosition, false)
+                }
+            }
             .build()
 
     }
@@ -271,17 +279,21 @@ class AudioService : Service() {
     }
 
     private fun sendPause() {
-        sendBroadcast(Intent("MY_ACTION")
-            .putExtra("paused", "")
-            .putExtra("playerCurrentTime", player!!.currentPosition.toString())
-            .putExtra("playerTotalTime", player!!.duration.toString()))
+        player?.let {
+            sendBroadcast(Intent("MY_ACTION")
+                .putExtra("paused", "")
+                .putExtra("playerCurrentTime", it.currentPosition.toString())
+                .putExtra("playerTotalTime", it.duration.toString()))
+        }
     }
 
     private fun sendPlay() {
-        sendBroadcast(Intent("MY_ACTION")
-            .putExtra("played", "")
-            .putExtra("playerCurrentTime", player!!.currentPosition.toString())
-            .putExtra("playerTotalTime", player!!.duration.toString()))
+        player?.let {
+            sendBroadcast(Intent("MY_ACTION")
+                .putExtra("played", "")
+                .putExtra("playerCurrentTime", it.currentPosition.toString())
+                .putExtra("playerTotalTime", it.duration.toString()))
+        }
     }
 
     private fun sendCurrentTime(time: String) {
@@ -292,9 +304,9 @@ class AudioService : Service() {
     private fun pausePlaying() {
         isPaused = true
         if (isPlaying && player != null) {
-            player!!.pause()
+            player?.pause()
             isPlaying = false
-            updatePlaybackState(PlaybackStateCompat.STATE_PAUSED, player!!.currentPosition)
+            player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PAUSED, it) }
             showNotification()
         }
     }
@@ -305,7 +317,9 @@ class AudioService : Service() {
             it.release()
             player = null
             isPlaying = false
-            audioManager.abandonAudioFocusRequest(audioFocusRequest!!)
+            if (audioFocusRequest != null) {
+                audioManager.abandonAudioFocusRequest(audioFocusRequest!!)
+            }
         }
 
         stopForeground(true)

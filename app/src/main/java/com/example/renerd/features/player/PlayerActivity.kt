@@ -15,46 +15,60 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.utils.formatTime
+import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityPlayerBinding
 import com.example.renerd.services.AudioService
 import com.example.renerd.view_models.EpisodeViewModel
+import org.koin.android.ext.android.inject
 
-class PlayerActivity: AppCompatActivity() {
+class PlayerActivity: AppCompatActivity(), PlayerContract.View {
 
     private val context = this
     private val thisActivity = this
+
     private lateinit var binding: ActivityPlayerBinding
+    private val presenter: PlayerContract.Presenter by inject()
+
+
     private var currentAction = "PLAY"
     private var totalDuration: Int = 0
     private var currenPosition: Int = 0
 
     private lateinit var bitmap: Bitmap
 
+    private var isTheSameEpisodePlaying = false
+
+
     private val myReceiver = object : BroadcastReceiver() {
         override fun onReceive(contexta: Context, intent: Intent) {
+            if(isTheSameEpisodePlaying) {
+                log("devo mostrar att na ui")
+                val playerTotalTime = intent.getStringExtra("playerTotalTime")
+                playerTotalTime?.let {
+                    totalDuration = it.toInt()
+                    setSeekBarMax(it.toInt())
+                    setTotalTime(it.toInt())
+                }
 
-            val playerTotalTime = intent.getStringExtra("playerTotalTime")
-            playerTotalTime?.let {
-                totalDuration = it.toInt()
-                setSeekBarMax(it.toInt())
-                setTotalTime(it.toInt())
+
+                val playerCurrentTime = intent.getStringExtra("playerCurrentTime")
+                playerCurrentTime?.let {
+                    setCurrentTime(it.toInt())
+                    setSeekBarPosition(it.toInt())
+                }
+
+                val recivePause = intent.getStringExtra("paused")
+                recivePause?.let {
+                    binding.fabPlayOrPause.setImageResource(R.drawable.ic_play)
+                }
+
+                val recivePlay = intent.getStringExtra("played")
+                recivePlay?.let {
+                    binding.fabPlayOrPause.setImageResource(R.drawable.ic_pause)
+                }
             }
-
-
-            val playerCurrentTime = intent.getStringExtra("playerCurrentTime")
-            playerCurrentTime?.let {
-                setCurrentTime(it.toInt())
-                setSeekBarPosition(it.toInt())
-            }
-
-            val recivePause = intent.getStringExtra("paused")
-            recivePause?.let {
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_play)
-            }
-
-            val recivePlay = intent.getStringExtra("played")
-            recivePlay?.let {
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_pause)
+            else{
+                log("nn devo mostrar att na ui")
             }
         }
     }
@@ -69,12 +83,18 @@ class PlayerActivity: AppCompatActivity() {
         window.statusBarColor = Color.parseColor("#191919")
 
 
+        presenter.attachView(this)
 
         val episodeModel = intent.getParcelableExtra<EpisodeViewModel>("episode")
         if(episodeModel != null){
+            if(episodeModel.audioUrl == presenter.getCurrentEpisodePlaying()){
+                isTheSameEpisodePlaying = true
+            }
+            else{
+                isTheSameEpisodePlaying = false
+            }
             this.setUpPodcast(episodeModel)
         }
-
     }
 
 
@@ -104,6 +124,13 @@ class PlayerActivity: AppCompatActivity() {
                 currentAction = "PLAY"
             }
 
+            if(!isTheSameEpisodePlaying){
+                stopService(Intent(this, AudioService::class.java))
+                presenter.setCurrentEpisodePlaying(episode.audioUrl)
+                isTheSameEpisodePlaying = true
+            }
+
+
             intent.putExtra("title", episode.title)
             intent.putExtra("artist", "Nerdcast")
             intent.putExtra("url", episode.audioUrl)
@@ -111,9 +138,6 @@ class PlayerActivity: AppCompatActivity() {
             intent.putExtra("position", currenPosition.toString())
             startService(intent)
         }
-
-
-
 
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -164,6 +188,11 @@ class PlayerActivity: AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         unregisterReceiver(myReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.detachView()
     }
 }
 
