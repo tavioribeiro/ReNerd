@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("app.cash.sqldelight")
 }
 
 android {
@@ -37,6 +38,15 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+}
+
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.example.renerd.core.database.Episode.db")
+        }
     }
 }
 
@@ -87,4 +97,10 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
+
+
+
+    //sqldelight
+    implementation("app.cash.sqldelight:android-driver:2.0.2")
+    implementation("app.cash.sqldelight:coroutines-extensions-jvm:2.0.2")
 }

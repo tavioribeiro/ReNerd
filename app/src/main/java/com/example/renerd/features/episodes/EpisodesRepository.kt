@@ -11,7 +11,7 @@ import java.net.SocketTimeoutException
 import java.net.URLDecoder
 import kotlin.random.Random
 
-class EpisodesRepository : EpisodesContract.Repository {
+class EpisodesRepository: EpisodesContract.Repository {
 
     override suspend fun getEpisodes(): MutableList<EpisodeViewModel> {
         return withContext(Dispatchers.IO) { // Usando withContext para garantir que a rede seja acessada em uma thread apropriada
