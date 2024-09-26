@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        log(getCurrentDateFormatted())
+
         this.goTo(EpisodesActivity::class.java)
         //getNerdcasts("2024-09-06%2000%3A00%3A00","2024-09-13%2000%3A00%3A00")
 
