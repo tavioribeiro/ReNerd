@@ -28,17 +28,10 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
                 val productsList = extractUniqueProducts(episodes)
                 val subjectsList = extractUniqueSubjects(episodes)
                 val guestsList = extractUniqueGuests(episodes)
-                log(productsList)
-                log(subjectsList)
-                log(guestsList)
-
 
                 val filteredByProducts = filterEpisodesByProductsInclude(episodes, listOf("nerdcast", "nerdtech")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
                 val filteredBySubjects = filterEpisodesBySubjectInclude(filteredByProducts, listOf("Ciências, Cinema")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
                 val filteredByGuests = filterEpisodesByGuestInclude(filteredBySubjects, listOf("Affonso Solano")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
-
-
-
 
                 view?.showEpisodes(filteredByGuests)
                 view?.hideLoading()
@@ -48,11 +41,17 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
         }
     }
 
+
     override fun loadLastEpisodes() {
         try {
             CoroutineScope(Dispatchers.Main).launch {
                 val episodes = repository.getLastEpisodes()
-                view?.showEpisodes(episodes)
+
+                val filteredByProducts = filterEpisodesByProductsInclude(episodes, listOf("nerdcast", "nerdtech")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+                val filteredBySubjects = filterEpisodesBySubjectInclude(filteredByProducts, listOf("Ciências, Cinema")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+                val filteredByGuests = filterEpisodesByGuestInclude(filteredBySubjects, listOf("Affonso Solano")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+
+                view?.showEpisodes(filteredByGuests)
             }
         } catch (e: Exception) {
             view?.showError("Erro ao carregar episódios")
