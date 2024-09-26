@@ -35,13 +35,8 @@ class EpisodesRepository: EpisodesContract.Repository {
                     return@withContext localEpisodes
                 }
 
-
                 val after = getAfter()
-                //val before = "2024-09-13%2000%3A00%3A00"
-
                 val afterDecoded = URLDecoder.decode(after, "UTF-8")
-                //val beforeDecoded = URLDecoder.decode(before, "UTF-8")
-                //val response = PodcastClient.api.getNerdcasts(after = afterDecoded, before = beforeDecoded).execute()
                 val response = PodcastClient.api.getNerdcasts(after = afterDecoded, before = "").execute()
 
                 if (response.isSuccessful) {
@@ -85,6 +80,60 @@ class EpisodesRepository: EpisodesContract.Repository {
             }
         }
     }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun getLastEpisodes(): MutableList<EpisodeViewModel> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val localEpisodes = dbHelper.getAllEpisodes().toMutableList()
+
+                val after = getAfter()
+                val afterDecoded = URLDecoder.decode(after, "UTF-8")
+                val response = PodcastClient.api.getNerdcasts(after = afterDecoded, before = "").execute()
+
+                if (response.isSuccessful) {
+                    val podcasts = response.body()
+
+                    if (!podcasts.isNullOrEmpty()) {
+                        for (episode in podcasts) {
+                            val episodeViewModel = EpisodeViewModel(
+                                id = episode.id.toLong(),
+                                title = episode.title ?: "",
+                                description = episode.description ?: "",
+                                imageUrl = episode.image ?: "",
+                                audioUrl = episode.audioHigh ?: "",
+                                duration = episode.duration.toLong(),
+                                publishedAt = episode.publishedAt ?: "",
+                                slug = episode.slug ?: "",
+                                episode = episode.episode ?: "",
+                                product = episode.product ?: "",
+                                productName = episode.productName ?: "",
+                                subject = episode.subject ?: "",
+                                jumpToTime = episode.jumpToTime.startTime.toLong(),
+                                guests = episode.guests ?: "",
+                                postTypeClass = episode.postTypeClass ?: "",
+                            )
+
+                            dbHelper.insertEpisode(episodeViewModel)
+                            localEpisodes.add(episodeViewModel)
+                        }
+                    }
+                    setAfter()
+                    localEpisodes
+                } else {
+                    mutableListOf()
+                }
+            } catch (e: SocketTimeoutException) {
+                log(e)
+                mutableListOf()
+            } catch (e: Exception) {
+                log(e)
+                mutableListOf()
+            }
+        }
+    }
+
 
     private fun getAfter(): String {
         var current_after_search = sharedPref.getString("current_after_search", "") ?: ""

@@ -31,4 +31,15 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
             view?.showError("Erro ao carregar episódios")
         }
     }
+
+    override fun loadLastEpisodes() {
+        try {
+            CoroutineScope(Dispatchers.Main).launch {
+                val episodes = repository.getLastEpisodes()
+                view?.showEpisodes(episodes)
+            }
+        } catch (e: Exception) {
+            view?.showError("Erro ao carregar episódios")
+        }
+    }
 }

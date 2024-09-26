@@ -75,19 +75,15 @@ dependencies {
 
     // Koin Core features
     implementation("io.insert-koin:koin-core:3.4.3")
-    // Koin Test features
     testImplementation("io.insert-koin:koin-test:3.4.3")
-    // Koin for Android
     implementation("io.insert-koin:koin-android:3.4.3")
-    // Koin Android Compatibility
     implementation("io.insert-koin:koin-android-compat:3.4.3")
-    // Koin for Jetpack WorkManager
     implementation("io.insert-koin:koin-androidx-workmanager:3.4.3")
-    // Koin for Jetpack Compose
     implementation("io.insert-koin:koin-androidx-compose:3.4.3")
 
 
 
+    //Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
@@ -98,4 +94,8 @@ dependencies {
     implementation("app.cash.sqldelight:android-driver:2.0.2")
     //implementation("app.cash.sqldelight:native-driver:2.0.0")
     implementation("app.cash.sqldelight:coroutines-extensions-jvm:2.0.2")
+
+
+    //Swipe
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }
