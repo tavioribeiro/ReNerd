@@ -1,16 +1,17 @@
 package com.example.renerd.features.player
 
 import android.content.Context
+import com.example.renerd.core.database.DatabaseHelper
+import com.example.renerd.core.extentions.ContextManager
 
 
-class PlayerRepository(private var context: Context): PlayerContract.Repository {
-    //private lateinit var context: Context
+class PlayerRepository: PlayerContract.Repository {
+    val context = ContextManager.getGlobalContext()
+
     val sharedPref = context.getSharedPreferences("SharedPrefsReNerd", Context.MODE_PRIVATE)
     val editor = sharedPref.edit()
+    val dbHelper = DatabaseHelper(context)
 
-    override fun setContext(context: Context) {
-
-    }
 
 
     override suspend fun setCurrentEpisodePlaying(url: String){

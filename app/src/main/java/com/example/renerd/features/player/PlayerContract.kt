@@ -1,10 +1,7 @@
 package com.example.renerd.features.player
 
-import android.content.Context
-
 
 interface PlayerContract {
-
     interface View {
 
     }
@@ -18,8 +15,8 @@ interface PlayerContract {
         fun getCurrentEpisodePosition(): String
     }
 
+
     interface Repository {
-        fun setContext(context: Context)
         suspend fun setCurrentEpisodePlaying(url: String)
         fun getCurrentEpisodePlaying(): String
         fun setCurrentEpisodePosition(url: String)

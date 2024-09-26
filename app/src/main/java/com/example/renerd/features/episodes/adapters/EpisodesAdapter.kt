@@ -44,7 +44,7 @@ class EpisodesAdapter(
         )
 
         holder.texView_name.text = episodes[position].title
-        holder.texView_info.text = episodes[position].category.toString()
+        holder.texView_info.text = episodes[position].productName
 
         holder.imageView_play_icon.setOnClickListener(){
             onClick(episodes[position])

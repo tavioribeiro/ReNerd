@@ -42,13 +42,7 @@ android {
 }
 
 
-sqldelight {
-    databases {
-        create("Database") {
-            packageName.set("com.example.renerd.core.database.Episode.db")
-        }
-    }
-}
+
 
 dependencies {
 
@@ -102,5 +96,6 @@ dependencies {
 
     //sqldelight
     implementation("app.cash.sqldelight:android-driver:2.0.2")
+    //implementation("app.cash.sqldelight:native-driver:2.0.0")
     implementation("app.cash.sqldelight:coroutines-extensions-jvm:2.0.2")
 }
