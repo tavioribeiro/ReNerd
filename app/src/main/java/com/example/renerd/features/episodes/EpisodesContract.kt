@@ -17,9 +17,11 @@ interface EpisodesContract {
         fun attachView(view: View)
         fun detachView()
         fun loadEpisodes()
+        fun loadLastEpisodes()
     }
 
     interface Repository {
         suspend fun getEpisodes(): MutableList<EpisodeViewModel>
+        suspend fun getLastEpisodes(): MutableList<EpisodeViewModel>
     }
 }

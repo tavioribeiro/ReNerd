@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.example.renerd.R
+import com.example.renerd.core.database.DatabaseHelper
+import com.example.renerd.core.database.Episode
 import com.example.renerd.core.utils.formatTime
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityPlayerBinding
@@ -127,6 +129,16 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
             if(!isTheSameEpisodePlaying){
                 stopService(Intent(this, AudioService::class.java))
                 presenter.setCurrentEpisodePlaying(episode.audioUrl)
+
+
+
+
+
+                val dbHelper = DatabaseHelper(context)
+                //dbHelper.insertEpisode(episode)
+                log(dbHelper.getAllEpisodes().size)
+
+
                 isTheSameEpisodePlaying = true
             }
 

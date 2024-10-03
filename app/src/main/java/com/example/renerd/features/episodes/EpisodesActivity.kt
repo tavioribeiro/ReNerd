@@ -6,13 +6,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityEpisodesBinding
 import com.example.renerd.features.episodes.adapters.EpisodesAdapter
 import com.example.renerd.features.player.PlayerActivity
 import com.example.renerd.view_models.EpisodeViewModel
-import core.extensions.styleBackground
 import core.extensions.toast
 import org.koin.android.ext.android.inject
+
 
 class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
@@ -24,10 +25,24 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         binding = ActivityEpisodesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor = Color.parseColor("#191919")
-
+        this.setUpUi()
         presenter.attachView(this)
         presenter.loadEpisodes()
+    }
+
+
+    private fun setUpUi(){
+        window.statusBarColor = Color.parseColor("#191919")
+        binding.swipeRefreshLayout.isEnabled = false
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            presenter.loadLastEpisodes()
+        }
+    }
+
+
+    private fun allowSwipeRefreshLayout(){
+        binding.swipeRefreshLayout.isEnabled = true
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 
 
@@ -35,6 +50,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         super.onDestroy()
         presenter.detachView()
     }
+
 
     override fun showEpisodes(episodes: MutableList<EpisodeViewModel>) {
         binding.recyclerviewEpisodes.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -46,7 +62,10 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
             }
         )
         binding.recyclerviewEpisodes.adapter = adapter
+
+        this.allowSwipeRefreshLayout()
     }
+
 
     private fun goTo(episode: EpisodeViewModel){
         val intent = Intent(this, PlayerActivity::class.java)
@@ -54,14 +73,19 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         startActivity(intent)
     }
 
+
     override fun showError(message: String) {
         toast(message)
+        binding.swipeRefreshLayout.isRefreshing = false
+        this.allowSwipeRefreshLayout()
     }
+
 
     override fun showLoading() {
         binding.progressIndicator.visibility = View.VISIBLE
         binding.recyclerviewEpisodes.visibility = View.GONE
     }
+
 
     override fun hideLoading() {
         binding.progressIndicator.visibility = View.GONE

@@ -10,7 +10,7 @@ import org.koin.dsl.module
 object PlayerModule {
 
     val instance = module {
-        factory<PlayerContract.Repository> { PlayerRepository(get()) }
+        factory<PlayerContract.Repository> { PlayerRepository() }
         factory<PlayerContract.Presenter> { PlayerPresenter(get()) }
     }
 }

@@ -21,6 +21,7 @@ import com.example.renerd.core.network.PodcastClient
 import com.example.renerd.core.network.model.EpisodeModel
 import com.example.renerd.services.AudioService
 import com.example.renerd.core.utils.formatTime
+import com.example.renerd.core.utils.getCurrentDateFormatted
 import com.example.renerd.core.utils.log
 import com.example.renerd.features.episodes.EpisodesActivity
 import kotlinx.coroutines.GlobalScope
@@ -96,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
