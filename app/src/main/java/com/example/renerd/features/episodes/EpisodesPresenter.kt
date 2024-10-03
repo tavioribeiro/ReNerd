@@ -25,15 +25,22 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
             CoroutineScope(Dispatchers.Main).launch {
                 val episodes = repository.getEpisodes()
 
+
                 val productsList = extractUniqueProducts(episodes)
                 val subjectsList = extractUniqueSubjects(episodes)
                 val guestsList = extractUniqueGuests(episodes)
+                val yearsList = extractUniqueYears(episodes)
+
+
 
                 val filteredByProducts = filterEpisodesByProductsInclude(episodes, listOf("nerdcast", "nerdtech")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
                 val filteredBySubjects = filterEpisodesBySubjectInclude(filteredByProducts, listOf("Ciências, Cinema")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
                 val filteredByGuests = filterEpisodesByGuestInclude(filteredBySubjects, listOf("Affonso Solano")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+                val filteredByYears = filterEpisodesByYearInclude(filteredByGuests, listOf("2019", "2012")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+                //adicione o filtro por ano aqui
+                log(filteredByYears)
 
-                view?.showEpisodes(filteredByGuests)
+                view?.showEpisodes(filteredByYears)
                 view?.hideLoading()
             }
         } catch (e: Exception) {
@@ -74,6 +81,8 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
 
 
 
+
+
     fun extractUniqueSubjects(episodes: List<EpisodeViewModel>): List<String> {
         return episodes
             .flatMap { it.subject.split(",") }
@@ -106,6 +115,9 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
             episodeSubjects.any { it in normalizedSubjectsToExclude }
         }
     }
+
+
+
 
 
 
@@ -144,4 +156,21 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
         }
     }
 
+
+
+
+
+
+
+    private fun extractUniqueYears(episodes: List<EpisodeViewModel>): List<String> {
+        return episodes.map { it.publishedAt.substring(0, 4) }.distinct().sorted()
+    }
+
+    private fun filterEpisodesByYearInclude(episodes: List<EpisodeViewModel>, years: List<String>): List<EpisodeViewModel> {
+        return episodes.filter { episode -> years.contains(episode.publishedAt.substring(0, 4)) }
+    }
+
+    private fun filterEpisodesByYearExclude(episodes: List<EpisodeViewModel>, years: List<String>): List<EpisodeViewModel> {
+        return episodes.filterNot { episode -> years.contains(episode.publishedAt.substring(0, 4)) }
+    }
 }
