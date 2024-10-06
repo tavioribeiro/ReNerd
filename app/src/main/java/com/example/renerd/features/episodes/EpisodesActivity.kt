@@ -33,16 +33,17 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
     private fun setUpUi(){
         window.statusBarColor = Color.parseColor("#191919")
-        binding.swipeRefreshLayout.isEnabled = false
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            presenter.loadLastEpisodes()
+
+
+        binding.customBottomSheet.post {
+            binding.customBottomSheet.collapse()
         }
-    }
+        binding.customBottomSheet.setOnExpandedCallback {
 
+        }
+        binding.customBottomSheet.setOnCollapsedCallback {
 
-    private fun allowSwipeRefreshLayout(){
-        binding.swipeRefreshLayout.isEnabled = true
-        binding.swipeRefreshLayout.isRefreshing = false
+        }
     }
 
 
@@ -63,7 +64,6 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         )
         binding.recyclerviewEpisodes.adapter = adapter
 
-        this.allowSwipeRefreshLayout()
     }
 
 
@@ -76,8 +76,6 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
     override fun showError(message: String) {
         toast(message)
-        binding.swipeRefreshLayout.isRefreshing = false
-        this.allowSwipeRefreshLayout()
     }
 
 
