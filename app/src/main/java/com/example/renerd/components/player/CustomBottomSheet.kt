@@ -37,7 +37,8 @@ class CustomBottomSheet @JvmOverloads constructor(
     private fun setupBottomSheet(onInitialized: () -> Unit) {
         bottomSheetBehavior = BottomSheetBehavior.from(this)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        bottomSheetBehavior.peekHeight = 200
+        //bottomSheetBehavior.peekHeight = 200
+        bottomSheetBehavior.peekHeight = binding.miniPlayer.layoutParams.height
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
@@ -61,7 +62,7 @@ class CustomBottomSheet @JvmOverloads constructor(
     }
 
     private fun setUpTouch(){
-        binding.pink.setOnClickListener {
+        binding.miniPlayer.setOnClickListener {
             this.expand()
         }
     }

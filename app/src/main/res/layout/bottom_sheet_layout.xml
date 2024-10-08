@@ -5,20 +5,54 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+
+
     <LinearLayout
-        android:id="@+id/pink"
+        android:id="@+id/mini_player"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:background="#ff00ff"
-        android:orientation="vertical">
+        android:background="@color/color2"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="15dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/poster"
+            android:layout_width="70dp"
+            android:layout_height="70dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Texto"
-            android:textColor="@color/white"
-            android:padding="16dp"/>
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No More Push-Backs"
+                android:fontFamily="@font/font_inter"
+                android:textFontWeight="600"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/font_inter"
+                android:textFontWeight="500"
+                android:text="Lauer"
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_pause" />
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
