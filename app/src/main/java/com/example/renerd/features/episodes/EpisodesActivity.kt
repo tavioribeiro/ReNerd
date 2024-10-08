@@ -34,7 +34,6 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     private fun setUpUi(){
         window.statusBarColor = Color.parseColor("#191919")
 
-
         binding.customBottomSheet.post {
             binding.customBottomSheet.collapse()
         }

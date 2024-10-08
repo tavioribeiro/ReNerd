@@ -36,14 +36,6 @@
         </FrameLayout>
     </LinearLayout>
 
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/white"
-        app:layout_anchor="@id/customBottomSheet"
-        app:layout_anchorGravity="top"/>
-
     <com.example.renerd.components.player.CustomBottomSheet
         android:id="@+id/customBottomSheet"
         android:layout_width="match_parent"
