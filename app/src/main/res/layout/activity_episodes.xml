@@ -40,7 +40,6 @@
         android:id="@+id/customBottomSheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/green"
         android:layout_gravity="bottom"
         app:behavior_peekHeight="50dp"
         app:behavior_hideable="false"

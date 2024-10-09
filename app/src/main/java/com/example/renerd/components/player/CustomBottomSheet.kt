@@ -34,8 +34,12 @@ class CustomBottomSheet @JvmOverloads constructor(
         this.setUpTouch()
     }
 
+
+
+
     private fun setupBottomSheet(onInitialized: () -> Unit) {
         bottomSheetBehavior = BottomSheetBehavior.from(this)
+
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         //bottomSheetBehavior.peekHeight = 200
         bottomSheetBehavior.peekHeight = binding.miniPlayer.layoutParams.height
@@ -43,11 +47,11 @@ class CustomBottomSheet @JvmOverloads constructor(
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_EXPANDED -> {
-                        binding.root.setBackgroundColor(resources.getColor(R.color.blue))
+                        //binding.root.setBackgroundColor(resources.getColor(R.color.blue))
                         onExpandedCallback?.invoke()
                     }
                     BottomSheetBehavior.STATE_COLLAPSED -> {
-                        binding.root.setBackgroundColor(resources.getColor(R.color.green))
+                        //binding.root.setBackgroundColor(resources.getColor(R.color.color7))
                         onCollapsedCallback?.invoke()
                     }
                 }
@@ -55,6 +59,8 @@ class CustomBottomSheet @JvmOverloads constructor(
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 log("abertura: ${slideOffset * 100}%")
+                binding.miniPlayer.alpha = 1 - slideOffset
+                binding.mainPlayer.alpha = slideOffset
             }
         })
 

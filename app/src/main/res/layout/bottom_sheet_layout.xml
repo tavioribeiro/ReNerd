@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/color1"
     android:orientation="vertical">
-
 
 
     <LinearLayout
@@ -13,58 +13,124 @@
         android:layout_height="80dp"
         android:background="@color/color2"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="15dp">
-
-        <ImageView
-            android:id="@+id/poster"
-            android:layout_width="70dp"
-            android:layout_height="70dp" />
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="10dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="15dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No More Push-Backs"
-                android:fontFamily="@font/font_inter"
-                android:textFontWeight="600"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+            <ImageView
+                android:id="@+id/poster"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/background" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/font_inter"
-                android:textFontWeight="500"
-                android:text="Lauer"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp" />
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No More Push-Backs"
+                    android:fontFamily="@font/font_inter"
+                    android:textFontWeight="600"
+                    android:textColor="@color/color5"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/font_inter"
+                    android:textFontWeight="500"
+                    android:text="Lauer"
+                    android:textColor="@color/color4"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/mini_player_play_pause_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_pause" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_pause" />
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:progressTint="@color/color5" />
     </LinearLayout>
 
 
     <LinearLayout
+        android:id="@+id/main_player"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:background="#ff6000"
+        android:layout_height="match_parent"
+        android:background="@color/color1"
+        android:alpha="0"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/backgroundImage"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/background" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Texto"
-            android:textColor="@color/white"
-            android:padding="16dp"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/playerCurrentTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="00:00"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/playerTotalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="00:00"
+                android:textColor="#FFFFFF" />
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:progressTint="#FFA500"
+                android:thumbTint="#FFA500" />
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/myIconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:icon="@drawable/ic_play" />
+        </RelativeLayout>
     </LinearLayout>
 </LinearLayout>
