@@ -67,9 +67,13 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
     private fun goTo(episode: EpisodeViewModel){
-        val intent = Intent(this, PlayerActivity::class.java)
+        binding.customBottomSheet.startEpisode(episode)
+
+        /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("episode", episode)
         startActivity(intent)
+
+         */
     }
 
 
