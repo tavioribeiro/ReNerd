@@ -18,7 +18,7 @@ class DatabaseHelper(context: Context) {
     }
 
     // Pega um episódio por ID
-    fun getEpisodeById(id: Long): EpisodeViewModel? { // Ajuste o tipo para Long
+    fun getEpisodeById(id: Long): EpisodeViewModel? {
         return database.episodeQueries.selectEpisodeById(id).executeAsOneOrNull()?.toEpisodeViewModel()
     }
 
@@ -29,22 +29,54 @@ class DatabaseHelper(context: Context) {
             description = episode.description,
             image_url = episode.imageUrl,
             audio_url = episode.audioUrl,
-            duration = episode.duration,
+            duration = episode.duration.toLong(),
             published_at = episode.publishedAt,
             slug = episode.slug,
             episode = episode.episode,
             product = episode.product,
             product_name = episode.productName,
             subject = episode.subject,
-            jump_to_time = episode.jumpToTime,
+            jump_to_time = episode.jumpToTime.toLong(),
             guests = episode.guests,
             post_type_class = episode.postTypeClass,
-            elapsed_time = episode.elapsedTime
+            elapsed_time = episode.elapsedTime.toLong()
         )
     }
 
     // Deleta um episódio por ID
-    fun deleteEpisodeById(id: Long) { // Ajuste o tipo para Long
+    fun deleteEpisodeById(id: Long) {
         database.episodeQueries.deleteEpisodeById(id)
+    }
+
+    // Atualiza um episódio existente
+    fun updateEpisode(episode: EpisodeViewModel) {
+        database.episodeQueries.updateEpisode(
+            title = episode.title,
+            description = episode.description,
+            image_url = episode.imageUrl,
+            audio_url = episode.audioUrl,
+            duration = episode.duration.toLong(),
+            published_at = episode.publishedAt,
+            slug = episode.slug,
+            episode = episode.episode,
+            product = episode.product,
+            product_name = episode.productName,
+            subject = episode.subject,
+            jump_to_time = episode.jumpToTime.toLong(),
+            guests = episode.guests,
+            post_type_class = episode.postTypeClass,
+            elapsed_time = episode.elapsedTime.toLong(),
+            id = episode.id.toLong()
+        )
+    }
+
+    // Verifica se um episódio existe pelo ID
+    fun episodeExists(id: Long): Boolean {
+        return database.episodeQueries.selectEpisodeById(id).executeAsOneOrNull() != null
+    }
+
+    // Limpa todos os episódios do banco de dados
+    fun deleteAllEpisodes() {
+        database.episodeQueries.deleteAllEpisodes()
     }
 }

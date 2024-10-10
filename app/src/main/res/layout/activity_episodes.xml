@@ -36,7 +36,7 @@
         </FrameLayout>
     </LinearLayout>
 
-    <com.example.renerd.components.player.CustomBottomSheet2
+    <com.example.renerd.components.player.FloatingPlayer
         android:id="@+id/customBottomSheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

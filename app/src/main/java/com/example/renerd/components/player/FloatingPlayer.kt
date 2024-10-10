@@ -19,61 +19,51 @@ import com.example.renerd.databinding.BottomSheetLayoutBinding
 import com.example.renerd.services.AudioService2
 import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import org.koin.java.KoinJavaComponent.inject
 
-class CustomBottomSheet2 @JvmOverloads constructor(
+
+class FloatingPlayer @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : ConstraintLayout(context, attrs, defStyleAttr), FloatingPlayerContract.View {
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private var onExpandedCallback: (() -> Unit)? = null
     private var onCollapsedCallback: (() -> Unit)? = null
-    private val binding: BottomSheetLayoutBinding = BottomSheetLayoutBinding.inflate(LayoutInflater.from(context), this, true)
 
-    private var currentAction = "PLAY"
+    private val binding: BottomSheetLayoutBinding = BottomSheetLayoutBinding.inflate(LayoutInflater.from(context), this, true)
+    private val presenter: FloatingPlayerContract.Presenter by inject(clazz = FloatingPlayerContract.Presenter::class.java)
+
     private var isPlaying = false
 
-    private val playerBroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == "PLAYER_ACTION") {
+    private var currentEpisode = EpisodeViewModel()
 
-                log(intent.getStringExtra("action"))
-                when (intent.getStringExtra("action")) {
-                    "play" -> {
-                        binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
-                        binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_pause) // Atualiza o botão do main player também
-                        isPlaying = true
-                        val currentTime = intent.getStringExtra("currentTime")?.toIntOrNull() ?: 0
-                        val totalTime = intent.getStringExtra("totalTime")?.toIntOrNull() ?: 0
-                        updatePlayerUI(currentTime, totalTime)
-                    }
-                    "pause" -> {
-                        binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play)
-                        binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_play) // Atualiza o botão do main player também
-                        isPlaying = false
-                        val currentTime = intent.getStringExtra("currentTime")?.toIntOrNull() ?: 0
-                        val totalTime = intent.getStringExtra("totalTime")?.toIntOrNull() ?: 0
-                        updatePlayerUI(currentTime, totalTime)
-                    }
-                    "currentTime" -> {
-                        val time = intent.getStringExtra("time")?.toIntOrNull() ?: 0
-                        binding.mainPlayerCurrentTime.text = formatTime(time)
-                        binding.mainPlayerSeekBar.progress = time
-                    }
-                    "totalTime" -> {
-                        val time = intent.getStringExtra("time")?.toIntOrNull() ?: 0
-                        binding.mainPlayerTotalTime.text = formatTime(time)
-                        binding.mainPlayerSeekBar.max = time
-                    }
-                }
+    init {
+        // View.inflate(context, R.layout.bottom_sheet_layout, this)
+    }
+
+
+    private val playerStatusReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == PLAYER_STATUS_UPDATE) {
+                val isPlaying = intent.getBooleanExtra(IS_PLAYING, false)
+                val currentTime = intent.getIntExtra(CURRENT_TIME, 0)
+                val totalTime = intent.getIntExtra(TOTAL_TIME, 0)
+
+                updateUi(isPlaying, currentTime, totalTime)
+
+                log(currentTime)
+                log(totalTime)
+
+                updateDatabase(isPlaying, currentTime, totalTime)
             }
         }
     }
 
-    init {
-        //View.inflate(context, R.layout.bottom_sheet_layout, this) -
-    }
+
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onAttachedToWindow() {
@@ -82,8 +72,18 @@ class CustomBottomSheet2 @JvmOverloads constructor(
             collapse()
         }
         this.setUpTouch()
-        context.registerReceiver(playerBroadcastReceiver, IntentFilter("PLAYER_ACTION"), Context.RECEIVER_NOT_EXPORTED)
+
+        val intentFilter = IntentFilter(FloatingPlayer.PLAYER_STATUS_UPDATE)
+        context.registerReceiver(playerStatusReceiver, intentFilter, Context.RECEIVER_EXPORTED)
     }
+
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        context.unregisterReceiver(playerStatusReceiver)
+    }
+
+
 
     private fun updatePlayerUI(currentTime: Int, totalTime: Int) {
         binding.mainPlayerCurrentTime.text = formatTime(currentTime)
@@ -92,35 +92,28 @@ class CustomBottomSheet2 @JvmOverloads constructor(
         binding.mainPlayerSeekBar.progress = currentTime
     }
 
+
+
     private fun setupBottomSheet(onInitialized: () -> Unit) {
         bottomSheetBehavior = BottomSheetBehavior.from(this)
-
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        //bottomSheetBehavior.peekHeight = 200
         bottomSheetBehavior.peekHeight = binding.miniPlayer.layoutParams.height
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
-                    BottomSheetBehavior.STATE_EXPANDED -> {
-                        //binding.root.setBackgroundColor(resources.getColor(R.color.blue))
-                        onExpandedCallback?.invoke()
-                    }
-                    BottomSheetBehavior.STATE_COLLAPSED -> {
-                        //binding.root.setBackgroundColor(resources.getColor(R.color.color7))
-                        onCollapsedCallback?.invoke()
-                    }
+                    BottomSheetBehavior.STATE_EXPANDED -> onExpandedCallback?.invoke()
+                    BottomSheetBehavior.STATE_COLLAPSED -> onCollapsedCallback?.invoke()
                 }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                log("abertura: ${slideOffset * 100}%")
                 binding.miniPlayer.alpha = 1 - slideOffset
                 binding.mainPlayer.alpha = slideOffset
             }
         })
-
         onInitialized()
     }
+
 
 
     private fun setUpTouch() {
@@ -138,71 +131,98 @@ class CustomBottomSheet2 @JvmOverloads constructor(
 
         binding.mainPlayerSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    seekTo(progress)
-                }
+                if (fromUser) seekTo(progress)
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
 
+
+
     private fun playPauseClicked() {
         val intent = Intent(context, AudioService2::class.java)
-
         if (isPlaying) {
             intent.action = "PAUSE"
-            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play)
-            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_play)
-            currentAction = "PLAY"
             isPlaying = false
         } else {
             intent.action = "PLAY"
-            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
-            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_pause)
-            currentAction = "PAUSE"
             isPlaying = true
         }
-
         context.startService(intent)
     }
+
+
 
     private fun seekTo(position: Int) {
         val intent = Intent(context, AudioService2::class.java)
-        intent.action = "PLAY"
-        intent.putExtra("position", position.toString())
+        intent.action = "SEEK_TO"
+        intent.putExtra("position", position)
         context.startService(intent)
     }
 
+
+
     fun startEpisode(episode: EpisodeViewModel) {
+        // Pare o serviço se estiver tocando outro episódio
+        //this.stopService()
+
+        currentEpisode = episode
+        this.updateUi(isPlaying, episode.elapsedTime.toInt(), episode.duration.toInt())
+
         val intent = Intent(context, AudioService2::class.java)
         intent.action = "PLAY"
-
+        intent.putExtra("id", episode.id)
         intent.putExtra("title", episode.title)
-        intent.putExtra("artist", episode.product)
-        intent.putExtra("url", episode.audioUrl)
-        intent.putExtra("backgroundImageUrl", episode.imageUrl)
-        intent.putExtra("position", "0") // Inicia do começo
+        intent.putExtra("product", episode.product)
+        intent.putExtra("audioUrl", episode.audioUrl)
+        intent.putExtra("imageUrl", episode.imageUrl)
+        intent.putExtra("elapsedTime", episode.elapsedTime)
+
+        log("BBBBBBBBBBBBBB: ${episode.elapsedTime}")
 
         context.startService(intent)
 
-
+        // Atualizar a UI do player
         binding.miniPlayerTitle.text = episode.title
         binding.miniPlayerProduct.text = episode.product
         binding.miniPlayerPoster.load(episode.imageUrl)
         binding.mainPlayerPoster.load(episode.imageUrl)
 
-
-
         isPlaying = true
-        binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
-        binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_pause)
-        currentAction = "PAUSE"
     }
 
+
+    private fun updateDatabase(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
+        this.isPlaying = isPlaying
+        if(isPlaying) {
+            currentEpisode.elapsedTime = currentTime
+            currentEpisode.duration = totalTime
+            presenter.updateEpisode(currentEpisode)
+        }
+    }
+
+
+    fun updateUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
+        this.isPlaying = isPlaying
+        if (isPlaying) {
+            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
+            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_pause)
+        } else {
+            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play)
+            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_play)
+        }
+        updatePlayerUI(currentTime, totalTime)
+    }
+
+
+
+
+
+
+
+
     fun expand() {
-        log("expandidooo")
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
@@ -211,7 +231,6 @@ class CustomBottomSheet2 @JvmOverloads constructor(
     }
 
     fun collapse() {
-        log("Colapsouuu")
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
@@ -219,8 +238,22 @@ class CustomBottomSheet2 @JvmOverloads constructor(
         this.onCollapsedCallback = callback
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        context.unregisterReceiver(playerBroadcastReceiver)
+
+
+
+
+
+    fun stopService() {
+        val intent = Intent(context, AudioService2::class.java)
+        intent.action = "STOP"
+        context.startService(intent)
+    }
+
+
+    companion object {
+        const val PLAYER_STATUS_UPDATE = "com.example.renerd.components.player.PLAYER_STATUS_UPDATE"
+        const val IS_PLAYING = "isPlaying"
+        const val CURRENT_TIME = "currentTime"
+        const val TOTAL_TIME = "totalTime"
     }
 }

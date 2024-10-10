@@ -5,27 +5,27 @@ import android.os.Parcelable
 import com.example.renerd.core.database.Episode
 
 data class EpisodeViewModel(
-    val id: Long = 0L,
+    var id: Int = 0,
     val publishedAt: String = "",
-    val duration: Long = 0L,
-    val title: String = "",
+    var duration: Int = 0,
+    var title: String = "",
     val slug: String = "",
     val episode: String = "",
     val product: String = "",
-    val productName: String = "",
+    var productName: String = "",
     val subject: String = "",
-    val imageUrl: String? = null,
-    val audioUrl: String = "",
+    var imageUrl: String? = null,
+    var audioUrl: String = "",
     val description: String = "",
-    val jumpToTime: Long = 0L,
+    val jumpToTime: Int = 0,
     val guests: String = "",
     val postTypeClass: String = "",
-    val elapsedTime: Long = 0L
+    var elapsedTime: Int = 0
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readLong(),
+        parcel.readInt(),
         parcel.readString() ?: "",
-        parcel.readLong(),
+        parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
@@ -35,16 +35,16 @@ data class EpisodeViewModel(
         parcel.readString(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readLong(),
+        parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readLong(),
+        parcel.readInt(),
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(id)
+        parcel.writeInt(id)
         parcel.writeString(publishedAt)
-        parcel.writeLong(duration)
+        parcel.writeInt(duration)
         parcel.writeString(title)
         parcel.writeString(slug)
         parcel.writeString(episode)
@@ -54,10 +54,10 @@ data class EpisodeViewModel(
         parcel.writeString(imageUrl)
         parcel.writeString(audioUrl)
         parcel.writeString(description)
-        parcel.writeLong(jumpToTime)
+        parcel.writeInt(jumpToTime)
         parcel.writeString(guests)
         parcel.writeString(postTypeClass)
-        parcel.writeLong(elapsedTime)
+        parcel.writeInt(elapsedTime)
     }
 
     override fun describeContents(): Int {
@@ -77,9 +77,9 @@ data class EpisodeViewModel(
 
 fun Episode.toEpisodeViewModel(): EpisodeViewModel {
     return EpisodeViewModel(
-        id = this.id,
+        id = this.id.toInt(),
         publishedAt = this.published_at,
-        duration = this.duration,
+        duration = this.duration.toInt(),
         title = this.title,
         slug = this.slug,
         episode = this.episode,
@@ -89,9 +89,9 @@ fun Episode.toEpisodeViewModel(): EpisodeViewModel {
         imageUrl = this.image_url,
         audioUrl = this.audio_url,
         description = this.description,
-        jumpToTime = this.jump_to_time,
+        jumpToTime = this.jump_to_time.toInt(),
         guests = this.guests,
         postTypeClass = this.post_type_class,
-        elapsedTime = this.elapsed_time
+        elapsedTime = this.elapsed_time.toInt(),
     )
 }

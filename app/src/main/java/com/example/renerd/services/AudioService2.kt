@@ -1,16 +1,15 @@
 package com.example.renerd.services
 
 import android.app.*
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
@@ -20,9 +19,11 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.example.renerd.R
+import com.example.renerd.components.player.FloatingPlayer
 import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
 import com.example.renerd.features.player.PlayerActivity
+import com.example.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.*
 import java.io.IOException
 
@@ -33,10 +34,8 @@ class AudioService2 : Service() {
     private var isPlaying: Boolean = false
     private var isPaused = false
 
-    private var url = ""
-    private var title = ""
-    private var artist = ""
-    private var backgroundImageUrl = ""
+    private val currentEpisode = EpisodeViewModel()
+
     private lateinit var albumArt: Bitmap
 
     private lateinit var audioManager: AudioManager
@@ -62,14 +61,8 @@ class AudioService2 : Service() {
         }
     }
 
-    private val playPauseReceiver = object : BroadcastReceiver() {
-        @RequiresApi(Build.VERSION_CODES.O)
-        override fun onReceive(context: Context, intent: Intent) {
-            if (isPlaying) pausePlaying() else startPlaying()
-        }
-    }
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    //override fun onBind(intent: Intent?): IBinder? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
@@ -81,26 +74,28 @@ class AudioService2 : Service() {
             isActive = true
             setCallback(mediaSessionCallback)
         }
-
-        registerReceiver(playPauseReceiver, IntentFilter("PLAY_PAUSE"), RECEIVER_EXPORTED)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         extractTrackInfoFromIntent(intent)
+
+
         when (intent?.action) {
-            "PLAY" -> startPlaying(intent.getStringExtra("position")?.toIntOrNull() ?: 0)
+            "PLAY" -> startPlaying(intent.getIntExtra("position", 2))
             "PAUSE" -> pausePlaying()
             "STOP" -> stopPlaying()
+            "SEEK_TO" -> seekTo(intent.getIntExtra("position", 0))
         }
         return START_NOT_STICKY
     }
 
     private fun extractTrackInfoFromIntent(intent: Intent?) {
-        url = intent?.getStringExtra("url") ?: url
-        title = intent?.getStringExtra("title") ?: title
-        artist = intent?.getStringExtra("artist") ?: artist
-        backgroundImageUrl = intent?.getStringExtra("backgroundImageUrl") ?: backgroundImageUrl
+        currentEpisode.id = intent?.getIntExtra("id", 0) ?: currentEpisode.id
+        currentEpisode.audioUrl = intent?.getStringExtra("audioUrl") ?: currentEpisode.audioUrl
+        currentEpisode.title = intent?.getStringExtra("title") ?: currentEpisode.title
+        currentEpisode.productName = intent?.getStringExtra("productName") ?: currentEpisode.productName
+        currentEpisode.imageUrl = intent?.getStringExtra("imageUrl") ?: currentEpisode.imageUrl
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -114,7 +109,7 @@ class AudioService2 : Service() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun startPlaying(position: Int = 0) {
+    private fun startPlaying(position: Int = 1) {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         requestAudioFocus()
 
@@ -144,7 +139,7 @@ class AudioService2 : Service() {
             if (player == null) {
                 player = MediaPlayer().apply {
                     try {
-                        setDataSource(url)
+                        setDataSource(currentEpisode.audioUrl)
                         setOnPreparedListener {
                             handleMediaPlayerPrepared(position)
                         }
@@ -158,6 +153,7 @@ class AudioService2 : Service() {
                 isPlaying = true
                 player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, it) }
                 showNotification()
+                sendPlayerStatusUpdate()
             }
         } else {
             player?.seekTo(position)
@@ -167,12 +163,12 @@ class AudioService2 : Service() {
     private fun handleMediaPlayerPrepared(position: Int) {
         player?.let {
             it.start()
-            sendTotalTime(it.duration.toString())
-            startProgressUpdateJob()
             it.seekTo(position)
             isPlaying = true
             updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, position)
             showNotification()
+            startProgressUpdateJob()
+            sendPlayerStatusUpdate()
         }
     }
 
@@ -183,10 +179,8 @@ class AudioService2 : Service() {
                 if (!isPaused) {
                     player?.let {
                         val currentPosition = it.currentPosition
-                        sendCurrentTime(currentPosition.toString())
-                        sendTotalTime(it.duration.toString())
-                        sendPlay()
                         updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentPosition)
+                        sendPlayerStatusUpdate()
                     }
                 }
 
@@ -209,14 +203,22 @@ class AudioService2 : Service() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun showNotification() {
-        val playPauseIntent = Intent("PLAY_PAUSE")
-        playPausePendingIntent = PendingIntent.getBroadcast(this, 0, playPauseIntent, PendingIntent.FLAG_IMMUTABLE)
+        val playPauseIntent = Intent(this, AudioService2::class.java).apply {
+            action = if (isPlaying) "PAUSE" else "PLAY"
+        }
+
+        playPausePendingIntent = PendingIntent.getService(
+            this,
+            0,
+            playPauseIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         notificationIcon = if (!isPlaying) R.drawable.ic_play else R.drawable.ic_pause
         notificationActionTitle = if (isPlaying) "Pausar" else "Reproduzir"
 
         GlobalScope.launch(Dispatchers.Main) {
-            albumArtBitmap = loadBitmapFromUrl(backgroundImageUrl, context) ?: albumArt
+            albumArtBitmap = currentEpisode.imageUrl?.let { loadBitmapFromUrl(it, context) } ?: albumArt
             val notification = createNotification()
             startForeground(1, notification)
         }
@@ -227,11 +229,9 @@ class AudioService2 : Service() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onPlay() {
             handlePlayAction(null)
-            sendPlay()
         }
         override fun onPause() {
             pausePlaying()
-            sendPause()
         }
         override fun onSkipToNext() = log("NEXT")
     }
@@ -246,8 +246,8 @@ class AudioService2 : Service() {
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         val mediaMetadata = MediaMetadataCompat.Builder()
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentEpisode.title)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentEpisode.productName)
             .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArtBitmap)
             .build()
 
@@ -256,8 +256,8 @@ class AudioService2 : Service() {
 
         // 4. Crie a notificação
         return NotificationCompat.Builder(this, "media_playback_channel")
-            .setContentTitle(title)
-            .setContentText(artist)
+            .setContentTitle(currentEpisode.title)
+            .setContentText(currentEpisode.productName)
             .setSmallIcon(R.drawable.ic_play)
             .setContentIntent(pendingIntent)
             .setStyle(
@@ -275,32 +275,6 @@ class AudioService2 : Service() {
 
     }
 
-    private fun sendTotalTime(time: String) {
-        sendBroadcast(Intent("PLAYER_ACTION").putExtra("action", "totalTime").putExtra("time", time))
-    }
-
-    private fun sendPause() {
-        player?.let {
-            sendBroadcast(Intent("PLAYER_ACTION")
-                .putExtra("action", "pause")
-                .putExtra("currentTime", it.currentPosition.toString())
-                .putExtra("totalTime", it.duration.toString()))
-        }
-    }
-
-    private fun sendPlay() {
-        player?.let {
-            sendBroadcast(Intent("PLAYER_ACTION")
-                .putExtra("action", "play")
-                .putExtra("currentTime", it.currentPosition.toString())
-                .putExtra("totalTime", it.duration.toString()))
-        }
-    }
-
-    private fun sendCurrentTime(time: String) {
-        sendBroadcast(Intent("PLAYER_ACTION").putExtra("action", "currentTime").putExtra("time", time))
-        showNotification()
-    }
 
     private fun pausePlaying() {
         isPaused = true
@@ -309,7 +283,14 @@ class AudioService2 : Service() {
             isPlaying = false
             player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PAUSED, it) }
             showNotification()
+            sendPlayerStatusUpdate()
         }
+    }
+
+    private fun seekTo(position: Int) {
+        player?.seekTo(position)
+        updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, position)
+        sendPlayerStatusUpdate()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -332,6 +313,18 @@ class AudioService2 : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopPlaying()
-        unregisterReceiver(playPauseReceiver)
+    }
+
+    private fun sendPlayerStatusUpdate() {
+        val intent = Intent(FloatingPlayer.PLAYER_STATUS_UPDATE).apply {
+            putExtra(FloatingPlayer.IS_PLAYING, isPlaying)
+            putExtra(FloatingPlayer.CURRENT_TIME, player?.currentPosition ?: 0)
+            putExtra(FloatingPlayer.TOTAL_TIME, player?.duration ?: 10000)
+        }
+        sendBroadcast(intent)
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return Binder()
     }
 }

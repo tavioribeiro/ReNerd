@@ -49,6 +49,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     override fun onDestroy() {
         super.onDestroy()
         presenter.detachView()
+        binding.customBottomSheet.stopService()
     }
 
 
@@ -72,8 +73,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("episode", episode)
         startActivity(intent)
-
-         */
+        */
     }
 
 
