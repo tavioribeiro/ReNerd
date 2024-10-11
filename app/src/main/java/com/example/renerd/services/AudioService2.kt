@@ -78,8 +78,13 @@ class AudioService2 : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        extractTrackInfoFromIntent(intent)
-
+        val newEpisodeId = intent?.getIntExtra("id", 0) ?: 0
+        if (newEpisodeId != currentEpisode.id) {
+            if (isPlaying) {
+                stopPlaying()
+            }
+            extractTrackInfoFromIntent(intent)
+        }
 
         when (intent?.action) {
             "PLAY" -> startPlaying(intent.getIntExtra("position", 2))

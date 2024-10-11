@@ -179,7 +179,6 @@ class FloatingPlayer @JvmOverloads constructor(
         intent.putExtra("imageUrl", episode.imageUrl)
         intent.putExtra("elapsedTime", episode.elapsedTime)
 
-        log("BBBBBBBBBBBBBB: ${episode.elapsedTime}")
 
         context.startService(intent)
 
