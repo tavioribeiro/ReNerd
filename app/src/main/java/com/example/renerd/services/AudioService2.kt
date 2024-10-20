@@ -118,12 +118,21 @@ class AudioService2 : Service() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         requestAudioFocus()
 
-        if (audioFocusRequest != null && audioManager.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            isPaused = false
-            initializeMediaPlayer(position)
-        } else {
-            log("Failed to obtain audio focus")
+        if (player == null || !player!!.isPlaying) {
+            player?.reset()
+            player = MediaPlayer().apply {
+                try {
+                    setDataSource(currentEpisode.audioUrl)
+                    setOnPreparedListener {
+                        handleMediaPlayerPrepared(position)
+                    }
+                    prepareAsync()
+                } catch (e: IOException) {
+                    log("Erro ao definir o data source")
+                }
+            }
         }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -139,31 +148,6 @@ class AudioService2 : Service() {
             .build()
     }
 
-    private fun initializeMediaPlayer(position: Int) {
-        if (!isPlaying) {
-            if (player == null) {
-                player = MediaPlayer().apply {
-                    try {
-                        setDataSource(currentEpisode.audioUrl)
-                        setOnPreparedListener {
-                            handleMediaPlayerPrepared(position)
-                        }
-                        prepareAsync()
-                    } catch (e: IOException) {
-                        log("Error setting data source")
-                    }
-                }
-            } else {
-                player?.start()
-                isPlaying = true
-                player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, it) }
-                showNotification()
-                sendPlayerStatusUpdate()
-            }
-        } else {
-            player?.seekTo(position)
-        }
-    }
 
     private fun handleMediaPlayerPrepared(position: Int) {
         player?.let {
@@ -301,17 +285,12 @@ class AudioService2 : Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun stopPlaying() {
         player?.let {
-            it.release()
-            player = null
+            it.stop()
+            it.reset() // Reseta o player sem liberar
             isPlaying = false
-            if (audioFocusRequest != null) {
-                audioManager.abandonAudioFocusRequest(audioFocusRequest!!)
-            }
+            updatePlaybackState(PlaybackStateCompat.STATE_STOPPED, 0)
+            showNotification() // Atualiza a notificação sem pará-la
         }
-
-        stopForeground(true)
-        mediaSession?.release()
-        mediaSession = null
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
