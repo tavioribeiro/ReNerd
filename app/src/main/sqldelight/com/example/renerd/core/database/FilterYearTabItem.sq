@@ -1,0 +1,18 @@
+import kotlin.Boolean;
+
+CREATE TABLE FilterYearTabItem (
+    label TEXT PRIMARY KEY,
+    status INTEGER AS Boolean DEFAULT 0
+);
+
+
+-- Query para pegar todos os episódios
+selectAllFilterYearTabItem:
+SELECT * FROM FilterYearTabItem;
+
+-- Query para inserir um novo episódio (ou atualizar se já existir)
+insertFilterYearTabItem:
+INSERT OR REPLACE INTO FilterYearTabItem (
+    label,
+    status
+) VALUES (?, ?);

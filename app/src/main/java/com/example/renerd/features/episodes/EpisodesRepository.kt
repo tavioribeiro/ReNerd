@@ -9,6 +9,7 @@ import com.example.renerd.core.network.PodcastClient
 import com.example.renerd.core.utils.getCurrentDateFormatted
 import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
+import com.example.renerd.view_models.FiltersTabsListItemModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -82,6 +83,163 @@ class EpisodesRepository: EpisodesContract.Repository {
     }
 
 
+
+
+
+
+    override suspend fun insertFilterTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
+        withContext(Dispatchers.IO) {
+            try {
+                dbHelper.insertFilterTabItem(filterTabItem = filtersTabsListItemModel)
+            } catch (e: SocketTimeoutException) {
+                log(e)
+            }
+        }
+    }
+
+    override suspend fun getAllFilterTabItems(): MutableList<FiltersTabsListItemModel> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val localFilterTabItems = dbHelper.getAllFilterTabItems().toMutableList()
+                if (localFilterTabItems.isNotEmpty()) {
+                    return@withContext localFilterTabItems
+                }
+
+                return@withContext mutableListOf()
+            } catch (e: SocketTimeoutException) {
+                log(e)
+                mutableListOf()
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+
+    override suspend fun insertFilterProductTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
+        withContext(Dispatchers.IO) {
+            try {
+                dbHelper.insertFilterProductTabItem(filterProductTabItem = filtersTabsListItemModel)
+                //log(filtersTabsListItemModel.label)
+            } catch (e: SocketTimeoutException) {
+                log(e)
+            }
+        }
+    }
+
+    override suspend fun getAllFilterProductTabItems(): MutableList<FiltersTabsListItemModel> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val localFilterProductTabItems = dbHelper.getAllFilterProductTabItems().toMutableList()
+                if (localFilterProductTabItems.isNotEmpty()) {
+                    return@withContext localFilterProductTabItems
+                }
+
+                return@withContext mutableListOf()
+            } catch (e: SocketTimeoutException) {
+                log(e)
+                mutableListOf()
+            }
+        }
+    }
+
+    override suspend fun insertFilterSubjectTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
+        withContext(Dispatchers.IO) {
+            try {
+                dbHelper.insertFilterSubjectTabItem(filterSubjectTabItem = filtersTabsListItemModel)
+                //log(filtersTabsListItemModel.label)
+            } catch (e: SocketTimeoutException) {
+                log(e)
+            }
+        }
+    }
+
+    override suspend fun getAllFilterSubjectTabItems(): MutableList<FiltersTabsListItemModel> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val localFilterSubjectTabItems = dbHelper.getAllFilterSubjectTabItems().toMutableList()
+                if (localFilterSubjectTabItems.isNotEmpty()) {
+                    return@withContext localFilterSubjectTabItems
+                }
+
+                return@withContext mutableListOf()
+            } catch (e: SocketTimeoutException) {
+                log(e)
+                mutableListOf()
+            }
+        }
+    }
+
+    override suspend fun insertFilterGuestTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
+        withContext(Dispatchers.IO) {
+            try {
+                dbHelper.insertFilterGuestTabItem(filterGuestTabItem = filtersTabsListItemModel)
+                //log(filtersTabsListItemModel.label)
+            } catch (e: SocketTimeoutException) {
+                log(e)
+            }
+        }
+    }
+
+    override suspend fun getAllFilterGuestTabItems(): MutableList<FiltersTabsListItemModel> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val localFilterGuestTabItems = dbHelper.getAllFilterGuestTabItems().toMutableList()
+                if (localFilterGuestTabItems.isNotEmpty()) {
+                    return@withContext localFilterGuestTabItems
+                }
+
+                return@withContext mutableListOf()
+            } catch (e: SocketTimeoutException) {
+                log(e)
+                mutableListOf()
+            }
+        }
+    }
+
+
+    override suspend fun insertFilterYearTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
+        withContext(Dispatchers.IO) {
+            try {
+                dbHelper.insertFilterYearTabItem(filterYearTabItem = filtersTabsListItemModel)
+                //log(filtersTabsListItemModel.label)
+            } catch (e: SocketTimeoutException) {
+                log(e)
+            }
+        }
+    }
+
+
+    override suspend fun getAllFilterYearTabItems(): MutableList<FiltersTabsListItemModel> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val localFilterYearTabItems = dbHelper.getAllFilterYearTabItems().toMutableList()
+                if (localFilterYearTabItems.isNotEmpty()) {
+                    return@withContext localFilterYearTabItems
+                }
+
+                return@withContext mutableListOf()
+            } catch (e: SocketTimeoutException) {
+                log(e)
+                mutableListOf()
+            }
+        }
+    }
+
+
+*/
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getLastEpisodes(): MutableList<EpisodeViewModel> {
         return withContext(Dispatchers.IO) {

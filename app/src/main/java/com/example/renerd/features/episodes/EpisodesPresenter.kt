@@ -2,6 +2,8 @@ package com.example.renerd.features.episodes
 
 import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
+import com.example.renerd.view_models.FiltersTabsListItemModel
+import com.example.renerd.view_models.FiltersTabsListModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,6 +13,13 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
 
     private var view: EpisodesContract.View? = null
 
+    private var filtersTabsListModel = FiltersTabsListModel(
+        productsList = mutableListOf(),
+        subjectsList = mutableListOf(),
+        guestsList = mutableListOf(),
+        yearsList = mutableListOf()
+    )
+
     override fun attachView(view: EpisodesContract.View) {
         this.view = view
     }
@@ -19,6 +28,132 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
         this.view = null
     }
 
+
+    override fun getFiltersTabsList(){
+        //view?.showLoading()
+        try {
+            CoroutineScope(Dispatchers.Main).launch {
+
+                view?.showActionButtons(getFiltersTabsListModel())
+            }
+        }
+        catch (_:Exception){
+
+        }
+    }
+
+
+
+    override fun updateFiltersTabsList(tempFiltersTabsListModel:FiltersTabsListModel) {
+        try {
+            CoroutineScope(Dispatchers.Main).launch {
+                for (item in tempFiltersTabsListModel.productsList) {
+                    repository.insertFilterTabItem(item)
+                }
+
+                for (item in tempFiltersTabsListModel.subjectsList) {
+                    repository.insertFilterTabItem(item)
+                }
+
+                for (item in tempFiltersTabsListModel.guestsList) {
+                    repository.insertFilterTabItem(item)
+                }
+
+                for (item in tempFiltersTabsListModel.yearsList) {
+                    repository.insertFilterTabItem(item)
+                }
+
+
+                view?.showActionButtons(getFiltersTabsListModel())
+            }
+        }
+        catch (_:Exception){
+
+        }
+    }
+
+
+
+    private suspend fun getFiltersTabsListModel(): FiltersTabsListModel{
+        val episodes = repository.getEpisodes()
+
+        val productsList = extractUniqueProducts(episodes)
+        val subjectsList = extractUniqueSubjects(episodes)
+        val guestsList = extractUniqueGuests(episodes)
+        val yearsList = extractUniqueYears(episodes)
+
+
+        for (product in productsList) {
+            if (product.isNotEmpty()) {
+                val tempList = FiltersTabsListItemModel(
+                    label = product,
+                    type = "product",
+                    status = true
+                )
+                repository.insertFilterTabItem(tempList)
+            }
+        }
+
+
+        for (subject in subjectsList) {
+            if (subject.isNotEmpty()) {
+                val tempList = FiltersTabsListItemModel(
+                    label = subject,
+                    type = "subject",
+                    status = true
+                )
+                repository.insertFilterTabItem(tempList)
+            }
+        }
+
+
+        for (guest in guestsList) {
+            if (guest.isNotEmpty()) {
+                val tempList = FiltersTabsListItemModel(
+                    label = guest,
+                    type = "guest",
+                    status = true
+                )
+                repository.insertFilterTabItem(tempList)
+            }
+        }
+
+
+        for (year in yearsList) {
+            if (year.isNotEmpty()) {
+                val tempList = FiltersTabsListItemModel(
+                    label = year,
+                    type = "year",
+                    status = true
+                )
+                repository.insertFilterTabItem(tempList)
+            }
+        }
+
+
+        val allMixedFilters = repository.getAllFilterTabItems()
+
+
+        filtersTabsListModel = FiltersTabsListModel(
+            productsList = mutableListOf(),
+            subjectsList = mutableListOf(),
+            guestsList = mutableListOf(),
+            yearsList = mutableListOf()
+        )
+
+        for(item in allMixedFilters){
+            when(item.type){
+                "product" -> filtersTabsListModel.productsList.add(item)
+                "subject" -> filtersTabsListModel.subjectsList.add(item)
+                "guest" -> filtersTabsListModel.guestsList.add(item)
+                "year" -> filtersTabsListModel.yearsList.add(item)
+            }
+        }
+
+        return filtersTabsListModel
+    }
+
+
     override fun loadEpisodes() {
         view?.showLoading()
         try {
@@ -26,19 +161,11 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
                 val episodes = repository.getEpisodes()
 
 
-                val productsList = extractUniqueProducts(episodes)
-                val subjectsList = extractUniqueSubjects(episodes)
-                val guestsList = extractUniqueGuests(episodes)
-                val yearsList = extractUniqueYears(episodes)
+                val filteredByProducts = filterEpisodesByProductsInclude(episodes, getLabelsWithStatusTrue(getFiltersTabsListModel().productsList)).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+                val filteredBySubjects = filterEpisodesBySubjectInclude(filteredByProducts, getLabelsWithStatusTrue(getFiltersTabsListModel().subjectsList)).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+                val filteredByGuests = filterEpisodesByGuestInclude(filteredBySubjects, getLabelsWithStatusTrue(getFiltersTabsListModel().guestsList)).toMutableList() ?: mutableListOf<EpisodeViewModel>()
+                val filteredByYears = filterEpisodesByYearInclude(filteredByGuests, getLabelsWithStatusTrue(getFiltersTabsListModel().yearsList)).toMutableList() ?: mutableListOf<EpisodeViewModel>()
 
-
-
-                val filteredByProducts = filterEpisodesByProductsInclude(episodes, listOf("nerdcast", "nerdtech")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
-                val filteredBySubjects = filterEpisodesBySubjectInclude(filteredByProducts, listOf("Ciências, Cinema")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
-                val filteredByGuests = filterEpisodesByGuestInclude(filteredBySubjects, listOf("Affonso Solano")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
-                val filteredByYears = filterEpisodesByYearInclude(filteredByGuests, listOf("2019", "2012")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
-                //adicione o filtro por ano aqui
-                log(filteredByYears)
 
                 view?.showEpisodes(filteredByYears)
                 view?.hideLoading()
@@ -47,6 +174,15 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
             view?.showError("Erro ao carregar episódios")
         }
     }
+
+
+
+
+    private fun getLabelsWithStatusTrue(items: MutableList<FiltersTabsListItemModel>): List<String> {
+        return items.filter { it.status }
+            .map { it.label }
+    }
+
 
 
     override fun loadLastEpisodes() {

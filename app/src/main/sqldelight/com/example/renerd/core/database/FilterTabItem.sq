@@ -1,0 +1,20 @@
+import kotlin.Boolean;
+
+CREATE TABLE FiltersTabsListItemModel (
+    label TEXT PRIMARY KEY,
+    type TEXT,
+    status INTEGER AS Boolean DEFAULT 0
+);
+
+
+-- Query para pegar todos os episódios
+selectAllFilterTabItem:
+SELECT * FROM FiltersTabsListItemModel;
+
+-- Query para inserir um novo episódio (ou atualizar se já existir)
+insertFilterTabItem:
+INSERT OR REPLACE INTO FiltersTabsListItemModel (
+    label,
+    type,
+    status
+) VALUES (?, ?,?);

@@ -1,0 +1,370 @@
+package core.extensions
+
+import android.animation.ValueAnimator
+import android.content.res.Resources
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.widget.ImageView
+import androidx.palette.graphics.Palette
+import android.graphics.Bitmap
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Shader
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+
+
+
+
+
+
+val defaultOriginalMatriz = floatArrayOf(
+    1.1f, 0f, 0f, 0f, 0f,
+    0f, 1.1f, 0f, 0f, 0f,
+    0f, 0f, 1.1f, 0f, 0f,
+    0f, 0f, 0f, 1f, 0f
+)
+val defaultFinalMatriz = floatArrayOf(
+    0.8f, 0f, 0f, 0f, 0f,
+    0f, 0.8f, 0f, 0f, 0f,
+    0f, 0f, 0.8f, 0f, 0f,
+    0f, 0f, 0f, 1f, 0f
+)
+
+
+
+
+/**
+ * Aplica uma animação de overlay (sobreposição) a ImageView, clareando a imagem.
+ *
+ * Uso:
+ * // Mostrar overlay com matrizes padrão e duração de 300ms.
+ * myImageView.showOverlay()
+ *
+ * // Mostrar overlay com matrizes personalizadas.
+ * myImageView.showOverlay(
+ *     originalMatriz = floatArrayOf(...),
+ *     finalMatriz = floatArrayOf(...)
+ * )
+ *
+ * ```
+ *
+ * @param originalMatriz Matriz de cores original da imagem.
+ * @param finalMatriz Matriz de cores final da animação.
+ */
+fun ImageView.showOverlay(
+    originalMatriz: FloatArray = defaultOriginalMatriz,
+    finalMatriz: FloatArray = defaultFinalMatriz
+) {
+    val animation = ValueAnimator.ofFloat(0f, 1f)
+    animation.duration = 300
+
+    animation.addUpdateListener { valueAnimator ->
+        val fraction = valueAnimator.animatedFraction
+        val interpolatedMatriz = FloatArray(originalMatriz.size)
+        for (i in originalMatriz.indices) {
+            interpolatedMatriz[i] =
+                originalMatriz[i] + (finalMatriz[i] - originalMatriz[i]) * fraction
+        }
+        val matrizCor = ColorMatrix(interpolatedMatriz)
+        val filtroCor = ColorMatrixColorFilter(matrizCor)
+        this.colorFilter = filtroCor
+    }
+    animation.start()
+}
+
+
+
+
+
+
+
+
+/**
+ * Remove a animação de overlay (sobreposição) da ImageView, restaurando a cor original da imagem.
+ *
+ * Uso:
+ * // Remover overlay com matrizes padrão e duração de 300ms.
+ * myImageView.hideOverlay()
+ *
+ * // Remover overlay com matrizes personalizadas.
+ * myImageView.hideOverlay(
+ *     originalMatriz = floatArrayOf(...),
+ *     finalMatriz = floatArrayOf(...)
+ * )
+ *
+ * ```
+ *
+ * @param originalMatriz Matriz de cores original da imagem.
+ * @param finalMatriz Matriz de cores final da animação.
+ */
+fun ImageView.hideOverlay(
+    originalMatriz: FloatArray = defaultOriginalMatriz,
+    finalMatriz: FloatArray = defaultFinalMatriz
+) {
+    val animation = ValueAnimator.ofFloat(0f, 1f)
+    animation.duration = 300
+
+    animation.addUpdateListener { valueAnimator ->
+        val fraction = valueAnimator.animatedFraction
+        val interpolatedMatriz = FloatArray(originalMatriz.size)
+        for (i in originalMatriz.indices) {
+            interpolatedMatriz[i] =
+                finalMatriz[i] + (originalMatriz[i] - finalMatriz[i]) * fraction
+        }
+        val matrizCor = ColorMatrix(interpolatedMatriz)
+        val filtroCor = ColorMatrixColorFilter(matrizCor)
+        this.colorFilter = filtroCor
+    }
+    animation.start()
+}
+
+
+
+
+
+
+
+/**
+ * Reseta o Color Filter da ImageView para o estado final da animação de overlay.
+ *
+ * Uso:
+ * // Reseta o Color Filter com a matriz padrão.
+ * myImageView.resetColorFilter()
+ *
+ * // Reseta o Color Filter com uma matriz personalizada.
+ * myImageView.resetColorFilter(finalMatriz = floatArrayOf(...))
+ *
+ * ```
+ *
+ * @param finalMatriz Matriz de cores final da animação de overlay.
+ */
+fun ImageView.resetColorFilter(finalMatriz: FloatArray = defaultFinalMatriz) {
+    this.colorFilter = ColorMatrixColorFilter(finalMatriz)
+}
+
+
+
+
+
+
+
+/**
+ * Obtém as cores da paleta da imagem na ImageView.
+ *
+ * Uso:
+ * // Obtém as cores da paleta e imprime no Logcat.
+ * myImageView.getPalletColors { (color1, color2) ->
+ *     Log.d("Cores", "Cor 1: $color1, Cor 2: $color2")
+ * }
+ *
+ * ```
+ *
+ * @param completion Função a ser executada após a extração das cores da paleta, recebendo um Pair com os códigos hexadecimais das cores.
+ */
+fun ImageView.getPalletColors(completion: ((Pair<String, String>) -> Unit)? = null) {
+    var color1Hex = "191919"
+    var color2Hex = "191919"
+    if (this.drawable is BitmapDrawable) {
+        val bitmap: Bitmap = (this.drawable as BitmapDrawable).bitmap
+        Palette.from(bitmap).generate { palette ->
+            val color1 = palette?.darkVibrantSwatch?.rgb ?: 0
+            color1Hex = if (color1 != 0) {
+                String.format("%06X", (0xFFFFFF and color1))
+            } else {
+                "191919"
+            }
+            val color2 = palette?.mutedSwatch?.rgb ?: 0
+            color2Hex = if (color2 != 0) {
+                String.format("%06X", (0xFFFFFF and color2))
+            } else {
+                "191919"
+            }
+            completion?.invoke(Pair(color1Hex, color2Hex))
+        }
+    } else {
+        completion?.invoke(Pair(color1Hex, color2Hex))
+    }
+}
+
+
+fun ImageView.getDominantColor(completion: ((String) -> Unit)? = null) {
+    var dominantColorHex = "191919" // Default color if no dominant color is found
+    if (this.drawable is BitmapDrawable) {
+        val bitmap: Bitmap = (this.drawable as BitmapDrawable).bitmap
+        Palette.from(bitmap).generate { palette ->
+            val dominantColor = palette?.dominantSwatch?.rgb ?: 0
+            dominantColorHex = if (dominantColor != 0) {
+                String.format("%06X", (0xFFFFFF and dominantColor))
+            } else {
+                "191919"
+            }
+            completion?.invoke(dominantColorHex)
+        }
+    } else {
+        completion?.invoke(dominantColorHex)
+    }
+}
+
+
+
+fun ImageView.getBitmap(): Bitmap? {
+    val drawable = this.drawable
+    return if (drawable is BitmapDrawable) {
+        drawable.bitmap
+    } else {
+        null
+    }
+}
+
+
+fun ImageView.getBrightestColor(completion: ((String?) -> Unit)? = null) {
+    if (this.drawable is BitmapDrawable) {
+        val bitmap: Bitmap = (this.drawable as BitmapDrawable).bitmap
+        Palette.from(bitmap).generate { palette ->
+            val swatches = listOf(
+                palette?.vibrantSwatch,
+                palette?.darkVibrantSwatch,
+                palette?.lightVibrantSwatch,
+                palette?.mutedSwatch,
+                palette?.darkMutedSwatch,
+                palette?.lightMutedSwatch
+            ).filterNotNull()
+
+            val colors = swatches.map { swatch ->
+                String.format("#%06X", (0xFFFFFF and swatch.rgb))
+            }
+
+            val brightestColor = brightestColor(colors)
+            completion?.invoke(brightestColor)
+        }
+    } else {
+        completion?.invoke(null)
+    }
+}
+
+
+
+
+
+
+
+
+
+
+fun Drawable.resize(width: Int, height: Int, resources: Resources): Drawable {
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    this.setBounds(0, 0, canvas.width, canvas.height)
+    this.draw(canvas)
+
+    return BitmapDrawable(resources, bitmap)
+}
+
+
+
+
+fun Drawable.cropCenterSection(widthDp: Int, heightDp: Int, resources: Resources): BitmapDrawable {
+    val widthPx = (widthDp * resources.displayMetrics.density).toInt()
+    val heightPx = (heightDp * resources.displayMetrics.density).toInt()
+
+
+    val bitmap = if (this is BitmapDrawable) {
+        this.bitmap
+    } else {
+        Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight, Bitmap.Config.ARGB_8888).also { bmp ->
+            val canvas = Canvas(bmp)
+            this.setBounds(0, 0, canvas.width, canvas.height)
+            this.draw(canvas)
+        }
+    }
+
+    val bitmapWidth = bitmap.width
+    val bitmapHeight = bitmap.height
+
+    val startX = (bitmapWidth / 2) - (widthPx / 2)
+    val startY = (bitmapHeight / 2) - (heightPx / 2)
+    val endX = startX + widthPx
+    val endY = startY + heightPx
+
+    val validStartX = startX.coerceAtLeast(0)
+    val validStartY = startY.coerceAtLeast(0)
+    val validEndX = endX.coerceAtMost(bitmapWidth)
+    val validEndY = endY.coerceAtMost(bitmapHeight)
+
+    val croppedBitmap = Bitmap.createBitmap(
+        bitmap,
+        validStartX,
+        validStartY,
+        validEndX - validStartX,
+        validEndY - validStartY
+    )
+
+    return BitmapDrawable(resources, croppedBitmap)
+}
+
+
+
+
+
+fun Drawable.toTopRoundedDrawable(radius: Float): BitmapDrawable {
+    val bitmap = if (this is BitmapDrawable) {
+        this.bitmap
+    } else {
+        Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight, Bitmap.Config.ARGB_8888).also { bmp ->
+            val canvas = Canvas(bmp)
+            this.setBounds(0, 0, canvas.width, canvas.height)
+            this.draw(canvas)
+        }
+    }
+
+    val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(output)
+
+    val paint = Paint().apply {
+        isAntiAlias = true
+        shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+    }
+
+    val rect = RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
+    val path = Path().apply {
+        addRoundRect(rect, floatArrayOf(radius, radius, radius, radius, 0f, 0f, 0f, 0f), Path.Direction.CW)
+    }
+
+    canvas.drawPath(path, paint)
+    return BitmapDrawable(output)
+}
+
+
+
+fun Drawable.toAllRoundedDrawable(radius: Float): BitmapDrawable {
+    val bitmap = if (this is BitmapDrawable) {
+        this.bitmap
+    } else {
+        Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight, Bitmap.Config.ARGB_8888).also { bmp ->
+            val canvas = Canvas(bmp)
+            this.setBounds(0, 0, canvas.width, canvas.height)
+            this.draw(canvas)
+        }
+    }
+
+    val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(output)
+
+    val paint = Paint().apply {
+        isAntiAlias = true
+        shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+    }
+
+    val rect = RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
+    val path = Path().apply {
+        addRoundRect(rect, radius, radius, Path.Direction.CW)
+    }
+
+    canvas.drawPath(path, paint)
+    return BitmapDrawable(output)
+}

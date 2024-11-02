@@ -98,4 +98,8 @@ dependencies {
 
     //Swipe
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+
+    //FruFru
+    implementation("androidx.palette:palette:1.0.0")
 }

@@ -12,10 +12,15 @@ import android.os.SystemClock
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import com.example.renerd.core.extentions.dpToPx
 import java.util.concurrent.atomic.AtomicLong
 
 
@@ -140,6 +145,24 @@ fun View.fadeOutAnimation(duration: Long = 500, visibility: Int = View.INVISIBLE
         }
 }
 
+
+fun View.fadeOutAnimationNoRepeat(duration: Long = 500, visibility: Int = View.INVISIBLE, completion: (() -> Unit)? = null) {
+    if (this.visibility == View.VISIBLE) {
+        animate()
+            .alpha(0f)
+            .setDuration(duration)
+            .withEndAction {
+                this.visibility = visibility
+                completion?.let { it() }
+            }
+    } else {
+        // View já está invisível ou gone, não precisa fazer fade out
+        this.visibility = visibility // Define a visibilidade para o valor desejado
+        completion?.let { it() }
+    }
+}
+
+
 /**
  * Aplica uma animação de fade in (aparecimento gradual) à view.
  *
@@ -172,6 +195,22 @@ fun View.fadeInAnimation(duration: Long = 500, completion: (() -> Unit)? = null)
         }
 }
 
+fun View.fadeInAnimationNoRepeat(duration: Long = 500, completion: (() -> Unit)? = null) {
+    if (visibility == View.GONE || visibility == View.INVISIBLE) {
+        alpha = 0f
+        visibility = View.VISIBLE
+        animate()
+            .alpha(1f)
+            .setDuration(duration)
+            .withEndAction {
+                completion?.let { it() }
+            }
+    } else {
+        // View já está visível, não precisa fazer fade in
+        completion?.let { it() }
+    }
+}
+
 
 /**
  * Define a largura da view em dp (Density-independent Pixels).
@@ -183,7 +222,14 @@ fun View.fadeInAnimation(duration: Long = 500, completion: (() -> Unit)? = null)
  *
  * @param widthInDp Largura da view em dp.
  */
+fun View.setWidthInDp(widthInDp: Float) {
+    val layoutParams = this.layoutParams ?: return
 
+    layoutParams.width = context.dpToPx(widthInDp)
+
+    this.layoutParams = layoutParams
+    this.requestLayout()
+}
 
 /**
  * Define o estilo de fundo da view usando um GradientDrawable.
@@ -210,88 +256,64 @@ fun View.fadeInAnimation(duration: Long = 500, completion: (() -> Unit)? = null)
  * @param bottomRightRadius Raio do canto inferior direito em pixels. Padrão: igual ao valor de `radius`.
  */
 fun View.styleBackground(
-    backgroundColor: String ?= "#00FFFFFF",
+    backgroundColor: String? = "#00FFFFFF",
     radius: Float = 0f,
     borderWidth: Int = 0,
-    borderColor: String ?= "#00FFFFFF",
+    borderColor: String? = "#00FFFFFF",
     topLeftRadius: Float = radius,
     topRightRadius: Float = radius,
     bottomLeftRadius: Float = radius,
-    bottomRightRadius: Float = radius
+    bottomRightRadius: Float = radius,
+    widthInDp: Float? = null,
+    heightInDp: Float? = null,
+    marginInDp: Float? = null,
+    paddingInDp: Float? = null
 ) {
-    // Cria um novo GradientDrawable.
-    val shape = GradientDrawable()
-    // Define o formato como retângulo.
-    shape.shape = GradientDrawable.RECTANGLE
-    // Define o raio dos cantos.
-    shape.cornerRadii = floatArrayOf(
-        topLeftRadius, topLeftRadius,
-        topRightRadius, topRightRadius,
-        bottomRightRadius, bottomRightRadius,
-        bottomLeftRadius, bottomLeftRadius
-    )
-    // Define a cor de fundo.
-    shape.setColor(Color.parseColor(backgroundColor))
-    // Define a borda.
-    shape.setStroke(borderWidth, Color.parseColor(borderColor))
-    // Define o GradientDrawable como background da view.
+    // Configuração do background com GradientDrawable.
+    val shape = GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        cornerRadii = floatArrayOf(
+            topLeftRadius, topLeftRadius,
+            topRightRadius, topRightRadius,
+            bottomRightRadius, bottomRightRadius,
+            bottomLeftRadius, bottomLeftRadius
+        )
+        setColor(Color.parseColor(backgroundColor))
+        setStroke(borderWidth, Color.parseColor(borderColor))
+    }
     this.background = shape
-}
 
+    // Configuração de largura e altura (caso especificado).
+    widthInDp?.let { setWidthInDp(it) }
+    heightInDp?.let { setHeightInDp(it) }
 
-
-fun View.styleBackground2(
-    @DrawableRes svgDrawable: Int? = null,
-    @ColorInt backgroundColor: Int = Color.TRANSPARENT,
-    radius: Float = 0f,
-    borderWidth: Int = 0,
-    @ColorInt borderColor: Int = Color.TRANSPARENT,
-    topLeftRadius: Float = radius,
-    topRightRadius: Float = radius,
-    bottomLeftRadius: Float = radius,
-    bottomRightRadius: Float = radius
-) {
-
-    val background = GradientDrawable()
-    background.cornerRadius = radius
-
-    // Definindo o background
-    background.setColor(backgroundColor)
-
-    // Criando a borda
-    if (borderWidth > 0) {
-        val strokeDrawable = GradientDrawable()
-        strokeDrawable.setStroke(borderWidth, borderColor)
-
-        // Criando um LayerDrawable para combinar o SVG e a borda
-        val layers = arrayOf<Drawable>(strokeDrawable, background)
-        val layerDrawable = LayerDrawable(layers)
-
-        // Definindo o SVG como background, se fornecido
-        if (svgDrawable != null) {
-            val vectorDrawable = ContextCompat.getDrawable(context, svgDrawable)
-            vectorDrawable?.let {
-                // Ajustar o tamanho do SVG conforme necessário
-                it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                layerDrawable.setDrawableByLayerId(0, it)
-            }
-        }
-
-        // Definindo o LayerDrawable como background da View
-        this.background = layerDrawable
-    } else {
-        // Se não houver borda, defina apenas o background
-        this.background = background
+    // Configuração de padding.
+    paddingInDp?.let {
+        val paddingPx = context.dpToPx(it)
+        setPadding(paddingPx, paddingPx, paddingPx, paddingPx)
     }
 
-    // Definindo os cantos arredondados individualmente
-    background.cornerRadii = floatArrayOf(
-        topLeftRadius, topLeftRadius,
-        topRightRadius, topRightRadius,
-        bottomRightRadius, bottomRightRadius,
-        bottomLeftRadius, bottomLeftRadius
-    )
+    // Configuração de margin.
+    marginInDp?.let {
+        val marginPx = context.dpToPx(it)
+        (layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
+            params.setMargins(marginPx, marginPx, marginPx, marginPx)
+            layoutParams = params
+        }
+    }
 }
+
+// Função auxiliar para definir altura em DP.
+fun View.setHeightInDp(heightInDp: Float) {
+    layoutParams = (layoutParams ?: ViewGroup.LayoutParams(0, 0)).apply {
+        height = context.dpToPx(heightInDp)
+    }
+    requestLayout()
+}
+
+
+
+
 
 /**
  * Define um gradiente de fundo para a view usando um GradientDrawable.
@@ -356,3 +378,257 @@ fun View.animateScale(scaleFactor: Float, duration: Long = 200) {
 
 
 
+/**
+ * Define o padding de uma view usando valores em dp.
+ * O padding vertical e horizontal é aplicado igualmente em todos os lados.
+ *
+ * Uso:
+ * ```kotlin
+ * val myView: View = findViewById(R.id.my_view)
+ * myView.setPadding2(context, 16, 8) // Define padding vertical de 16dp e horizontal de 8dp
+ * ```
+ *
+ * @param context O contexto da aplicação.
+ * @param vertical O valor do padding vertical em dp.
+ * @param horizontal O valor do padding horizontal em dp.
+ */
+fun View.setPadding2(context: Context, vertical: Int, horizontal:Int){
+    val paddingLeftPx = context.dpToPx(horizontal.toFloat())
+    val paddingTopPx = context.dpToPx(vertical.toFloat())
+    val paddingRightPx = context.dpToPx(horizontal.toFloat())
+    val paddingBottomPx = context.dpToPx(vertical.toFloat())
+
+    this.setPadding(paddingLeftPx, paddingTopPx, paddingRightPx, paddingBottomPx)
+}
+
+/**
+ * Define a margem de uma view usando valores em dp.
+ * A margem vertical e horizontal é aplicada igualmente em todos os lados.
+ *
+ * Uso:
+ * ```kotlin
+ * val myView: View = findViewById(R.id.my_view)
+ * myView.setMargin(context, 16, 8) // Define margem vertical de 16dp e horizontal de 8dp
+ * ```
+ *
+ * @param context O contexto da aplicação.
+ * @param vertical O valor da margem vertical em dp.
+ * @param horizontal O valor da margem horizontal em dp.
+ */
+fun View.setMargin(context: Context, vertical: Int, horizontal:Int){
+    val marginLeftPx = context.dpToPx(horizontal.toFloat())
+    val marginTopPx = context.dpToPx(vertical.toFloat())
+    val marginRightPx = context.dpToPx(horizontal.toFloat())
+    val marginBottomPx = context.dpToPx(vertical.toFloat())
+
+    val layoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
+    layoutParams.setMargins(marginLeftPx, marginTopPx, marginRightPx, marginBottomPx)
+    this.layoutParams = layoutParams
+}
+
+/**
+ * Define a largura de uma view usando um valor em dp.
+ *
+ * Uso:
+ * ```kotlin
+ * val myView: View = findViewById(R.id.my_view)
+ * myView.setWidth(context, 100) // Define a largura da view para 100dp
+ * ```
+ *
+ * @param context O contexto da aplicação.
+ * @param size O valor da largura em dp.
+ */
+fun View.setWidth(context: Context, size: Int) {
+    val widthPx = context.dpToPx(size.toFloat())
+    val layoutParams = this.layoutParams
+
+    layoutParams.width = widthPx
+    this.layoutParams = layoutParams
+}
+
+/**
+ * Define a altura de uma view usando um valor em dp.
+ *
+ * Uso:
+ * ```kotlin
+ * val myView: View = findViewById(R.id.my_view)
+ * myView.setHeight(context, 150) // Define a altura da view para 150dp
+ * ```
+ *
+ * @param context O contexto da aplicação.
+ * @param size O valor da altura em dp.
+ */
+fun View.setHeight(context: Context, size: Int) {
+    val heightPx = context.dpToPx(size.toFloat())
+    val layoutParams = this.layoutParams
+
+    layoutParams.height = heightPx
+    this.layoutParams = layoutParams
+}
+
+
+
+
+fun View.blockDPadAction(keycode:Int){
+    this.setOnKeyListener(object : View.OnKeyListener {
+        override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+            if (event?.action == KeyEvent.ACTION_DOWN) {
+                if (keyCode == keycode) {
+                    return true
+                }
+            }
+            return false
+        }
+    })
+}
+
+
+fun View.blockDPadActions(keycodes: MutableList<Int>) {
+    this.setOnKeyListener(object : View.OnKeyListener {
+        override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+            if (event?.action == KeyEvent.ACTION_DOWN) {
+                if (keycodes.contains(keyCode)) {
+                    return true // Bloqueia a ação se o keyCode estiver na lista
+                }
+            }
+            return false
+        }
+    })
+}
+
+
+
+
+
+fun View.blockDpadForWhile(interval: Long) {
+    // Disable D-pad actions
+    this.setOnKeyListener { _, keyCode, _ ->
+        return@setOnKeyListener keyCode in KeyEvent.KEYCODE_DPAD_UP..KeyEvent.KEYCODE_DPAD_RIGHT
+    }
+
+    // Enable D-pad actions after x ms
+    Handler(Looper.getMainLooper()).postDelayed({
+        this.setOnKeyListener(null)
+    }, interval)
+}
+
+
+
+
+
+fun View.dpadEvent3(callback: ((keycode: Int) -> Boolean)? = null) {
+    this.setOnKeyListener { _, keyCode, event ->
+        if (event.action == KeyEvent.ACTION_DOWN || event.action == KeyEvent.ACTION_UP) {
+            if (callback != null) { // Verifica se o D-Pad está bloqueado
+                return@setOnKeyListener callback(keyCode)
+            }
+        }
+        return@setOnKeyListener false
+    }
+}
+
+
+
+
+fun View.blockDpadInitiallyThenHandle(interval: Long, callback: ((keycode: Int) -> Boolean)? = null) {
+    var isBlocked = true
+
+    // Bloqueia inicialmente as ações do D-pad
+    this.setOnKeyListener { _, keyCode, _ ->
+        return@setOnKeyListener isBlocked && keyCode in KeyEvent.KEYCODE_DPAD_UP..KeyEvent.KEYCODE_DPAD_RIGHT
+    }
+
+    // Libera as ações do D-pad após o intervalo, e passa o controle para o callback
+    Handler(Looper.getMainLooper()).postDelayed({
+        isBlocked = false
+        this.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN || event.action == KeyEvent.ACTION_UP) {
+                if (callback != null) {
+                    return@setOnKeyListener callback(keyCode)
+                }
+            }
+            return@setOnKeyListener false
+        }
+    }, interval)
+}
+
+
+
+
+fun View.zoomIn(duration: Long = 300, factor: Float = 1.5f) {
+    val scale = ScaleAnimation(
+        1f, factor,
+        1f, factor,
+        Animation.RELATIVE_TO_SELF, 0.5f,
+        Animation.RELATIVE_TO_SELF, 0.5f
+    )
+    scale.duration = duration
+    scale.fillAfter = true
+    this.startAnimation(scale)
+}
+
+fun View.zoomOut(duration: Long = 300, factor: Float = 1.5f) {
+    val scale = ScaleAnimation(
+        factor, 1f,
+        factor, 1f,
+        Animation.RELATIVE_TO_SELF, 0.5f,
+        Animation.RELATIVE_TO_SELF, 0.5f
+    )
+    scale.duration = duration
+    scale.fillAfter = true
+    this.startAnimation(scale)
+}
+
+
+
+
+fun View.getWidth(onWidthReady: (Int) -> Unit) {
+    if (width > 0) {
+        onWidthReady(width)
+    } else {
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                onWidthReady(width)
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+    }
+}
+
+
+
+fun View.getHeight(onHeightReady: (Int) -> Unit) {
+    if (height > 0) {
+        // Se a altura já estiver disponível, retorna imediatamente
+        onHeightReady(height)
+    } else {
+        // Caso contrário, espera até o layout ser medido
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                // Chama a função passando a altura
+                onHeightReady(height)
+                // Remove o listener após obter a altura
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+    }
+}
+
+
+
+fun View.getSizes(onSizeReady: (Int, Int) -> Unit) {
+    if (width > 0 && height > 0) {
+        // Se a largura e altura já estiverem disponíveis, retorna imediatamente
+        onSizeReady(width, height)
+    } else {
+        // Caso contrário, espera até o layout ser medido
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                // Chama a função passando a largura e altura
+                onSizeReady(width, height)
+                // Remove o listener após obter os valores
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        })
+    }
+}

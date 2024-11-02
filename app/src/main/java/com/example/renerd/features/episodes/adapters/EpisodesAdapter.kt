@@ -1,6 +1,7 @@
 package com.example.renerd.features.episodes.adapters
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.renerd.R
+import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.view_models.EpisodeViewModel
 import core.extensions.styleBackground
 
@@ -39,7 +41,7 @@ class EpisodesAdapter(
         holder.imageView.load(episodes[position].imageUrl)
 
         holder.play_icon_background.styleBackground(
-            backgroundColor = "#191919",
+            backgroundColor = ContextManager.getColorHex(1),
             radius = 50f
         )
 

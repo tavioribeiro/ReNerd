@@ -4,13 +4,18 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.renerd.components.filters_dialog.FiltersDialog
+import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityEpisodesBinding
 import com.example.renerd.features.episodes.adapters.EpisodesAdapter
 import com.example.renerd.features.player.PlayerActivity
 import com.example.renerd.view_models.EpisodeViewModel
+import com.example.renerd.view_models.FiltersTabsListModel
+import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.toast
 import org.koin.android.ext.android.inject
 
@@ -20,23 +25,69 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     private lateinit var binding: ActivityEpisodesBinding
     private val presenter: EpisodesContract.Presenter by inject()
 
+    private lateinit var filtersTabsListModel:FiltersTabsListModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEpisodesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         this.setUpUi()
+        this.setUpActionButtons()
         presenter.attachView(this)
-        presenter.loadEpisodes()
+
+        presenter.getFiltersTabsList()
+        //presenter.loadEpisodes()
     }
 
 
     private fun setUpUi(){
-        window.statusBarColor = Color.parseColor("#191919")
+        window.statusBarColor = Color.parseColor(ContextManager.getColorHex(0))
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+
+
+
+
         binding.swipeRefreshLayout.isEnabled = false
         binding.swipeRefreshLayout.setOnRefreshListener {
-            presenter.loadLastEpisodes()
+            //presenter.loadLastEpisodes()
         }
+    }
+
+
+    override fun showActionButtons(tempFiltersTabsListModel:FiltersTabsListModel) {
+        filtersTabsListModel = tempFiltersTabsListModel
+
+        binding.iconFilter.fadeInAnimationNoRepeat(1000) {  }
+        binding.iconSearch.fadeInAnimationNoRepeat(1000) {  }
+
+        presenter.loadEpisodes()
+    }
+
+
+
+    private fun setUpActionButtons(){
+        binding.iconFilter.setOnClickListener(){
+            setUpFilterModal(filtersTabsListModel)
+        }
+
+        binding.iconSearch.setOnClickListener(){
+        }
+    }
+
+    override fun setUpFilterModal(filtersTabsListModel:FiltersTabsListModel){
+        val filterModal = FiltersDialog(
+            context = this,
+            filtersList = filtersTabsListModel,
+            onSave = {
+
+            }
+        )
+        filterModal.show(supportFragmentManager, "filterModal")
     }
 
 
