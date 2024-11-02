@@ -12,7 +12,7 @@ import com.example.renerd.view_models.FiltersTabsListItemModel
 
 class FilterItemAdapter(
     private val filtersTabsListItemModelList: List<FiltersTabsListItemModel>,
-    private val onClick: (Boolean, FiltersTabsListItemModel, Int) -> Unit
+    private val onClick: (FiltersTabsListItemModel) -> Unit
 ) : RecyclerView.Adapter<FilterItemAdapter.FilterItemViewHolder>() {
 
     class FilterItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -31,7 +31,8 @@ class FilterItemAdapter(
         holder.checkBox.isChecked = currentItem.status
 
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
-            onClick(isChecked, currentItem, position)
+            currentItem.status = isChecked
+            onClick(currentItem)
         }
     }
 

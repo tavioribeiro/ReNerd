@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.renerd.components.filters_dialog.FilterTabListener
 import com.example.renerd.components.filters_dialog.adapters.FilterItemAdapter
 import com.example.renerd.databinding.CLayoutFilterTabBinding
 import com.example.renerd.view_models.FiltersTabsListItemModel
 
 
-class FiltersGuestTabFragment(private val guestsList: List<FiltersTabsListItemModel>) : Fragment() {
+class FiltersGuestTabFragment(
+    private val guestsList: List<FiltersTabsListItemModel>,
+    private val filterTabListener: FilterTabListener
+) : Fragment() {
 
     private lateinit var binding: CLayoutFilterTabBinding
 
@@ -50,8 +54,8 @@ class FiltersGuestTabFragment(private val guestsList: List<FiltersTabsListItemMo
 
         val filterItemAdapter = FilterItemAdapter(
             filtersTabsListItemModelList = guestsList,
-            onClick = { isChecked, text, position ->
-
+            onClick = { filtersTabsListItemModel ->
+                filterTabListener.onItemValeuChange(filtersTabsListItemModel)
             }
         )
 
@@ -61,8 +65,8 @@ class FiltersGuestTabFragment(private val guestsList: List<FiltersTabsListItemMo
 
 
     companion object {
-        fun newInstance(guestsList: List<FiltersTabsListItemModel>):FiltersGuestTabFragment {
-            return FiltersGuestTabFragment(guestsList)
+        fun newInstance(guestsList: List<FiltersTabsListItemModel>, filterTabListener: FilterTabListener):FiltersGuestTabFragment {
+            return FiltersGuestTabFragment(guestsList, filterTabListener)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.renerd.features.episodes
 
-import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
 import com.example.renerd.view_models.FiltersTabsListItemModel
 import com.example.renerd.view_models.FiltersTabsListModel
@@ -30,16 +29,13 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
 
 
     override fun getFiltersTabsList(){
-        //view?.showLoading()
         try {
             CoroutineScope(Dispatchers.Main).launch {
 
                 view?.showActionButtons(getFiltersTabsListModel())
             }
         }
-        catch (_:Exception){
-
-        }
+        catch (_:Exception){ }
     }
 
 
@@ -130,7 +126,6 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
             }
         }
 
-
         val allMixedFilters = repository.getAllFilterTabItems()
 
 
@@ -152,6 +147,7 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
 
         return filtersTabsListModel
     }
+
 
 
     override fun loadEpisodes() {
@@ -177,10 +173,8 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
 
 
 
-
     private fun getLabelsWithStatusTrue(items: MutableList<FiltersTabsListItemModel>): List<String> {
-        return items.filter { it.status }
-            .map { it.label }
+        return items.filter { it.status }.map { it.label }
     }
 
 

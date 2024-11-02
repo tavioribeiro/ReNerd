@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.renerd.components.filters_dialog.FilterTabListener
 import com.example.renerd.components.filters_dialog.adapters.FilterItemAdapter
 import com.example.renerd.databinding.CLayoutFilterTabBinding
 import com.example.renerd.view_models.FiltersTabsListItemModel
 
 
-class FiltersYearTabFragment(private val yearsList: List<FiltersTabsListItemModel>) : Fragment() {
+class FiltersYearTabFragment(
+    private val yearsList: List<FiltersTabsListItemModel>,
+    private val filterTabListener: FilterTabListener
+) : Fragment() {
 
     private lateinit var binding: CLayoutFilterTabBinding
 
@@ -52,8 +56,8 @@ class FiltersYearTabFragment(private val yearsList: List<FiltersTabsListItemMode
 
         val filterItemAdapter = FilterItemAdapter(
             filtersTabsListItemModelList = yearsList,
-            onClick = { isChecked, text, position ->
-
+            onClick = { filtersTabsListItemModel ->
+                filterTabListener.onItemValeuChange(filtersTabsListItemModel)
             }
         )
 
@@ -64,8 +68,8 @@ class FiltersYearTabFragment(private val yearsList: List<FiltersTabsListItemMode
 
 
     companion object {
-        fun newInstance(yearsList: List<FiltersTabsListItemModel>):FiltersYearTabFragment {
-            return FiltersYearTabFragment(yearsList)
+        fun newInstance(yearsList: List<FiltersTabsListItemModel>, filterTabListener: FilterTabListener):FiltersYearTabFragment {
+            return FiltersYearTabFragment(yearsList, filterTabListener)
         }
     }
 }

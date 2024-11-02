@@ -13,7 +13,9 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.example.renerd.R
 import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.CLayoutFilterModalBinding
+import com.example.renerd.view_models.FiltersTabsListItemModel
 import com.example.renerd.view_models.FiltersTabsListModel
 import core.extensions.hexToArgb
 import core.extensions.styleBackground
@@ -22,9 +24,10 @@ class FiltersDialog(
     private val context: Context,
     private val filtersList: FiltersTabsListModel,
     private val onSave: (FiltersTabsListModel) -> Unit
-) : DialogFragment() {
+) : DialogFragment(), FilterTabListener {
 
     private lateinit var binding: CLayoutFilterModalBinding
+    private val mixedFiltersItens: MutableList<FiltersTabsListItemModel> = mutableListOf()
 
 
     override fun onCreateView(
@@ -66,7 +69,7 @@ class FiltersDialog(
             
         }
 
-        val mainTabFragmentPhone = FiltersTabs.newInstance(filtersList)
+        val mainTabFragmentPhone = FiltersTabs.newInstance(filtersList, this)
 
         childFragmentManager.beginTransaction()
             .replace(R.id.fragmentContent, mainTabFragmentPhone)
@@ -110,5 +113,16 @@ class FiltersDialog(
 
     fun dismissModal() {
         dismiss()
+    }
+
+    override fun onItemValeuChange(filtersTabsListItemModel:FiltersTabsListItemModel) {
+        val index = mixedFiltersItens.indexOfFirst { it.label == filtersTabsListItemModel.label }
+
+        if (index != -1) {
+            mixedFiltersItens[index] = filtersTabsListItemModel
+        } else {
+            mixedFiltersItens.add(filtersTabsListItemModel)
+
+        }
     }
 }

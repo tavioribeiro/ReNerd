@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.renerd.components.filters_dialog.FilterTabListener
 import com.example.renerd.components.filters_dialog.adapters.FilterItemAdapter
 import com.example.renerd.databinding.CLayoutFilterTabBinding
 import com.example.renerd.view_models.FiltersTabsListItemModel
 
 
-class FiltersSubjectTabFragment(private val subjectsList: List<FiltersTabsListItemModel>) : Fragment() {
+class FiltersSubjectTabFragment(
+    private val subjectsList: List<FiltersTabsListItemModel>,
+    private val filterTabListener: FilterTabListener,
+) : Fragment() {
 
     private lateinit var binding: CLayoutFilterTabBinding
 
@@ -46,8 +50,8 @@ class FiltersSubjectTabFragment(private val subjectsList: List<FiltersTabsListIt
 
         val filterItemAdapter = FilterItemAdapter(
             filtersTabsListItemModelList = subjectsList,
-            onClick = { isChecked, text, position ->
-
+            onClick = { filtersTabsListItemModel ->
+                filterTabListener.onItemValeuChange(filtersTabsListItemModel)
             }
         )
 
@@ -55,8 +59,8 @@ class FiltersSubjectTabFragment(private val subjectsList: List<FiltersTabsListIt
     }
 
     companion object {
-        fun newInstance(subjectsList: List<FiltersTabsListItemModel>):FiltersSubjectTabFragment {
-            return FiltersSubjectTabFragment(subjectsList)
+        fun newInstance(subjectsList: List<FiltersTabsListItemModel>, filterTabListener: FilterTabListener):FiltersSubjectTabFragment {
+            return FiltersSubjectTabFragment(subjectsList, filterTabListener)
         }
     }
 }

@@ -6,12 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.renerd.components.filters_dialog.FilterTabListener
 import com.example.renerd.components.filters_dialog.adapters.FilterItemAdapter
+import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.CLayoutFilterTabBinding
 import com.example.renerd.view_models.FiltersTabsListItemModel
 
 
-class FiltersProductTabFragment(private val productsList: List<FiltersTabsListItemModel>) : Fragment() {
+class FiltersProductTabFragment(
+    private val productsList: List<FiltersTabsListItemModel>,
+    private val filterTabListener: FilterTabListener,
+) : Fragment() {
 
     private lateinit var binding: CLayoutFilterTabBinding
 
@@ -20,7 +25,6 @@ class FiltersProductTabFragment(private val productsList: List<FiltersTabsListIt
         savedInstanceState: Bundle?
     ): View {
         binding = CLayoutFilterTabBinding.inflate(inflater, container, false)
-
 
         return binding.root
     }
@@ -50,8 +54,8 @@ class FiltersProductTabFragment(private val productsList: List<FiltersTabsListIt
 
         val filterItemAdapter = FilterItemAdapter(
             filtersTabsListItemModelList = productsList,
-            onClick = { isChecked, text, position ->
-
+            onClick = { filtersTabsListItemModel ->
+                filterTabListener.onItemValeuChange(filtersTabsListItemModel)
             }
         )
 
@@ -60,8 +64,8 @@ class FiltersProductTabFragment(private val productsList: List<FiltersTabsListIt
 
 
     companion object {
-        fun newInstance(productsList: List<FiltersTabsListItemModel>):FiltersProductTabFragment {
-            return FiltersProductTabFragment(productsList)
+        fun newInstance(productsList: List<FiltersTabsListItemModel>, filterTabListener: FilterTabListener):FiltersProductTabFragment {
+            return FiltersProductTabFragment(productsList, filterTabListener)
         }
     }
 }

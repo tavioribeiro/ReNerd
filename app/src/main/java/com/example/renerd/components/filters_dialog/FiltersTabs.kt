@@ -10,6 +10,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.renerd.components.filters_dialog.adapters.TabsAdapter
 import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.databinding.FragmentTabListHeadBinding
+import com.example.renerd.view_models.FiltersTabsListItemModel
 import com.example.renerd.view_models.FiltersTabsListModel
 import core.extensions.styleBackground
 
@@ -18,6 +19,7 @@ import core.extensions.styleBackground
 
 class FiltersTabs(
     private val tabs: FiltersTabsListModel,
+    private val filterTabListener: FilterTabListener
 ): Fragment() {
 
     private lateinit var binding: FragmentTabListHeadBinding
@@ -64,8 +66,9 @@ class FiltersTabs(
         tabsAdapter = TabsAdapter(
             context = requireContext(),
             fragment = this,
+            filterTabListener = filterTabListener,
             size = 4,
-            tabs = tabs
+            originalTabs = tabs
         )
         binding.viewPager.adapter = tabsAdapter
 
@@ -218,8 +221,8 @@ class FiltersTabs(
 
 
     companion object {
-        fun newInstance(tabs: FiltersTabsListModel): FiltersTabs {
-            return FiltersTabs(tabs)
+        fun newInstance(tabs: FiltersTabsListModel, filterTabListener: FilterTabListener): FiltersTabs {
+            return FiltersTabs(tabs, filterTabListener)
         }
     }
 }
