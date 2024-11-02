@@ -75,10 +75,14 @@ class AudioService3 : Service() {
             elapsedTime = intent?.getIntExtra("elapsedTime", 0) ?: 0
         )
 
+        log("-------------")
+        log("Ep recebido: ${tempEpisode.id}")
+        log("Ep atual: ${currentEpisode.id}")
+        log("-------------")
 
         when (intent?.action) {
             "PLAY" -> {
-                if(tempEpisode.id != currentEpisode.id){
+                if(tempEpisode.id != currentEpisode.id && tempEpisode.id != 0){
                     this.extractTrackInfoFromIntent(intent)
                     this.stopPlaying()
                     this.startPlaying()
@@ -94,6 +98,7 @@ class AudioService3 : Service() {
         return START_NOT_STICKY
     }
 
+
     private fun extractTrackInfoFromIntent(intent: Intent?) {
         currentEpisode.id = intent?.getIntExtra("id", 0) ?: currentEpisode.id
         currentEpisode.audioUrl = intent?.getStringExtra("audioUrl") ?: currentEpisode.audioUrl
@@ -101,6 +106,7 @@ class AudioService3 : Service() {
         currentEpisode.productName = intent?.getStringExtra("productName") ?: currentEpisode.productName
         currentEpisode.imageUrl = intent?.getStringExtra("imageUrl") ?: currentEpisode.imageUrl
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun startPlaying() {
@@ -154,7 +160,6 @@ class AudioService3 : Service() {
     private fun resumePlaying() {
         if (player == null) return
 
-
         if (isPaused) {
             player?.start()
             isPaused = false
@@ -176,6 +181,7 @@ class AudioService3 : Service() {
         sendPlayerStatusUpdate()
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun stopPlaying() {
         player?.let {
@@ -190,12 +196,14 @@ class AudioService3 : Service() {
         stopForeground(true)
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onDestroy() {
         super.onDestroy()
         stopPlaying()
         mediaSessionHelper.release()
     }
+
 
     private fun startProgressUpdateJob() {
         job = CoroutineScope(Dispatchers.Default).launch {
@@ -209,9 +217,11 @@ class AudioService3 : Service() {
         }
     }
 
+
     private fun stopProgressUpdateJob() {
         job?.cancel()
     }
+
 
     private fun sendPlayerStatusUpdate() {
         val intent = Intent(FloatingPlayer.PLAYER_STATUS_UPDATE).apply {
@@ -221,6 +231,7 @@ class AudioService3 : Service() {
         }
         sendBroadcast(intent)
     }
+
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun showNotification() {
@@ -239,9 +250,11 @@ class AudioService3 : Service() {
         }
     }
 
+
     private fun updatePlaybackState(state: Int, position: Int) {
         mediaSessionHelper.updatePlaybackState(state, position)
     }
+
 
     private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
         @RequiresApi(Build.VERSION_CODES.O)
