@@ -16,7 +16,7 @@ import com.example.renerd.R
 import com.example.renerd.core.utils.formatTime
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.BottomSheetLayoutBinding
-import com.example.renerd.services.AudioService2
+import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.java.KoinJavaComponent.inject
@@ -53,8 +53,8 @@ class FloatingPlayer @JvmOverloads constructor(
 
                 updateUi(isPlaying, currentTime, totalTime)
 
-                log(currentTime)
-                log(totalTime)
+                //log(currentTime)
+                //log(totalTime)
 
                 updateDatabase(isPlaying, currentTime, totalTime)
             }
@@ -141,7 +141,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     private fun playPauseClicked() {
-        val intent = Intent(context, AudioService2::class.java)
+        val intent = Intent(context, AudioService3::class.java)
         if (isPlaying) {
             intent.action = "PAUSE"
             isPlaying = false
@@ -155,7 +155,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     private fun seekTo(position: Int) {
-        val intent = Intent(context, AudioService2::class.java)
+        val intent = Intent(context, AudioService3::class.java)
         intent.action = "SEEK_TO"
         intent.putExtra("position", position)
         context.startService(intent)
@@ -170,7 +170,7 @@ class FloatingPlayer @JvmOverloads constructor(
         currentEpisode = episode
         this.updateUi(isPlaying, episode.elapsedTime.toInt(), episode.duration.toInt())
 
-        val intent = Intent(context, AudioService2::class.java)
+        val intent = Intent(context, AudioService3::class.java)
         intent.action = "PLAY"
         intent.putExtra("id", episode.id)
         intent.putExtra("title", episode.title)
@@ -243,7 +243,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     fun stopService() {
-        val intent = Intent(context, AudioService2::class.java)
+        val intent = Intent(context, AudioService3::class.java)
         intent.action = "STOP"
         context.startService(intent)
     }

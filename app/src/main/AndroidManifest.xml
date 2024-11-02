@@ -59,5 +59,9 @@
             android:name=".services.AudioService2"
             android:foregroundServiceType="mediaPlayback"
             android:exported="false"/>
+        <service
+            android:name=".services.AudioService3"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false"/>
     </application>
 </manifest>
