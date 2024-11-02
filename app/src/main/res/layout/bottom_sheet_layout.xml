@@ -131,6 +131,7 @@
                 android:id="@+id/main_player_play_pause_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
                 android:gravity="center"
                 app:icon="@drawable/ic_play" />
         </RelativeLayout>

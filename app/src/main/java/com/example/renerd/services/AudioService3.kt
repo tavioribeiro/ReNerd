@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi
 import com.example.renerd.R
 import com.example.renerd.components.player.FloatingPlayer
 import com.example.renerd.core.extentions.loadBitmapFromUrl
+import com.example.renerd.core.utils.log
 import com.example.renerd.helpers.audio_focus.AudioFocusHelper
 import com.example.renerd.helpers.media_session.MediaSessionHelper
 import com.example.renerd.helpers.notification_compact.NotificationHelper
@@ -35,7 +36,6 @@ class AudioService3 : Service() {
     private lateinit var mediaSessionHelper: MediaSessionHelper
 
     private var isPaused = false
-    private var currentPosition = 0
 
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -65,17 +65,31 @@ class AudioService3 : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        this.extractTrackInfoFromIntent(intent)
+
+        val tempEpisode = EpisodeViewModel(
+            id = intent?.getIntExtra("id", 0) ?: currentEpisode.id,
+            audioUrl = intent?.getStringExtra("audioUrl") ?: currentEpisode.audioUrl,
+            title = intent?.getStringExtra("title") ?: currentEpisode.title,
+            productName = intent?.getStringExtra("productName") ?: currentEpisode.productName,
+            imageUrl = intent?.getStringExtra("imageUrl") ?: currentEpisode.imageUrl,
+            elapsedTime = intent?.getIntExtra("elapsedTime", 0) ?: 0
+        )
+
 
         when (intent?.action) {
             "PLAY" -> {
-                // Para a reprodução atual se estiver tocando um episódio diferente
-                stopPlaying()
-                startPlaying()
+                if(tempEpisode.id != currentEpisode.id){
+                    this.extractTrackInfoFromIntent(intent)
+                    this.stopPlaying()
+                    this.startPlaying()
+                }
+                else{
+                    this.resumePlaying()
+                }
             }
-            "PAUSE" -> pausePlaying()
-            "STOP" -> stopPlaying()
-            "SEEK_TO" -> seekTo(intent.getIntExtra("position", 0))
+            "PAUSE" -> this.pausePlaying()
+            "STOP" -> this.stopPlaying()
+            "SEEK_TO" -> this.seekTo(intent.getIntExtra("position", 0))
         }
         return START_NOT_STICKY
     }
@@ -120,9 +134,12 @@ class AudioService3 : Service() {
     }
 
 
+
+
+
     private fun pausePlaying() {
         if (isPlaying && player != null) {
-            currentPosition = player!!.currentPosition // Salva a posição atual
+            currentEpisode.elapsedTime = player!!.currentPosition // Salva a posição atual
             player?.pause()
             isPlaying = false
             isPaused = true
@@ -132,7 +149,28 @@ class AudioService3 : Service() {
         }
     }
 
+
+
+    private fun resumePlaying() {
+        if (player == null) return
+
+
+        if (isPaused) {
+            player?.start()
+            isPaused = false
+            isPlaying = true
+            player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, it) }
+            showNotification()
+        }
+        sendPlayerStatusUpdate()
+        startProgressUpdateJob()
+    }
+
+
+
+
     private fun seekTo(position: Int) {
+        if (player == null) return
         player?.seekTo(position)
         updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, position)
         sendPlayerStatusUpdate()
@@ -163,6 +201,7 @@ class AudioService3 : Service() {
         job = CoroutineScope(Dispatchers.Default).launch {
             while (isActive) {
                 if (isPlaying) {
+                    currentEpisode.elapsedTime = player?.currentPosition ?: 0
                     sendPlayerStatusUpdate()
                 }
                 delay(1000L)

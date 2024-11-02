@@ -37,7 +37,7 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
                 val filteredBySubjects = filterEpisodesBySubjectInclude(filteredByProducts, listOf("Ciências, Cinema")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
                 val filteredByGuests = filterEpisodesByGuestInclude(filteredBySubjects, listOf("Affonso Solano")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
                 val filteredByYears = filterEpisodesByYearInclude(filteredByGuests, listOf("2019", "2012")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
-                log(filteredByYears)
+                //log(filteredByYears)
 
                 view?.showEpisodes(filteredByGuests)
                 view?.hideLoading()

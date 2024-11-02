@@ -78,6 +78,7 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
 
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         context.unregisterReceiver(playerStatusReceiver)
@@ -149,6 +150,15 @@ class FloatingPlayer @JvmOverloads constructor(
             intent.action = "PLAY"
             isPlaying = true
         }
+
+        intent.putExtra("id", currentEpisode.id)
+        intent.putExtra("title", currentEpisode.title)
+        intent.putExtra("product", currentEpisode.product)
+        intent.putExtra("audioUrl", currentEpisode.audioUrl)
+        intent.putExtra("imageUrl", currentEpisode.imageUrl)
+        intent.putExtra("elapsedTime", currentEpisode.elapsedTime)
+
+
         context.startService(intent)
     }
 
