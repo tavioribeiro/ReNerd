@@ -10,15 +10,22 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.renerd.R
 import com.example.renerd.components.filters_dialog.adapters.TabsAdapter
 import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.FragmentTabListHeadBinding
 import com.example.renerd.view_models.FiltersTabsListModel
 import core.extensions.hexToArgb
 import core.extensions.styleBackground
 
 
+interface TabsAdapterListener {
+    fun onTabSlided(position: Int)
+}
+
+
+
 class FiltersTabs(
     private val tabs: FiltersTabsListModel,
-): Fragment() {
+): Fragment(), TabsAdapterListener {
 
     private lateinit var binding: FragmentTabListHeadBinding
     private lateinit var tabsAdapter: TabsAdapter
@@ -61,8 +68,59 @@ class FiltersTabs(
 
 
     private fun setUpTabs(){
-        tabsAdapter = TabsAdapter(this, requireContext(), 4, tabs)
+        tabsAdapter = TabsAdapter(
+            context = requireContext(),
+            fragment = this,
+            size = 4,
+            tabs = tabs
+        )
         binding.viewPager.adapter = tabsAdapter
+
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+                setDefaultStyle()
+
+                when(position){
+                    0 -> {
+                        binding.textViewButtonProduct.styleBackground(
+                            backgroundColor = ContextManager.getColorHex(2),
+                            radius = 50f
+                        )
+                        scrollTo(binding.textViewButtonProduct)
+                    }
+                    1 -> {
+                        binding.textViewButtonSubject.styleBackground(
+                            backgroundColor = ContextManager.getColorHex(2),
+                            radius = 50f
+                        )
+                        scrollTo(binding.textViewButtonSubject)
+                    }
+                    2 -> {
+                        binding.textViewButtonGuest.styleBackground(
+                            backgroundColor = ContextManager.getColorHex(2),
+                            radius = 50f
+                        )
+                        scrollTo(binding.textViewButtonGuest)
+                    }
+                    3 -> {
+                        binding.textViewButtonYear.styleBackground(
+                            backgroundColor = ContextManager.getColorHex(2),
+                            radius = 50f
+                        )
+                        scrollTo(binding.textViewButtonYear)
+                    }
+                }
+            }
+        })
+    }
+
+
+    private fun scrollTo(view: View){
+        view.post {
+            binding.HorizontalScrollViewButtonListContainer.smoothScrollTo(view.left, 0)
+        }
     }
 
 
@@ -166,6 +224,37 @@ class FiltersTabs(
     companion object {
         fun newInstance(tabs: FiltersTabsListModel): FiltersTabs {
             return FiltersTabs(tabs)
+        }
+    }
+
+    override fun onTabSlided(position: Int) {
+        this.setDefaultStyle()
+
+        when(position){
+            0 -> {
+                binding.textViewButtonProduct.styleBackground(
+                    backgroundColor = ContextManager.getColorHex(2),
+                    radius = 50f
+                )
+            }
+            1 -> {
+                binding.textViewButtonSubject.styleBackground(
+                    backgroundColor = ContextManager.getColorHex(2),
+                    radius = 50f
+                )
+            }
+            2 -> {
+                binding.textViewButtonGuest.styleBackground(
+                    backgroundColor = ContextManager.getColorHex(2),
+                    radius = 50f
+                )
+            }
+            3 -> {
+                binding.textViewButtonYear.styleBackground(
+                    backgroundColor = ContextManager.getColorHex(2),
+                    radius = 50f
+                )
+            }
         }
     }
 }
