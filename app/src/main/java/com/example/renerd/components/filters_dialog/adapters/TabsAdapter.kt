@@ -3,7 +3,6 @@ package com.example.renerd.components.filters_dialog.adapters
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.renerd.components.filters_dialog.TabsAdapterListener
 import com.example.renerd.components.filters_dialog.tabs.FiltersGuestTabFragment
 import com.example.renerd.components.filters_dialog.tabs.FiltersProductTabFragment
 import com.example.renerd.components.filters_dialog.tabs.FiltersSubjectTabFragment
@@ -31,7 +30,6 @@ class TabsAdapter(
     }
 
     override fun createFragment(position: Int): Fragment {
-        log(position)
         return when (position) {
             0 -> filtersProductTabFragment
             1 -> filtersSubjectTabFragment

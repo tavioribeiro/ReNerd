@@ -1,5 +1,6 @@
 package com.example.renerd.components.filters_dialog.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,5 +37,13 @@ class FilterItemAdapter(
 
     override fun getItemCount(): Int {
         return filtersTabsListItemModelList.size
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun selectAll(select: Boolean) {
+        for (item in filtersTabsListItemModelList) {
+            item.status = select
+        }
+        notifyDataSetChanged()
     }
 }

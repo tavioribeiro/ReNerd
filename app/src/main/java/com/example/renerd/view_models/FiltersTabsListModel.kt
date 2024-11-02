@@ -12,6 +12,6 @@ data class FiltersTabsListModel (
 data class FiltersTabsListItemModel (
     val label: String,
     val type: String,
-    val status: Boolean
+    var status: Boolean
 )
 
