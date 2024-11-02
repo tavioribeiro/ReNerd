@@ -199,7 +199,7 @@ class DefaultButton @JvmOverloads constructor(
 
 
 
-    fun setOnClick(listener: () -> Unit) {
+    fun setOnClickListener(listener: () -> Unit) {
         this.onClickListener = listener
     }
 

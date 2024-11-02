@@ -79,12 +79,13 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         }
     }
 
+
     override fun setUpFilterModal(filtersTabsListModel:FiltersTabsListModel){
         val filterModal = FiltersDialog(
             context = this,
             filtersList = filtersTabsListModel,
-            onSave = {
-
+            onSave = {mixedFiltersItens ->
+                log(mixedFiltersItens)
             }
         )
         filterModal.show(supportFragmentManager, "filterModal")

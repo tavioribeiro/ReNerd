@@ -23,7 +23,7 @@ import core.extensions.styleBackground
 class FiltersDialog(
     private val context: Context,
     private val filtersList: FiltersTabsListModel,
-    private val onSave: (FiltersTabsListModel) -> Unit
+    private val onSave: (MutableList<FiltersTabsListItemModel>) -> Unit
 ) : DialogFragment(), FilterTabListener {
 
     private lateinit var binding: CLayoutFilterModalBinding
@@ -56,17 +56,10 @@ class FiltersDialog(
             radius = 40f
         )
 
-/*
-        binding.boxContainer.setOnClickListener(){
-            binding.boxContainer.styleBackground(
-                backgroundColor = ContextManager.getColorHex(6),
-                radius = 40f
-            )
-        }
-*/
 
         binding.saveButtom.setOnClickListener(){
-            
+            onSave(mixedFiltersItens)
+            this.dismiss()
         }
 
         val mainTabFragmentPhone = FiltersTabs.newInstance(filtersList, this)
@@ -122,7 +115,6 @@ class FiltersDialog(
             mixedFiltersItens[index] = filtersTabsListItemModel
         } else {
             mixedFiltersItens.add(filtersTabsListItemModel)
-
         }
     }
 }
