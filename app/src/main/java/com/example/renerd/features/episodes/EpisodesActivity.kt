@@ -33,22 +33,23 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
     private fun setUpUi(){
         window.statusBarColor = Color.parseColor("#191919")
-        binding.swipeRefreshLayout.isEnabled = false
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            presenter.loadLastEpisodes()
+
+        binding.customBottomSheet.post {
+            binding.customBottomSheet.collapse()
         }
-    }
+        binding.customBottomSheet.setOnExpandedCallback {
 
+        }
+        binding.customBottomSheet.setOnCollapsedCallback {
 
-    private fun allowSwipeRefreshLayout(){
-        binding.swipeRefreshLayout.isEnabled = true
-        binding.swipeRefreshLayout.isRefreshing = false
+        }
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
         presenter.detachView()
+        binding.customBottomSheet.stopService()
     }
 
 
@@ -63,21 +64,21 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         )
         binding.recyclerviewEpisodes.adapter = adapter
 
-        this.allowSwipeRefreshLayout()
     }
 
 
     private fun goTo(episode: EpisodeViewModel){
-        val intent = Intent(this, PlayerActivity::class.java)
+        binding.customBottomSheet.startEpisode(episode)
+
+        /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("episode", episode)
         startActivity(intent)
+        */
     }
 
 
     override fun showError(message: String) {
         toast(message)
-        binding.swipeRefreshLayout.isRefreshing = false
-        this.allowSwipeRefreshLayout()
     }
 
 
