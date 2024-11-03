@@ -15,7 +15,7 @@ import com.example.renerd.R
 import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.CLayoutFilterModalBinding
-import com.example.renerd.view_models.FiltersTabsListItemModel
+import com.example.renerd.view_models.FiltersTabsItemModel
 import com.example.renerd.view_models.FiltersTabsListModel
 import core.extensions.hexToArgb
 import core.extensions.styleBackground
@@ -23,11 +23,11 @@ import core.extensions.styleBackground
 class FiltersDialog(
     private val context: Context,
     private val filtersList: FiltersTabsListModel,
-    private val onSave: (MutableList<FiltersTabsListItemModel>) -> Unit
+    private val onSave: (MutableList<FiltersTabsItemModel>) -> Unit
 ) : DialogFragment(), FilterTabListener {
 
     private lateinit var binding: CLayoutFilterModalBinding
-    private val mixedFiltersItens: MutableList<FiltersTabsListItemModel> = mutableListOf()
+    private val mixedFiltersItens: MutableList<FiltersTabsItemModel> = mutableListOf()
 
 
     override fun onCreateView(
@@ -58,6 +58,7 @@ class FiltersDialog(
 
 
         binding.saveButtom.setOnClickListener(){
+            log(mixedFiltersItens)
             onSave(mixedFiltersItens)
             this.dismiss()
         }
@@ -70,6 +71,16 @@ class FiltersDialog(
     }
 
 
+
+    override fun onItemValeuChange(filtersTabsItemModel:FiltersTabsItemModel) {
+        val index = mixedFiltersItens.indexOfFirst { it.id == filtersTabsItemModel.id }
+
+        if (index != -1) {
+            mixedFiltersItens[index] = filtersTabsItemModel
+        } else {
+            mixedFiltersItens.add(filtersTabsItemModel)
+        }
+    }
 
 
 
@@ -106,15 +117,5 @@ class FiltersDialog(
 
     fun dismissModal() {
         dismiss()
-    }
-
-    override fun onItemValeuChange(filtersTabsListItemModel:FiltersTabsListItemModel) {
-        val index = mixedFiltersItens.indexOfFirst { it.label == filtersTabsListItemModel.label }
-
-        if (index != -1) {
-            mixedFiltersItens[index] = filtersTabsListItemModel
-        } else {
-            mixedFiltersItens.add(filtersTabsListItemModel)
-        }
     }
 }

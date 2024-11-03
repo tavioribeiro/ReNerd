@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.renerd.components.filters_dialog.FilterTabListener
 import com.example.renerd.components.filters_dialog.adapters.FilterItemAdapter
 import com.example.renerd.databinding.CLayoutFilterTabBinding
-import com.example.renerd.view_models.FiltersTabsListItemModel
+import com.example.renerd.view_models.FiltersTabsItemModel
 
 
 class FiltersGuestTabFragment(
-    private val guestsList: List<FiltersTabsListItemModel>,
+    private val guestsList: List<FiltersTabsItemModel>,
     private val filterTabListener: FilterTabListener
 ) : Fragment() {
 
@@ -53,7 +53,7 @@ class FiltersGuestTabFragment(
         binding.recyclerviewBase.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         val filterItemAdapter = FilterItemAdapter(
-            filtersTabsListItemModelList = guestsList,
+            filtersTabsListItemModel = guestsList,
             onClick = { filtersTabsListItemModel ->
                 filterTabListener.onItemValeuChange(filtersTabsListItemModel)
             }
@@ -65,7 +65,7 @@ class FiltersGuestTabFragment(
 
 
     companion object {
-        fun newInstance(guestsList: List<FiltersTabsListItemModel>, filterTabListener: FilterTabListener):FiltersGuestTabFragment {
+        fun newInstance(guestsList: List<FiltersTabsItemModel>, filterTabListener: FilterTabListener):FiltersGuestTabFragment {
             return FiltersGuestTabFragment(guestsList, filterTabListener)
         }
     }

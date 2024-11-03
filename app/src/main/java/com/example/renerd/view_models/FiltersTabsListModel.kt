@@ -2,16 +2,17 @@ package com.example.renerd.view_models
 
 
 data class FiltersTabsListModel (
-    val productsList: MutableList<FiltersTabsListItemModel>,
-    val subjectsList: MutableList<FiltersTabsListItemModel>,
-    val guestsList: MutableList<FiltersTabsListItemModel>,
-    val yearsList: MutableList<FiltersTabsListItemModel>
+    val productsList: MutableList<FiltersTabsItemModel>,
+    val subjectsList: MutableList<FiltersTabsItemModel>,
+    val guestsList: MutableList<FiltersTabsItemModel>,
+    val yearsList: MutableList<FiltersTabsItemModel>
 )
 
 
-data class FiltersTabsListItemModel (
-    val label: String,
-    val type: String,
+data class FiltersTabsItemModel (
+    var id : Int ? = null,
+    var label: String,
+    var type: String,
     var status: Boolean
 )
 

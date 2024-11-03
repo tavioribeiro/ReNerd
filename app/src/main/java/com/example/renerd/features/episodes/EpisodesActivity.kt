@@ -34,11 +34,9 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
         this.setUpUi()
-        this.setUpActionButtons()
         presenter.attachView(this)
 
         presenter.getFiltersTabsList()
-        //presenter.loadEpisodes()
     }
 
 
@@ -48,8 +46,6 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
-
-
 
 
         binding.swipeRefreshLayout.isEnabled = false
@@ -62,7 +58,10 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     override fun showActionButtons(tempFiltersTabsListModel:FiltersTabsListModel) {
         filtersTabsListModel = tempFiltersTabsListModel
 
-        binding.iconFilter.fadeInAnimationNoRepeat(1000) {  }
+
+        binding.iconFilter.fadeInAnimationNoRepeat(1000) {
+            this.setUpActionButtons()
+        }
         binding.iconSearch.fadeInAnimationNoRepeat(1000) {  }
 
         presenter.loadEpisodes()
@@ -72,11 +71,10 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
     private fun setUpActionButtons(){
         binding.iconFilter.setOnClickListener(){
-            setUpFilterModal(filtersTabsListModel)
+            this.setUpFilterModal(filtersTabsListModel)
         }
 
-        binding.iconSearch.setOnClickListener(){
-        }
+        binding.iconSearch.setOnClickListener(){}
     }
 
 
@@ -84,8 +82,8 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         val filterModal = FiltersDialog(
             context = this,
             filtersList = filtersTabsListModel,
-            onSave = {mixedFiltersItens ->
-                log(mixedFiltersItens)
+            onSave = { mixedFiltersItens ->
+                presenter.updateFiltersTabsItemList(mixedFiltersItens)
             }
         )
         filterModal.show(supportFragmentManager, "filterModal")

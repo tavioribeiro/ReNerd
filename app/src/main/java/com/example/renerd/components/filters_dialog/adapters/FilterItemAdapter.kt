@@ -8,11 +8,12 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.renerd.R
-import com.example.renerd.view_models.FiltersTabsListItemModel
+import com.example.renerd.core.utils.log
+import com.example.renerd.view_models.FiltersTabsItemModel
 
 class FilterItemAdapter(
-    private val filtersTabsListItemModelList: List<FiltersTabsListItemModel>,
-    private val onClick: (FiltersTabsListItemModel) -> Unit
+    private val filtersTabsListItemModel: List<FiltersTabsItemModel>,
+    private val onClick: (FiltersTabsItemModel) -> Unit
 ) : RecyclerView.Adapter<FilterItemAdapter.FilterItemViewHolder>() {
 
     class FilterItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,23 +27,26 @@ class FilterItemAdapter(
     }
 
     override fun onBindViewHolder(holder: FilterItemViewHolder, position: Int) {
-        val currentItem = filtersTabsListItemModelList[position]
-        holder.textView.text = currentItem.label
-        holder.checkBox.isChecked = currentItem.status
+        val item = filtersTabsListItemModel[position]
+        holder.textView.text = item.label
+
+        holder.checkBox.setOnCheckedChangeListener(null)
+        holder.checkBox.isChecked = item.status
 
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
-            currentItem.status = isChecked
-            onClick(currentItem)
+            item.status = isChecked
+            onClick(item)
+            notifyItemChanged(position)
         }
     }
 
     override fun getItemCount(): Int {
-        return filtersTabsListItemModelList.size
+        return filtersTabsListItemModel.size
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun selectAll(select: Boolean) {
-        for (item in filtersTabsListItemModelList) {
+        for (item in filtersTabsListItemModel) {
             item.status = select
         }
         notifyDataSetChanged()

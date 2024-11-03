@@ -1,7 +1,7 @@
 package com.example.renerd.features.episodes
 
 import com.example.renerd.view_models.EpisodeViewModel
-import com.example.renerd.view_models.FiltersTabsListItemModel
+import com.example.renerd.view_models.FiltersTabsItemModel
 import com.example.renerd.view_models.FiltersTabsListModel
 
 
@@ -19,17 +19,22 @@ interface EpisodesContract {
     interface Presenter {
         fun attachView(view: View)
         fun detachView()
-        fun getFiltersTabsList()
-        fun updateFiltersTabsList(tempFiltersTabsListModel:FiltersTabsListModel)
+
         fun loadEpisodes()
         fun loadLastEpisodes()
+
+
+        fun getFiltersTabsList()
+        fun updateFiltersTabsList(tempFiltersTabsListModel:FiltersTabsListModel)
+        fun updateFiltersTabsItemList(mixedFiltersTabsItemModel: MutableList<FiltersTabsItemModel>)
     }
 
     interface Repository {
         suspend fun getEpisodes(): MutableList<EpisodeViewModel>
 
-        suspend fun insertFilterTabItem(filtersTabsListItemModel: FiltersTabsListItemModel)
-        suspend fun getAllFilterTabItems(): MutableList<FiltersTabsListItemModel>
+        suspend fun insertFilterTabItem(filtersTabsItemModel: FiltersTabsItemModel)
+        suspend fun getAllFilterTabItems(): MutableList<FiltersTabsItemModel>
+        suspend fun updateFilterTabItem(filtersTabsItemModel: FiltersTabsItemModel)
 /*
         suspend fun insertFilterProductTabItem(filtersTabsListItemModel: FiltersTabsListItemModel)
         suspend fun getAllFilterProductTabItems(): MutableList<FiltersTabsListItemModel>

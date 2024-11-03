@@ -5,7 +5,7 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.example.renerd.Database
 import com.example.renerd.view_models.EpisodeViewModel
-import com.example.renerd.view_models.FiltersTabsListItemModel
+import com.example.renerd.view_models.FiltersTabsItemModel
 import com.example.renerd.view_models.toEpisodeViewModel
 
 
@@ -57,8 +57,9 @@ class DatabaseHelper(context: Context) {
     //******************************************************
 
     // Insere um novo FilterProductTabItem
-    fun insertFilterTabItem(filterTabItem: FiltersTabsListItemModel) {
+    fun insertFilterTabItem(filterTabItem: FiltersTabsItemModel) {
         database.filterTabItemQueries.insertFilterTabItem(
+            id = null,
             label = filterTabItem.label,
             type = filterTabItem.type,
             status = filterTabItem.status
@@ -66,12 +67,25 @@ class DatabaseHelper(context: Context) {
     }
 
     // Pega todos os FilterProductTabItem
-    fun getAllFilterTabItems(): List<FiltersTabsListItemModel> {
+    fun getAllFilterTabItems(): List<FiltersTabsItemModel> {
         return database.filterTabItemQueries.selectAllFilterTabItem().executeAsList().map { dbModel ->
-            com.example.renerd.view_models.FiltersTabsListItemModel(
-                label = dbModel.label,
+            com.example.renerd.view_models.FiltersTabsItemModel(
+                id = dbModel.id.toInt(),
+                label = dbModel.label ?: "",
                 type = dbModel.type ?: "",
                 status = dbModel.status ?: true
+            )
+        }
+    }
+
+    // Insere um novo FilterProductTabItem
+    fun updateFilterTabItem(filterTabItem: FiltersTabsItemModel) {
+        filterTabItem.id?.let {
+            database.filterTabItemQueries.updateFilterTabItem(
+                id = it.toLong(),
+                label = filterTabItem.label,
+                type = filterTabItem.type,
+                status = filterTabItem.status
             )
         }
     }
@@ -79,12 +93,12 @@ class DatabaseHelper(context: Context) {
     //******************************************************
 
     // Pega todos os FilterProductTabItem
-    fun getAllFilterProductTabItems(): List<FiltersTabsListItemModel> {
-        return database.filterProductTabItemQueries.selectAllFilterProductTabItem().executeAsList().map { it as FiltersTabsListItemModel }
+    fun getAllFilterProductTabItems(): List<FiltersTabsItemModel> {
+        return database.filterProductTabItemQueries.selectAllFilterProductTabItem().executeAsList().map { it as FiltersTabsItemModel }
     }
 
     // Insere um novo FilterProductTabItem
-    fun insertFilterProductTabItem(filterProductTabItem: FiltersTabsListItemModel) {
+    fun insertFilterProductTabItem(filterProductTabItem: FiltersTabsItemModel) {
         database.filterProductTabItemQueries.insertFilterProductTabItem(
             label = filterProductTabItem.label,
             status = filterProductTabItem.status
@@ -95,12 +109,12 @@ class DatabaseHelper(context: Context) {
     //******************************************************
 
     // Pega todos os FilterSubjectTabItem
-    fun getAllFilterSubjectTabItems(): List<FiltersTabsListItemModel> {
-        return database.filterSubjectTabItemQueries.selectAllFilterSubjectTabItem().executeAsList().map { it as FiltersTabsListItemModel}
+    fun getAllFilterSubjectTabItems(): List<FiltersTabsItemModel> {
+        return database.filterSubjectTabItemQueries.selectAllFilterSubjectTabItem().executeAsList().map { it as FiltersTabsItemModel}
     }
 
     // Insere um novo FilterSubjectTabItem
-    fun insertFilterSubjectTabItem(filterSubjectTabItem: FiltersTabsListItemModel) {
+    fun insertFilterSubjectTabItem(filterSubjectTabItem: FiltersTabsItemModel) {
         database.filterSubjectTabItemQueries.insertFilterSubjectTabItem(
             label = filterSubjectTabItem.label,
             status = filterSubjectTabItem.status
@@ -111,12 +125,12 @@ class DatabaseHelper(context: Context) {
     //******************************************************
 
 
-    fun getAllFilterGuestTabItems(): List<FiltersTabsListItemModel> {
-        return database.filterGuestTabItemQueries.selectAllFilterGuestTabItem().executeAsList().map { it as FiltersTabsListItemModel }
+    fun getAllFilterGuestTabItems(): List<FiltersTabsItemModel> {
+        return database.filterGuestTabItemQueries.selectAllFilterGuestTabItem().executeAsList().map { it as FiltersTabsItemModel }
     }
 
     // Insere um novo FilterGuestTabItem
-    fun insertFilterGuestTabItem(filterGuestTabItem: FiltersTabsListItemModel) {
+    fun insertFilterGuestTabItem(filterGuestTabItem: FiltersTabsItemModel) {
         database.filterGuestTabItemQueries.insertFilterGuestTabItem(
             label = filterGuestTabItem.label,
             status = filterGuestTabItem.status
@@ -127,12 +141,12 @@ class DatabaseHelper(context: Context) {
 
 
     // Pega todos os FilterYearTabItem
-    fun getAllFilterYearTabItems(): List<FiltersTabsListItemModel> {
-        return database.filterYearTabItemQueries.selectAllFilterYearTabItem().executeAsList().map { it as FiltersTabsListItemModel }
+    fun getAllFilterYearTabItems(): List<FiltersTabsItemModel> {
+        return database.filterYearTabItemQueries.selectAllFilterYearTabItem().executeAsList().map { it as FiltersTabsItemModel }
     }
 
     // Insere um novo FilterYearTabItem
-    fun insertFilterYearTabItem(filterYearTabItem: FiltersTabsListItemModel) {
+    fun insertFilterYearTabItem(filterYearTabItem: FiltersTabsItemModel) {
         database.filterYearTabItemQueries.insertFilterYearTabItem(
             label = filterYearTabItem.label,
             status = filterYearTabItem.status

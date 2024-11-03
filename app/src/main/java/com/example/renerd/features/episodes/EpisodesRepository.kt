@@ -9,14 +9,11 @@ import com.example.renerd.core.network.PodcastClient
 import com.example.renerd.core.utils.getCurrentDateFormatted
 import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
-import com.example.renerd.view_models.FiltersTabsListItemModel
+import com.example.renerd.view_models.FiltersTabsItemModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 import java.net.URLDecoder
-import kotlin.random.Random
 
 class EpisodesRepository: EpisodesContract.Repository {
     val context = ContextManager.getGlobalContext()
@@ -87,17 +84,17 @@ class EpisodesRepository: EpisodesContract.Repository {
 
 
 
-    override suspend fun insertFilterTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
+    override suspend fun insertFilterTabItem(filtersTabsItemModel: FiltersTabsItemModel) {
         withContext(Dispatchers.IO) {
             try {
-                dbHelper.insertFilterTabItem(filterTabItem = filtersTabsListItemModel)
+                dbHelper.insertFilterTabItem(filterTabItem = filtersTabsItemModel)
             } catch (e: SocketTimeoutException) {
                 log(e)
             }
         }
     }
 
-    override suspend fun getAllFilterTabItems(): MutableList<FiltersTabsListItemModel> {
+    override suspend fun getAllFilterTabItems(): MutableList<FiltersTabsItemModel> {
         return withContext(Dispatchers.IO) {
             try {
                 val localFilterTabItems = dbHelper.getAllFilterTabItems().toMutableList()
@@ -113,6 +110,16 @@ class EpisodesRepository: EpisodesContract.Repository {
         }
     }
 
+
+    override suspend fun updateFilterTabItem(filtersTabsItemModel: FiltersTabsItemModel) {
+        withContext(Dispatchers.IO) {
+            try {
+                dbHelper.updateFilterTabItem(filterTabItem = filtersTabsItemModel)
+            } catch (e: SocketTimeoutException) {
+                log(e)
+            }
+        }
+    }
 
 
 
