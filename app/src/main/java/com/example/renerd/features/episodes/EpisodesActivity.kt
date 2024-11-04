@@ -68,6 +68,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
 
+
     private fun setUpActionButtons(){
         binding.iconFilter.setOnClickListener(){
             this.setUpFilterModal(filtersTabsListModel)
