@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/background"
-        android:background="@color/color1"
         android:orientation="vertical"
         android:gravity="center"
+        android:background="@color/color1"
         tools:context=".features.episodes.EpisodesActivity">
-
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -55,20 +52,17 @@
                     android:visibility="gone"
                     android:src="@drawable/icon_search"/>
             </LinearLayout>
-
-
-
         </RelativeLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_episodes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:visibility="invisible"/>
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -79,7 +73,16 @@
                 android:backgroundTint="@color/white"
                 app:indicatorColor="@color/white"
                 android:indeterminate="true"/>
-
         </FrameLayout>
     </LinearLayout>
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.example.renerd.components.player.FloatingPlayer
+        android:id="@+id/customBottomSheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        app:behavior_peekHeight="50dp"
+        app:behavior_hideable="false"
+        app:behavior_expandedOffset="0dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -47,10 +47,10 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         )
 
 
-        binding.swipeRefreshLayout.isEnabled = false
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            //presenter.loadLastEpisodes()
-        }
+       // binding.swipeRefreshLayout.isEnabled = false
+//        binding.swipeRefreshLayout.setOnRefreshListener {
+//            //presenter.loadLastEpisodes()
+//        }
     }
 
 
@@ -90,8 +90,8 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
     private fun allowSwipeRefreshLayout(){
-        binding.swipeRefreshLayout.isEnabled = true
-        binding.swipeRefreshLayout.isRefreshing = false
+       // binding.swipeRefreshLayout.isEnabled = true
+       // binding.swipeRefreshLayout.isRefreshing = false
     }
 
 
@@ -112,20 +112,22 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         )
         binding.recyclerviewEpisodes.adapter = adapter
 
-        this.allowSwipeRefreshLayout()
+        //this.allowSwipeRefreshLayout()
     }
 
 
     private fun goTo(episode: EpisodeViewModel){
-        val intent = Intent(this, PlayerActivity::class.java)
+        binding.customBottomSheet.startEpisode(episode)
+
+        /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("episode", episode)
-        startActivity(intent)
+        startActivity(intent)*/
     }
 
 
     override fun showError(message: String) {
         toast(message)
-        binding.swipeRefreshLayout.isRefreshing = false
+       // binding.swipeRefreshLayout.isRefreshing = false
         this.allowSwipeRefreshLayout()
     }
 
