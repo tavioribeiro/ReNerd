@@ -32,7 +32,6 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         binding = ActivityEpisodesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         this.setUpUi()
         presenter.attachView(this)
 

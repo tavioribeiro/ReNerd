@@ -43,19 +43,19 @@ class EpisodesRepository: EpisodesContract.Repository {
                     if (!podcasts.isNullOrEmpty()) {
                         for (episode in podcasts) {
                             val episodeViewModel = EpisodeViewModel(
-                                id = episode.id.toLong(),
+                                id = episode.id,
                                 title = episode.title ?: "",
                                 description = episode.description ?: "",
                                 imageUrl = episode.image ?: "",
                                 audioUrl = episode.audioHigh ?: "",
-                                duration = episode.duration.toLong(),
+                                duration = episode.duration,
                                 publishedAt = episode.publishedAt ?: "",
                                 slug = episode.slug ?: "",
                                 episode = episode.episode ?: "",
                                 product = episode.product ?: "",
                                 productName = episode.productName ?: "",
                                 subject = episode.subject ?: "",
-                                jumpToTime = episode.jumpToTime.startTime.toLong(),
+                                jumpToTime = episode.jumpToTime.startTime,
                                 guests = episode.guests ?: "",
                                 postTypeClass = episode.postTypeClass ?: "",
                             )
@@ -263,19 +263,19 @@ class EpisodesRepository: EpisodesContract.Repository {
                     if (!podcasts.isNullOrEmpty()) {
                         for (episode in podcasts) {
                             val episodeViewModel = EpisodeViewModel(
-                                id = episode.id.toLong(),
+                                id = episode.id,
                                 title = episode.title ?: "",
                                 description = episode.description ?: "",
                                 imageUrl = episode.image ?: "",
                                 audioUrl = episode.audioHigh ?: "",
-                                duration = episode.duration.toLong(),
+                                duration = episode.duration,
                                 publishedAt = episode.publishedAt ?: "",
                                 slug = episode.slug ?: "",
                                 episode = episode.episode ?: "",
                                 product = episode.product ?: "",
                                 productName = episode.productName ?: "",
                                 subject = episode.subject ?: "",
-                                jumpToTime = episode.jumpToTime.startTime.toLong(),
+                                jumpToTime = episode.jumpToTime.startTime,
                                 guests = episode.guests ?: "",
                                 postTypeClass = episode.postTypeClass ?: "",
                             )

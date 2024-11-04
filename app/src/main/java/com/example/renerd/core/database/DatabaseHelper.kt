@@ -22,7 +22,7 @@ class DatabaseHelper(context: Context) {
     }
 
     // Pega um episódio por ID
-    fun getEpisodeById(id: Long): EpisodeViewModel? { // Ajuste o tipo para Long
+    fun getEpisodeById(id: Long): EpisodeViewModel? {
         return database.episodeQueries.selectEpisodeById(id).executeAsOneOrNull()?.toEpisodeViewModel()
     }
 
@@ -33,23 +33,56 @@ class DatabaseHelper(context: Context) {
             description = episode.description,
             image_url = episode.imageUrl,
             audio_url = episode.audioUrl,
-            duration = episode.duration,
+            duration = episode.duration.toLong(),
             published_at = episode.publishedAt,
             slug = episode.slug,
             episode = episode.episode,
             product = episode.product,
             product_name = episode.productName,
             subject = episode.subject,
-            jump_to_time = episode.jumpToTime,
+            jump_to_time = episode.jumpToTime.toLong(),
             guests = episode.guests,
             post_type_class = episode.postTypeClass,
-            elapsed_time = episode.elapsedTime
+            elapsed_time = episode.elapsedTime.toLong()
         )
     }
 
     // Deleta um episódio por ID
-    fun deleteEpisodeById(id: Long) { // Ajuste o tipo para Long
+    fun deleteEpisodeById(id: Long) {
         database.episodeQueries.deleteEpisodeById(id)
+    }
+
+
+    // Atualiza um episódio existente
+    fun updateEpisode(episode: EpisodeViewModel) {
+        database.episodeQueries.updateEpisode(
+            title = episode.title,
+            description = episode.description,
+            image_url = episode.imageUrl,
+            audio_url = episode.audioUrl,
+            duration = episode.duration.toLong(),
+            published_at = episode.publishedAt,
+            slug = episode.slug,
+            episode = episode.episode,
+            product = episode.product,
+            product_name = episode.productName,
+            subject = episode.subject,
+            jump_to_time = episode.jumpToTime.toLong(),
+            guests = episode.guests,
+            post_type_class = episode.postTypeClass,
+            elapsed_time = episode.elapsedTime.toLong(),
+            id = episode.id.toLong()
+        )
+    }
+
+    // Verifica se um episódio existe pelo ID
+    fun episodeExists(id: Long): Boolean {
+        return database.episodeQueries.selectEpisodeById(id).executeAsOneOrNull() != null
+    }
+
+    // Limpa todos os episódios do banco de dados
+    fun deleteAllEpisodes() {
+        database.episodeQueries.deleteAllEpisodes()
     }
 
 
@@ -89,71 +122,5 @@ class DatabaseHelper(context: Context) {
             )
         }
     }
-
-    //******************************************************
-
-    // Pega todos os FilterProductTabItem
-    fun getAllFilterProductTabItems(): List<FiltersTabsItemModel> {
-        return database.filterProductTabItemQueries.selectAllFilterProductTabItem().executeAsList().map { it as FiltersTabsItemModel }
-    }
-
-    // Insere um novo FilterProductTabItem
-    fun insertFilterProductTabItem(filterProductTabItem: FiltersTabsItemModel) {
-        database.filterProductTabItemQueries.insertFilterProductTabItem(
-            label = filterProductTabItem.label,
-            status = filterProductTabItem.status
-        )
-    }
-
-
-    //******************************************************
-
-    // Pega todos os FilterSubjectTabItem
-    fun getAllFilterSubjectTabItems(): List<FiltersTabsItemModel> {
-        return database.filterSubjectTabItemQueries.selectAllFilterSubjectTabItem().executeAsList().map { it as FiltersTabsItemModel}
-    }
-
-    // Insere um novo FilterSubjectTabItem
-    fun insertFilterSubjectTabItem(filterSubjectTabItem: FiltersTabsItemModel) {
-        database.filterSubjectTabItemQueries.insertFilterSubjectTabItem(
-            label = filterSubjectTabItem.label,
-            status = filterSubjectTabItem.status
-        )
-    }
-
-
-    //******************************************************
-
-
-    fun getAllFilterGuestTabItems(): List<FiltersTabsItemModel> {
-        return database.filterGuestTabItemQueries.selectAllFilterGuestTabItem().executeAsList().map { it as FiltersTabsItemModel }
-    }
-
-    // Insere um novo FilterGuestTabItem
-    fun insertFilterGuestTabItem(filterGuestTabItem: FiltersTabsItemModel) {
-        database.filterGuestTabItemQueries.insertFilterGuestTabItem(
-            label = filterGuestTabItem.label,
-            status = filterGuestTabItem.status
-        )
-    }
-
-    //******************************************************
-
-
-    // Pega todos os FilterYearTabItem
-    fun getAllFilterYearTabItems(): List<FiltersTabsItemModel> {
-        return database.filterYearTabItemQueries.selectAllFilterYearTabItem().executeAsList().map { it as FiltersTabsItemModel }
-    }
-
-    // Insere um novo FilterYearTabItem
-    fun insertFilterYearTabItem(filterYearTabItem: FiltersTabsItemModel) {
-        database.filterYearTabItemQueries.insertFilterYearTabItem(
-            label = filterYearTabItem.label,
-            status = filterYearTabItem.status
-        )
-    }
-
-
-    //******************************************************
 
 }

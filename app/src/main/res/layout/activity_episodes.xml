@@ -79,6 +79,7 @@
                 android:backgroundTint="@color/white"
                 app:indicatorColor="@color/white"
                 android:indeterminate="true"/>
+
         </FrameLayout>
     </LinearLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

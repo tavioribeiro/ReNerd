@@ -51,3 +51,28 @@ INSERT INTO Episode (
 deleteEpisodeById:
 DELETE FROM Episode WHERE id = ?;
 
+
+
+-- Query para atualizar um episódio
+updateEpisode:
+UPDATE Episode SET
+    title = ?,
+    description = ?,
+    image_url = ?,
+    audio_url = ?,
+    duration = ?,
+    published_at = ?,
+    slug = ?,
+    episode = ?,
+    product = ?,
+    product_name = ?,
+    subject = ?,
+    jump_to_time = ?,
+    guests = ?,
+    post_type_class = ?,
+    elapsed_time = ?
+WHERE id = ?;
+
+-- Query para deletar todos os episódios
+deleteAllEpisodes:
+DELETE FROM Episode;
