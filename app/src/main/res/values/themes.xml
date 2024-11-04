@@ -17,7 +17,7 @@
 
 <style name="Base.Theme.ReNerd" parent="Theme.MaterialComponents.DayNight.NoActionBar">
     <item name="android:windowTranslucentStatus">true</item>
-    <item name="android:fontFamily">@font/inter_regular</item>
+    <item name="android:fontFamily">@font/geist_regular_fontfamily</item>
 </style>
 
 <style name="Theme.ReNerd" parent="Base.Theme.ReNerd" />
