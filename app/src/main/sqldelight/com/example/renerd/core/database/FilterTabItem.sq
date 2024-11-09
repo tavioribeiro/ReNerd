@@ -1,7 +1,7 @@
 import kotlin.Boolean;
 
-CREATE TABLE FiltersTabsListItemModel (
-    id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS FiltersTabsListItemModel (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     label TEXT,
     type TEXT,
     status INTEGER AS Boolean DEFAULT 0
