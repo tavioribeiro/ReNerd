@@ -112,22 +112,21 @@ class AudioService3 : Service() {
     private fun startPlaying() {
         audioFocusHelper.requestAudioFocus()
 
-        // Se já há um player ativo, pare a reprodução anterior
         if (player != null) {
             player?.stop()
             player?.reset()
             player?.release()
         }
 
-        // Inicialize um novo MediaPlayer
         player = MediaPlayer().apply {
             try {
                 setDataSource(currentEpisode.audioUrl)
                 setOnPreparedListener {
-                    it.seekTo(currentPosition) // Começa de onde parou
+                    // Use a posição salva em currentEpisode.elapsedTime
+                    it.seekTo(currentEpisode.elapsedTime)
                     it.start()
                     this@AudioService3.isPlaying = true
-                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentPosition)
+                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentEpisode.elapsedTime)
                     showNotification()
                     startProgressUpdateJob()
                     sendPlayerStatusUpdate()
@@ -157,18 +156,26 @@ class AudioService3 : Service() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun resumePlaying() {
-        if (player == null) return
+        if (player == null) {
+            // Se o player for nulo, inicie uma nova reprodução
+            startPlaying()
+            return
+        }
 
         if (isPaused) {
+            // Garante que a posição correta seja mantida
+            val savedPosition = currentEpisode.elapsedTime
+            player?.seekTo(savedPosition)
             player?.start()
             isPaused = false
             isPlaying = true
-            player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, it) }
+            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, savedPosition)
             showNotification()
+            sendPlayerStatusUpdate()
+            startProgressUpdateJob()
         }
-        sendPlayerStatusUpdate()
-        startProgressUpdateJob()
     }
 
 
