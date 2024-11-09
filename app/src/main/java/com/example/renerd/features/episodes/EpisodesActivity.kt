@@ -34,7 +34,6 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
         this.setUpUi()
         presenter.attachView(this)
-
         presenter.getFiltersTabsList()
     }
 
@@ -45,12 +44,6 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
-
-
-       // binding.swipeRefreshLayout.isEnabled = false
-//        binding.swipeRefreshLayout.setOnRefreshListener {
-//            //presenter.loadLastEpisodes()
-//        }
     }
 
 
@@ -97,8 +90,9 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
     override fun onDestroy() {
-        super.onDestroy()
+        binding.customBottomSheet.stopService()
         presenter.detachView()
+        super.onDestroy()
     }
 
 

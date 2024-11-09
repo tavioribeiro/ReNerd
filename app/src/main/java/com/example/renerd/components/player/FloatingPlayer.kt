@@ -14,11 +14,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.utils.formatTime
-import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.BottomSheetLayoutBinding
 import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import core.extensions.fadeInAnimation
 import org.koin.java.KoinJavaComponent.inject
 
 
@@ -40,7 +40,25 @@ class FloatingPlayer @JvmOverloads constructor(
     private var currentEpisode = EpisodeViewModel()
 
     init {
-        // View.inflate(context, R.layout.bottom_sheet_layout, this)
+        binding.mainContainer.visibility = View.GONE
+
+        presenter.attachView(this)
+        presenter.getCurrentPlayingEpisode()
+    }
+
+
+    override fun showUi(){
+        binding.mainContainer.fadeInAnimation {
+            binding.mainContainer.visibility = View.VISIBLE
+        }
+    }
+
+    override fun updateInfosUi(episode: EpisodeViewModel){
+        // Atualizar a UI do player
+        binding.miniPlayerTitle.text = episode.title
+        binding.miniPlayerProduct.text = episode.product
+        binding.miniPlayerPoster.load(episode.imageUrl)
+        binding.mainPlayerPoster.load(episode.imageUrl)
     }
 
 
@@ -51,7 +69,7 @@ class FloatingPlayer @JvmOverloads constructor(
                 val currentTime = intent.getIntExtra(CURRENT_TIME, 0)
                 val totalTime = intent.getIntExtra(TOTAL_TIME, 0)
 
-                updateUi(isPlaying, currentTime, totalTime)
+                updatePlayPauseButtonUi(isPlaying, currentTime, totalTime)
 
                 //log(currentTime)
                 //log(totalTime)
@@ -86,7 +104,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
 
-    private fun updatePlayerUI(currentTime: Int, totalTime: Int) {
+    private fun updatePlayerTimerUI(currentTime: Int, totalTime: Int) {
         binding.mainPlayerCurrentTime.text = formatTime(currentTime)
         binding.mainPlayerTotalTime.text = formatTime(totalTime)
         binding.mainPlayerSeekBar.max = totalTime
@@ -174,11 +192,14 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     fun startEpisode(episode: EpisodeViewModel) {
-        // Pare o serviço se estiver tocando outro episódio
-        //this.stopService()
-
         currentEpisode = episode
-        this.updateUi(isPlaying, episode.elapsedTime.toInt(), episode.duration.toInt())
+
+        presenter.setCurrentPlayingEpisodeId(episode)
+
+
+        this.updatePlayPauseButtonUi(isPlaying, episode.elapsedTime.toInt(), episode.duration.toInt())
+        this.showUi()
+
 
         val intent = Intent(context, AudioService3::class.java)
         intent.action = "PLAY"
@@ -190,13 +211,11 @@ class FloatingPlayer @JvmOverloads constructor(
         intent.putExtra("elapsedTime", episode.elapsedTime)
 
 
+
         context.startService(intent)
 
         // Atualizar a UI do player
-        binding.miniPlayerTitle.text = episode.title
-        binding.miniPlayerProduct.text = episode.product
-        binding.miniPlayerPoster.load(episode.imageUrl)
-        binding.mainPlayerPoster.load(episode.imageUrl)
+        updateInfosUi(episode)
 
         isPlaying = true
     }
@@ -212,7 +231,7 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
 
-    fun updateUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
+     fun updatePlayPauseButtonUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
         this.isPlaying = isPlaying
         if (isPlaying) {
             binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
@@ -221,7 +240,7 @@ class FloatingPlayer @JvmOverloads constructor(
             binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play)
             binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_play)
         }
-        updatePlayerUI(currentTime, totalTime)
+        updatePlayerTimerUI(currentTime, totalTime)
     }
 
 

@@ -75,10 +75,6 @@ class AudioService3 : Service() {
             elapsedTime = intent?.getIntExtra("elapsedTime", 0) ?: 0
         )
 
-        log("-------------")
-        log("Ep recebido: ${tempEpisode.id}")
-        log("Ep atual: ${currentEpisode.id}")
-        log("-------------")
 
         when (intent?.action) {
             "PLAY" -> {
