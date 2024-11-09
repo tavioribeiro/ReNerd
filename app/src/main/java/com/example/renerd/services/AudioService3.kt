@@ -240,12 +240,14 @@ class AudioService3 : Service() {
             albumArtBitmap = withContext(Dispatchers.IO) {
                 currentEpisode.imageUrl?.let { loadBitmapFromUrl(it, this@AudioService3) } ?: albumArt
             }
-            val notification = notificationHelper.createNotification(
-                currentEpisode,
-                albumArtBitmap,
-                isPlaying,
-                mediaSessionHelper.mediaSession?.sessionToken
-            )
+            val notification = mediaSessionHelper.mediaSession?.let {
+                notificationHelper.createNotification(
+                    currentEpisode,
+                    albumArtBitmap,
+                    isPlaying,
+                    it
+                )
+            }
             startForeground(1, notification)
         }
     }
