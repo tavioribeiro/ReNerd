@@ -40,7 +40,9 @@ class FloatingPlayerPresenter(private val repository: FloatingPlayerContract.Rep
                 val currentEpisodePlaying = repository.getEpisodeById(currentEpisodePlayingId.toLong())
 
                 if(currentEpisodePlaying.id != 0){
+                    view?.updateCurrentEpisode(currentEpisodePlaying)
                     view?.updateInfosUi(currentEpisodePlaying)
+                    view?.updatePlayPauseButtonUi(false, currentEpisodePlaying.elapsedTime, currentEpisodePlaying.duration)
                     view?.showUi()
                 }
             }

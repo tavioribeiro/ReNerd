@@ -27,7 +27,7 @@ class AudioService3 : Service() {
     private var isPlaying: Boolean = false
     private var job: Job? = null
 
-    private val currentEpisode = EpisodeViewModel()
+    private var currentEpisode = EpisodeViewModel()
     private lateinit var albumArt: Bitmap
     private lateinit var albumArtBitmap: Bitmap
 
@@ -36,6 +36,7 @@ class AudioService3 : Service() {
     private lateinit var mediaSessionHelper: MediaSessionHelper
 
     private var isPaused = false
+    private var isFirstTime = true
 
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -75,11 +76,10 @@ class AudioService3 : Service() {
             elapsedTime = intent?.getIntExtra("elapsedTime", 0) ?: 0
         )
 
-
         when (intent?.action) {
             "PLAY" -> {
-                if(tempEpisode.id != currentEpisode.id && tempEpisode.id != 0){
-                    this.extractTrackInfoFromIntent(intent)
+                if(tempEpisode.id != currentEpisode.id || tempEpisode.id != 0){
+                    this.uptadeCurrentEpisodeInfo(intent)
                     this.stopPlaying()
                     this.startPlaying()
                 }
@@ -95,7 +95,7 @@ class AudioService3 : Service() {
     }
 
 
-    private fun extractTrackInfoFromIntent(intent: Intent?) {
+    private fun uptadeCurrentEpisodeInfo(intent: Intent?) {
         currentEpisode.id = intent?.getIntExtra("id", 0) ?: currentEpisode.id
         currentEpisode.audioUrl = intent?.getStringExtra("audioUrl") ?: currentEpisode.audioUrl
         currentEpisode.title = intent?.getStringExtra("title") ?: currentEpisode.title
@@ -115,6 +115,7 @@ class AudioService3 : Service() {
         }
 
         player = MediaPlayer().apply {
+            log(currentEpisode)
             try {
                 setDataSource(currentEpisode.audioUrl)
                 setOnPreparedListener {
@@ -202,8 +203,10 @@ class AudioService3 : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onDestroy() {
+        currentEpisode = EpisodeViewModel()
         super.onDestroy()
         stopPlaying()
+        stopProgressUpdateJob()
         mediaSessionHelper.release()
     }
 

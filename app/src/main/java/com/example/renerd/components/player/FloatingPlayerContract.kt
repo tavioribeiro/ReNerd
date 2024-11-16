@@ -7,6 +7,8 @@ interface FloatingPlayerContract {
     interface View {
         fun updateInfosUi(episode: EpisodeViewModel)
         fun showUi()
+        fun updateCurrentEpisode(episode: EpisodeViewModel)
+        fun updatePlayPauseButtonUi(isPlaying: Boolean, currentTime: Int, totalTime: Int)
     }
 
     interface Presenter {

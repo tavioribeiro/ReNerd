@@ -61,6 +61,9 @@ class FloatingPlayer @JvmOverloads constructor(
         binding.mainPlayerPoster.load(episode.imageUrl)
     }
 
+    override fun updateCurrentEpisode(episode: EpisodeViewModel){
+        currentEpisode = episode
+    }
 
     private val playerStatusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -70,9 +73,6 @@ class FloatingPlayer @JvmOverloads constructor(
                 val totalTime = intent.getIntExtra(TOTAL_TIME, 0)
 
                 updatePlayPauseButtonUi(isPlaying, currentTime, totalTime)
-
-                //log(currentTime)
-                //log(totalTime)
 
                 updateDatabase(isPlaying, currentTime, totalTime)
             }
@@ -176,7 +176,6 @@ class FloatingPlayer @JvmOverloads constructor(
         intent.putExtra("imageUrl", currentEpisode.imageUrl)
         intent.putExtra("elapsedTime", currentEpisode.elapsedTime)
 
-
         context.startService(intent)
     }
 
@@ -231,7 +230,7 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
 
-     fun updatePlayPauseButtonUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
+     override fun updatePlayPauseButtonUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
         this.isPlaying = isPlaying
         if (isPlaying) {
             binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
