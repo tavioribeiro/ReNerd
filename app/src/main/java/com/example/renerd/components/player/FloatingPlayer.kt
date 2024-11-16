@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.utils.formatTime
+import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.BottomSheetLayoutBinding
 import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
@@ -75,6 +76,8 @@ class FloatingPlayer @JvmOverloads constructor(
                 updatePlayPauseButtonUi(isPlaying, currentTime, totalTime)
 
                 updateDatabase(isPlaying, currentTime, totalTime)
+
+                log("\n\nFloating Player playerStatusReceiver currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
             }
         }
     }
@@ -169,6 +172,12 @@ class FloatingPlayer @JvmOverloads constructor(
             isPlaying = true
         }
 
+        //log("Floating Player: $currentEpisode")
+        log("")
+        log("--------------------------")
+        log("\n\nFloating Player playPauseClicked currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
+
+        log(context.packageName)
         intent.putExtra("id", currentEpisode.id)
         intent.putExtra("title", currentEpisode.title)
         intent.putExtra("product", currentEpisode.product)
@@ -209,7 +218,9 @@ class FloatingPlayer @JvmOverloads constructor(
         intent.putExtra("imageUrl", episode.imageUrl)
         intent.putExtra("elapsedTime", episode.elapsedTime)
 
-
+        log("")
+        log("--------------------------")
+        log("\n\nFloating Player startEpisode currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
 
         context.startService(intent)
 
