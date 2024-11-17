@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.renerd.components.filters_dialog.FiltersDialog
@@ -117,6 +118,23 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("episode", episode)
         startActivity(intent)*/
+    }
+
+
+
+    override fun onBackPressed() {
+        //trocar isso para um dialog de confirmação customizado
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Você tem certeza que quer sair?")
+            .setCancelable(false)
+            .setPositiveButton("Sim") { dialog, id ->
+                super.onBackPressed()
+            }
+            .setNegativeButton("Não") { dialog, id ->
+                dialog.dismiss()
+            }
+        val alert = builder.create()
+        alert.show()
     }
 
 

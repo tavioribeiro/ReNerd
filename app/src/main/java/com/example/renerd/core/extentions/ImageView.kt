@@ -9,13 +9,72 @@ import androidx.palette.graphics.Palette
 import android.graphics.Bitmap
 import android.graphics.BitmapShader
 import android.graphics.Canvas
-import android.graphics.Color
+import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
+import android.view.animation.LinearInterpolator
+import com.example.renerd.core.extentions.ContextManager
+
+
+
+
+
+private const val SKELETON_ANIMATOR_TAG = -123456
+fun ImageView.startSkeletonAnimation(cornerRadius: Float = 20f) {
+    val backgroundColor = 0xFF444444.toInt()
+    val shimmerColor = 0xFF858585.toInt()
+
+    val outerRadii = floatArrayOf(cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius)
+    val roundedRectShape = RoundRectShape(outerRadii, null, null)
+
+    this.background = ShapeDrawable(roundedRectShape).apply {
+        paint.color = backgroundColor
+    }
+
+    val animator = ValueAnimator.ofFloat(-1f, 1f).apply {
+        duration = 1500
+        repeatCount = ValueAnimator.INFINITE
+        interpolator = LinearInterpolator()
+
+        addUpdateListener { animation ->
+            val fraction = animation.animatedValue as Float
+            val translationX = fraction * width
+
+            val animatedShader = LinearGradient(
+                translationX, 0f, translationX + width, 0f,
+                intArrayOf(backgroundColor, shimmerColor, backgroundColor),
+                floatArrayOf(0f, 0.5f, 1f),
+                Shader.TileMode.CLAMP
+            )
+
+            val roundedRectDrawable = ShapeDrawable(roundedRectShape).apply {
+                paint.shader = animatedShader
+            }
+
+            this@startSkeletonAnimation.foreground = roundedRectDrawable
+        }
+    }
+
+    this.setTag(SKELETON_ANIMATOR_TAG, animator)
+    animator.start()
+}
+
+fun ImageView.stopSkeletonAnimation() {
+    (this.getTag(SKELETON_ANIMATOR_TAG) as? ValueAnimator)?.let {
+        it.cancel()
+        this.foreground = null
+        this.setTag(SKELETON_ANIMATOR_TAG, null)
+    }
+}
+
+
+
 
 
 
@@ -166,30 +225,35 @@ fun ImageView.resetColorFilter(finalMatriz: FloatArray = defaultFinalMatriz) {
  *
  * @param completion Função a ser executada após a extração das cores da paleta, recebendo um Pair com os códigos hexadecimais das cores.
  */
-fun ImageView.getPalletColors(completion: ((Pair<String, String>) -> Unit)? = null) {
-    var color1Hex = "191919"
-    var color2Hex = "191919"
+fun ImageView.getPalletColors(onCompletation: ((Pair<String, String>) -> Unit)? = null) {
+
+    val defaultColor = ContextManager.getColorHex(1)
+    var color1Hex = defaultColor
+    var color2Hex = defaultColor
     if (this.drawable is BitmapDrawable) {
         val bitmap: Bitmap = (this.drawable as BitmapDrawable).bitmap
         Palette.from(bitmap).generate { palette ->
-            val color1 = palette?.darkVibrantSwatch?.rgb ?: 0
+
+            val color1 = palette?.vibrantSwatch?.rgb ?: 0
             color1Hex = if (color1 != 0) {
                 String.format("%06X", (0xFFFFFF and color1))
             } else {
-                "191919"
+                defaultColor
             }
+
             val color2 = palette?.mutedSwatch?.rgb ?: 0
             color2Hex = if (color2 != 0) {
                 String.format("%06X", (0xFFFFFF and color2))
             } else {
-                "191919"
+                defaultColor
             }
-            completion?.invoke(Pair(color1Hex, color2Hex))
+            onCompletation?.invoke(Pair("#$color1Hex", "#$color2Hex"))
         }
     } else {
-        completion?.invoke(Pair(color1Hex, color2Hex))
+        onCompletation?.invoke(Pair("#$color1Hex", "#$color2Hex"))
     }
 }
+
 
 
 fun ImageView.getDominantColor(completion: ((String) -> Unit)? = null) {

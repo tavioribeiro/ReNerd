@@ -50,7 +50,7 @@ class NotificationHelper(private val context: Context) {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val notificationIcon = if (!isPlaying) R.drawable.ic_play else R.drawable.ic_pause
+        val notificationIcon = if (!isPlaying) R.drawable.icon_play else R.drawable.icon_pause
         val notificationActionTitle = if (isPlaying) "Pausar" else "Reproduzir"
 
         val intent = Intent(context, EpisodesActivity::class.java)
@@ -73,8 +73,8 @@ class NotificationHelper(private val context: Context) {
         return NotificationCompat.Builder(context, channelId)
             .setContentTitle(episode.title)
             .setContentText(episode.productName)
-            .setSmallIcon(R.drawable.ic_play)
-            .setSmallIcon(R.drawable.ic_play)
+            .setSmallIcon(R.drawable.icon_play)
+            .setSmallIcon(R.drawable.icon_play)
             .setContentIntent(pendingIntent)
             .setStyle(
                 MediaStyle()

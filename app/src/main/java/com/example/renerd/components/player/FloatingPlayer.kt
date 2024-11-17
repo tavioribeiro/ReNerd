@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.text.Html
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +20,16 @@ import com.example.renerd.databinding.BottomSheetLayoutBinding
 import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import core.extensions.changeBackgroundColorWithGradient
+import core.extensions.cropCenterSection
+import core.extensions.darkenColor
 import core.extensions.fadeInAnimation
+import core.extensions.getPalletColors
+import core.extensions.getSizes
+import core.extensions.resize
+import core.extensions.startSkeletonAnimation
+import core.extensions.stopSkeletonAnimation
+import core.extensions.toAllRoundedDrawable
 import org.koin.java.KoinJavaComponent.inject
 
 
@@ -57,9 +67,60 @@ class FloatingPlayer @JvmOverloads constructor(
     override fun updateInfosUi(episode: EpisodeViewModel){
         // Atualizar a UI do player
         binding.miniPlayerTitle.text = episode.title
+        binding.mainPlayerTitle.text = episode.title
+
+        binding.mainPlayerDescription.text = Html.fromHtml("${episode.description}")
         binding.miniPlayerProduct.text = episode.product
-        binding.miniPlayerPoster.load(episode.imageUrl)
-        binding.mainPlayerPoster.load(episode.imageUrl)
+
+
+        binding.miniPlayerPoster.startSkeletonAnimation(20f)
+        binding.mainPlayerPoster.startSkeletonAnimation(20f)
+
+
+        binding.miniPlayerPoster.load(episode.imageUrl){
+            target(
+
+                onSuccess = { drawable ->
+                    //Define a imagem com borda curva e para o skeleton
+                    binding.miniPlayerPoster.getSizes{ width, height ->
+                        val crop = drawable.cropCenterSection(widthDp = width, heightDp = height, resources)
+
+                        binding.miniPlayerPoster.setImageDrawable(crop.toAllRoundedDrawable(20f))
+                        binding.miniPlayerPoster.stopSkeletonAnimation()
+
+                    }
+
+
+
+                    //Define a imagem com borda curva e para o skeleton
+                    binding.mainPlayerPoster.getSizes{ width, height ->
+                        val resized = drawable.resize(width = width, height = height, resources)
+
+                        binding.mainPlayerPoster.setImageDrawable(resized.toAllRoundedDrawable(20f))
+                        binding.mainPlayerPoster.stopSkeletonAnimation()
+                    }
+
+
+
+                    //Obter a paleta de cores da imagem
+                    binding.mainPlayerPoster.getPalletColors { colors ->
+                        val (color1, color2) = colors
+                        try {
+                            binding.mainContainer.changeBackgroundColorWithGradient(
+                                color1 = darkenColor(color1, 90.0),
+                                color2 = darkenColor(color2, 70.0)
+                            )
+                        } catch (e: Exception) {
+                            log(e)
+                        }
+                    }
+                },
+                onError = {
+                    binding.miniPlayerPoster.setImageResource(R.drawable.background)
+                    binding.mainPlayerPoster.setImageResource(R.drawable.background)
+                }
+            )
+        }
     }
 
     override fun updateCurrentEpisode(episode: EpisodeViewModel){
@@ -139,6 +200,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     private fun setUpTouch() {
+
         binding.miniPlayer.setOnClickListener {
             this.expand()
         }
@@ -158,6 +220,10 @@ class FloatingPlayer @JvmOverloads constructor(
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+
+        binding.buttomJumpTo.setOnClickListener(){
+            this.seekTo(currentEpisode.jumpToTime * 1000)
+        }
     }
 
 
@@ -244,11 +310,13 @@ class FloatingPlayer @JvmOverloads constructor(
      override fun updatePlayPauseButtonUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
         this.isPlaying = isPlaying
         if (isPlaying) {
-            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
-            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_pause)
+            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.icon_pause)
+            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.icon_pause)
+            binding.mainPlayerPlayPauseButton.setLabel("Pause")
         } else {
-            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play)
-            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.ic_play)
+            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.icon_play)
+            binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.icon_play)
+            binding.mainPlayerPlayPauseButton.setLabel("Play")
         }
         updatePlayerTimerUI(currentTime, totalTime)
     }

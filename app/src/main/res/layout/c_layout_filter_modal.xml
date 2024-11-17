@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 app:default_width="false"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_play"
+                app:icon="@drawable/icon_play"
                 app:label="Salvar"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"/>

@@ -19,6 +19,7 @@ import com.example.renerd.databinding.LayoutDefaultButtonBinding
 import core.extensions.blockDPadActions
 import core.extensions.darkenColor
 import core.extensions.lightenColor
+import core.extensions.setHeightInDp
 import core.extensions.setWidthInDp
 import core.extensions.styleBackground
 
@@ -56,7 +57,7 @@ class DefaultButton @JvmOverloads constructor(
             try {
                 // Prioriza valores do construtor, caso não definidos, usa os do XML
                 icon = icon ?: getResourceId(R.styleable.DefaultButton_icon, 0)
-                label = label.ifEmpty { getString(R.styleable.DefaultButton_label) ?: "" }
+                label = getString(R.styleable.DefaultButton_label) ?: ""
                 width = width ?: getFloat(R.styleable.DefaultButton_width, 0f)
                 default_width = default_width ?: getBoolean(R.styleable.DefaultButton_default_width, true)
                 backgroundColor = backgroundColor ?: getString(R.styleable.DefaultButton_bgdColor) ?: ContextManager.getColorHex(2)
@@ -91,6 +92,8 @@ class DefaultButton @JvmOverloads constructor(
 
     //Configura o rótulo do botão
     private fun configureLabel() {
+
+        log("label $label")
         if(label == ""){
             binding.imageViewIcon.apply {
                 visibility = View.GONE
@@ -100,7 +103,6 @@ class DefaultButton @JvmOverloads constructor(
             binding.textViewText.text = label
             binding.textViewText.setTextColor(Color.parseColor(labelColor))
         }
-
     }
 
     //Configura o ícone, se disponível
@@ -205,18 +207,28 @@ class DefaultButton @JvmOverloads constructor(
 
     //Configura a largura do componente
     private fun configureWidth() {
-        log(default_width)
-        if (default_width == true) {
-            binding.mainContainer.layoutParams.width = context.dpToPx(DEFAULT_BUTTON_WIDTH_DP)
-        } else {
-            if (width != null) {
-                if (width != 0f) {
-                    binding.mainContainer.setWidthInDp(width!!)
-                } else {
-                    binding.mainContainer.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-                }
+        if(label == "") {
+            binding.mainContainer.setWidthInDp(60f)
+            binding.mainContainer.setHeightInDp(60f)
+
+            binding.textViewText.visibility = View.GONE
+
+            binding.imageViewIcon.setWidthInDp(30f)
+            binding.imageViewIcon.setHeightInDp(30f)
+        }
+        else{
+            if (default_width == true) {
+                binding.mainContainer.layoutParams.width = context.dpToPx(DEFAULT_BUTTON_WIDTH_DP)
             } else {
-                binding.mainContainer.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                if (width != null) {
+                    if (width != 0f) {
+                        binding.mainContainer.setWidthInDp(width!!)
+                    } else {
+                        binding.mainContainer.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+                } else {
+                    binding.mainContainer.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                }
             }
         }
     }
@@ -246,7 +258,7 @@ class DefaultButton @JvmOverloads constructor(
 
 
     //Atualiza o ícone do botão
-    fun setIcon(@DrawableRes newIcon: Int?) {
+    fun setIconResource(@DrawableRes newIcon: Int?) {
         icon = newIcon
         configureIcon()
     }
@@ -266,7 +278,7 @@ class DefaultButton @JvmOverloads constructor(
 
 
     companion object {
-        private const val DEFAULT_BUTTON_WIDTH_DP = 205.33333f
+        private const val DEFAULT_BUTTON_WIDTH_DP = 140.33333f
         private const val DEFAULT_BUTTON_HEIGHT_DP = 38f
     }
 }

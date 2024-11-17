@@ -1,7 +1,6 @@
 package com.example.renerd.app
 
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,7 +9,6 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toBitmap
@@ -21,7 +19,6 @@ import com.example.renerd.core.network.PodcastClient
 import com.example.renerd.core.network.model.EpisodeModel
 import com.example.renerd.services.AudioService
 import com.example.renerd.core.utils.formatTime
-import com.example.renerd.core.utils.getCurrentDateFormatted
 import com.example.renerd.core.utils.log
 import com.example.renerd.features.episodes.EpisodesActivity
 import kotlinx.coroutines.GlobalScope
@@ -61,12 +58,12 @@ class MainActivity : AppCompatActivity() {
 
             val recivePause = intent.getStringExtra("paused")
             recivePause?.let {
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_play)
+                binding.fabPlayOrPause.setImageResource(R.drawable.icon_play)
             }
 
             val recivePlay = intent.getStringExtra("played")
             recivePlay?.let {
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_pause)
+                binding.fabPlayOrPause.setImageResource(R.drawable.icon_pause)
             }
         }
     }
@@ -143,11 +140,11 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AudioService::class.java)
             if (currentAction == "PLAY"){
                 intent.action = "PLAY"
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_pause)
+                binding.fabPlayOrPause.setImageResource(R.drawable.icon_pause)
                 currentAction = "PAUSE"
             } else {
                 intent.action = "PAUSE"
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_play)
+                binding.fabPlayOrPause.setImageResource(R.drawable.icon_play)
                 currentAction = "PLAY"
             }
 
