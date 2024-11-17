@@ -409,13 +409,18 @@ fun Drawable.toAllRoundedDrawable(radius: Float): BitmapDrawable {
     val bitmap = if (this is BitmapDrawable) {
         this.bitmap
     } else {
-        Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight, Bitmap.Config.ARGB_8888).also { bmp ->
+        // Criar um bitmap com as dimensões originais do drawable
+        val width = this.intrinsicWidth
+        val height = this.intrinsicHeight
+
+        Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { bmp ->
             val canvas = Canvas(bmp)
-            this.setBounds(0, 0, canvas.width, canvas.height)
+            this.setBounds(0, 0, width, height)
             this.draw(canvas)
         }
     }
 
+    // Criar um novo bitmap com as mesmas dimensões do original
     val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(output)
 
@@ -430,5 +435,7 @@ fun Drawable.toAllRoundedDrawable(radius: Float): BitmapDrawable {
     }
 
     canvas.drawPath(path, paint)
-    return BitmapDrawable(output)
+    return BitmapDrawable(Resources.getSystem(), output) // Adiciona Resources para manter a escala
 }
+
+

@@ -24,6 +24,9 @@ import core.extensions.changeBackgroundColorWithGradient
 import core.extensions.cropCenterSection
 import core.extensions.darkenColor
 import core.extensions.fadeInAnimation
+import core.extensions.fadeInAnimationNoRepeat
+import core.extensions.fadeOutAnimation
+import core.extensions.fadeOutAnimationNoRepeat
 import core.extensions.getPalletColors
 import core.extensions.getSizes
 import core.extensions.resize
@@ -69,12 +72,21 @@ class FloatingPlayer @JvmOverloads constructor(
         binding.miniPlayerTitle.text = episode.title
         binding.mainPlayerTitle.text = episode.title
 
+
+        binding.miniPlayerProductName.text = episode.productName
+        binding.mainPlayerProductName.text = episode.productName
+
+
         binding.mainPlayerDescription.text = Html.fromHtml("${episode.description}")
-        binding.miniPlayerProduct.text = episode.product
 
 
-        binding.miniPlayerPoster.startSkeletonAnimation(20f)
-        binding.mainPlayerPoster.startSkeletonAnimation(20f)
+        binding.miniPlayer.isSelected = true
+        binding.mainPlayerTitle.isSelected = true
+
+
+
+        binding.miniPlayerPoster.startSkeletonAnimation(30f)
+        binding.mainPlayerPoster.startSkeletonAnimation(30f)
 
 
         binding.miniPlayerPoster.load(episode.imageUrl){
@@ -85,10 +97,10 @@ class FloatingPlayer @JvmOverloads constructor(
                     binding.miniPlayerPoster.getSizes{ width, height ->
                         val crop = drawable.cropCenterSection(widthDp = width, heightDp = height, resources)
 
-                        binding.miniPlayerPoster.setImageDrawable(crop.toAllRoundedDrawable(20f))
+                        binding.miniPlayerPoster.setImageDrawable(crop.toAllRoundedDrawable(30f))
                         binding.miniPlayerPoster.stopSkeletonAnimation()
-
                     }
+
 
 
 
@@ -96,9 +108,10 @@ class FloatingPlayer @JvmOverloads constructor(
                     binding.mainPlayerPoster.getSizes{ width, height ->
                         val resized = drawable.resize(width = width, height = height, resources)
 
-                        binding.mainPlayerPoster.setImageDrawable(resized.toAllRoundedDrawable(20f))
+                        binding.mainPlayerPoster.setImageDrawable(resized.toAllRoundedDrawable(15f))
                         binding.mainPlayerPoster.stopSkeletonAnimation()
                     }
+
 
 
 
@@ -134,10 +147,11 @@ class FloatingPlayer @JvmOverloads constructor(
                 val currentTime = intent.getIntExtra(CURRENT_TIME, 0)
                 val totalTime = intent.getIntExtra(TOTAL_TIME, 0)
 
-                updatePlayPauseButtonUi(isPlaying, currentTime, totalTime)
+                updateButtonsUi(isPlaying, currentTime, totalTime)
 
                 updateDatabase(isPlaying, currentTime, totalTime)
 
+                updatePlayerTimerUI(currentTime, totalTime)
                 log("\n\nFloating Player playerStatusReceiver currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
             }
         }
@@ -224,6 +238,14 @@ class FloatingPlayer @JvmOverloads constructor(
         binding.buttomJumpTo.setOnClickListener(){
             this.seekTo(currentEpisode.jumpToTime * 1000)
         }
+
+        binding.buttomReplay15.setOnClickListener(){
+            this.seekTo(currentEpisode.elapsedTime - 15000)
+        }
+
+        binding.buttomFoward15.setOnClickListener() {
+            this.seekTo(currentEpisode.elapsedTime + 15000)
+        }
     }
 
 
@@ -271,7 +293,7 @@ class FloatingPlayer @JvmOverloads constructor(
         presenter.setCurrentPlayingEpisodeId(episode)
 
 
-        this.updatePlayPauseButtonUi(isPlaying, episode.elapsedTime.toInt(), episode.duration.toInt())
+        this.updateButtonsUi(isPlaying, episode.elapsedTime.toInt(), episode.duration.toInt())
         this.showUi()
 
 
@@ -307,19 +329,61 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
 
-     override fun updatePlayPauseButtonUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
+     override fun updateButtonsUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
         this.isPlaying = isPlaying
         if (isPlaying) {
             binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.icon_pause)
             binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.icon_pause)
-            binding.mainPlayerPlayPauseButton.setLabel("Pause")
+            //binding.mainPlayerPlayPauseButton.setLabel("Pause")
+
+
+            if(currentTime > 500){
+                binding.buttomJumpTo.fadeInAnimationNoRepeat {
+                    binding.buttomJumpTo.visibility = View.VISIBLE
+                }
+
+                binding.buttomFoward15.fadeInAnimationNoRepeat {
+                    binding.buttomFoward15.visibility = View.VISIBLE
+                }
+
+                binding.buttomReplay15.fadeInAnimationNoRepeat {
+                    binding.buttomReplay15.visibility = View.VISIBLE
+                }
+            }else{
+                binding.buttomJumpTo.fadeOutAnimationNoRepeat {
+                    binding.buttomJumpTo.visibility = View.GONE
+                }
+
+                binding.buttomFoward15.fadeOutAnimationNoRepeat {
+                    binding.buttomFoward15.visibility = View.GONE
+                }
+
+
+                binding.buttomReplay15.fadeOutAnimationNoRepeat {
+                    binding.buttomReplay15.visibility = View.GONE
+                }
+            }
         } else {
             binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.icon_play)
             binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.icon_play)
-            binding.mainPlayerPlayPauseButton.setLabel("Play")
+            //binding.mainPlayerPlayPauseButton.setLabel("Play")
+
+            binding.buttomJumpTo.fadeOutAnimationNoRepeat {
+                binding.buttomJumpTo.visibility = View.GONE
+            }
+
+            binding.buttomFoward15.fadeOutAnimationNoRepeat {
+                binding.buttomFoward15.visibility = View.GONE
+            }
+
+
+            binding.buttomReplay15.fadeOutAnimationNoRepeat {
+                binding.buttomReplay15.visibility = View.GONE
+            }
         }
-        updatePlayerTimerUI(currentTime, totalTime)
     }
+
+
 
 
 

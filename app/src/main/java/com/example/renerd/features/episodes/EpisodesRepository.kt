@@ -55,7 +55,7 @@ class EpisodesRepository: EpisodesContract.Repository {
                                 product = episode.product ?: "",
                                 productName = episode.productName ?: "",
                                 subject = episode.subject ?: "",
-                                jumpToTime = episode.jumpToTime.startTime,
+                                jumpToTime = episode.jumpToTime.endTime,
                                 guests = episode.guests ?: "",
                                 postTypeClass = episode.postTypeClass ?: "",
                             )

@@ -63,3 +63,13 @@ fun String.capitalizeWords(): String {
             }
         }
 }
+
+
+
+fun normalizeText(input: String): String {
+    return input
+        .split("-")
+        .joinToString(" ") { word ->
+            word.capitalize()
+        }
+}

@@ -42,14 +42,17 @@
                     android:id="@+id/mini_player_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No More Push-Backs"
                     android:fontFamily="@font/geist_regular_fontfamily"
                     android:textFontWeight="600"
                     android:textColor="@color/color5"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"/>
 
                 <TextView
-                    android:id="@+id/mini_player_product"
+                    android:id="@+id/mini_player_product_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/geist_regular_fontfamily"
@@ -63,7 +66,7 @@
                 android:id="@+id/mini_player_play_pause_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icon_pause" />
+                android:src="@drawable/icon_pause"/>
         </LinearLayout>
 
         <ProgressBar
@@ -83,29 +86,47 @@
         android:paddingHorizontal="20dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/main_player_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/geist_regular_fontfamily"
-            android:textColor="@color/color5"
-            android:textAlignment="textStart"
-            android:textSize="20sp"/>
 
         <ImageView
             android:id="@+id/main_player_poster"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
             android:src="@drawable/background" />
+
+        <TextView
+            android:id="@+id/main_player_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/geist_semibold_fontfamily"
+            android:textColor="@color/color5"
+            android:textAlignment="textStart"
+            android:layout_marginTop="30dp"
+            android:textSize="26sp"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"/>
+
+        <TextView
+            android:id="@+id/main_player_product_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/geist_semibold_fontfamily"
+            android:textColor="@color/color4"
+            android:layout_marginTop="2dp"
+            android:textAlignment="textStart"
+            android:textSize="16sp"/>
+
 
         <TextView
             android:id="@+id/main_player_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/geist_regular_fontfamily"
-            android:textColor="@color/color5"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/color4"
             android:textAlignment="textStart"
             android:textSize="16sp"/>
 
@@ -141,31 +162,43 @@
                 android:thumbTint="@color/color6"/>
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_marginTop="30dp"
-            android:layout_height="50dp">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-            <com.example.renerd.components.buttons.DefaultButton
-                android:id="@+id/main_player_play_pause_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginTop="100dp"
-                app:icon="@drawable/icon_play"
-                app:label="Play"/>
-
-
-            <com.example.renerd.components.buttons.DefaultButton
+            <com.example.renerd.components.buttons.IconButton
                 android:id="@+id/buttom_jump_to"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                app:icon="@drawable/icon_jump"
-                app:label="Pular Intro"/>
-        </RelativeLayout>
+                android:layout_marginHorizontal="4dp"
+                android:visibility="gone"
+                app:icon="@drawable/icon_jump"/>
+
+            <com.example.renerd.components.buttons.IconButton
+                android:id="@+id/buttom_replay_15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:visibility="gone"
+                app:icon="@drawable/icon_replay_15"/>
+
+            <com.example.renerd.components.buttons.IconButton
+                android:id="@+id/main_player_play_pause_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                app:icon="@drawable/icon_play"/>
+
+            <com.example.renerd.components.buttons.IconButton
+                android:id="@+id/buttom_foward_15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:visibility="gone"
+                app:icon="@drawable/icon_foward_15"/>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

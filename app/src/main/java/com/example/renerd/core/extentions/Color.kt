@@ -289,6 +289,23 @@ fun hexToArgb(opacityPercentage: Int, hex: String): Int {
     )
 }
 
+fun hexWithOpacity(opacityPercentage: Int, hex: String): String {
+    val safeOpacity = opacityPercentage.coerceIn(0, 100)
+    val tempAlpha = (255 * safeOpacity) / 100
+    val color = Color.parseColor(hex)
+
+    return String.format(
+        "#%02X%02X%02X%02X",
+        tempAlpha,
+        Color.red(color),
+        Color.green(color),
+        Color.blue(color)
+    )
+}
+
+// Uso:
+// val hexWithOpacity = hexWithOpacity(50, "#FF0000")
+
 
 
 
