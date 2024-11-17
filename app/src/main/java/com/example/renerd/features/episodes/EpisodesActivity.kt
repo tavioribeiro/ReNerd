@@ -121,21 +121,14 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     }
 
 
-
     override fun onBackPressed() {
-        //trocar isso para um dialog de confirmação customizado
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage("Você tem certeza que quer sair?")
-            .setCancelable(false)
-            .setPositiveButton("Sim") { dialog, id ->
-                super.onBackPressed()
-            }
-            .setNegativeButton("Não") { dialog, id ->
-                dialog.dismiss()
-            }
-        val alert = builder.create()
-        alert.show()
+        if (0 == 0) {
+            binding.customBottomSheet.collapse()
+        } else {
+            super.onBackPressed()
+        }
     }
+
 
 
     override fun showError(message: String) {

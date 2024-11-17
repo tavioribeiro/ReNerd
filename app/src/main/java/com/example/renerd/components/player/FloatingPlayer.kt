@@ -152,6 +152,7 @@ class FloatingPlayer @JvmOverloads constructor(
                 updateDatabase(isPlaying, currentTime, totalTime)
 
                 updatePlayerTimerUI(currentTime, totalTime)
+
                 log("\n\nFloating Player playerStatusReceiver currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
             }
         }
@@ -214,7 +215,6 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     private fun setUpTouch() {
-
         binding.miniPlayer.setOnClickListener {
             this.expand()
         }
