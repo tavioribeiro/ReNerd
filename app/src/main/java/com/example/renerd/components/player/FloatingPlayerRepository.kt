@@ -3,6 +3,7 @@ package com.example.renerd.components.player
 import android.content.Context
 import com.example.renerd.core.database.DatabaseHelper
 import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
 
 
@@ -15,21 +16,14 @@ class FloatingPlayerRepository: FloatingPlayerContract.Repository {
 
 
 
-    override suspend fun setCurrentEpisodePlaying(url: String){
-        editor.putString("current_media_playing", url)
+    override fun setCurrentEpisodePlayingId(id: Int){
+        editor.putString("current_media_playing_id", id.toString())
         editor.apply()
     }
 
-    override fun getCurrentEpisodePlaying(): String{
-        return sharedPref.getString("current_media_playing", "") ?: ""
-    }
-
-    override fun setCurrentEpisodePosition(url: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCurrentEpisodePosition(): String {
-        TODO("Not yet implemented")
+    override fun getCurrentEpisodePlayingId(): Int {
+        val currentEpisodePlayingId = sharedPref.getString("current_media_playing_id", "")
+        return if (currentEpisodePlayingId.isNullOrEmpty()) 0 else currentEpisodePlayingId.toInt()
     }
 
 

@@ -27,7 +27,7 @@ class AudioService3 : Service() {
     private var isPlaying: Boolean = false
     private var job: Job? = null
 
-    private val currentEpisode = EpisodeViewModel()
+    private var currentEpisode = EpisodeViewModel()
     private lateinit var albumArt: Bitmap
     private lateinit var albumArtBitmap: Bitmap
 
@@ -36,6 +36,7 @@ class AudioService3 : Service() {
     private lateinit var mediaSessionHelper: MediaSessionHelper
 
     private var isPaused = false
+    private var isFirstTime = true
 
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -75,20 +76,32 @@ class AudioService3 : Service() {
             elapsedTime = intent?.getIntExtra("elapsedTime", 0) ?: 0
         )
 
-        log("-------------")
-        log("Ep recebido: ${tempEpisode.id}")
-        log("Ep atual: ${currentEpisode.id}")
-        log("-------------")
+        log("")
+        log("\n\nAudio Service tempEpisode: ${tempEpisode.title} | ${tempEpisode.elapsedTime}")
+        log("\n\nAudio Service currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
 
         when (intent?.action) {
-            "PLAY" -> {
-                if(tempEpisode.id != currentEpisode.id && tempEpisode.id != 0){
-                    this.extractTrackInfoFromIntent(intent)
+            "PLAY" -> when {
+                tempEpisode.id != currentEpisode.id && tempEpisode.id != 0 -> {
+                    log("1°")
+                    currentEpisode = tempEpisode
+                    this.uptadeCurrentEpisodeInfo(intent)
                     this.stopPlaying()
                     this.startPlaying()
                 }
-                else{
-                    this.resumePlaying()
+                isFirstTime -> {
+                    log("2°")
+                    currentEpisode = tempEpisode
+                    this.uptadeCurrentEpisodeInfo(intent)
+                    this.startPlaying()
+                    isFirstTime = false
+                }
+                else -> {
+                    log("3°")
+                    //tempEpisode = currentEpisode
+                    this.uptadeCurrentEpisodeInfo(intent)
+                    this.startPlaying()
+                    //this.resumePlaying()
                 }
             }
             "PAUSE" -> this.pausePlaying()
@@ -99,7 +112,7 @@ class AudioService3 : Service() {
     }
 
 
-    private fun extractTrackInfoFromIntent(intent: Intent?) {
+    private fun uptadeCurrentEpisodeInfo(intent: Intent?) {
         currentEpisode.id = intent?.getIntExtra("id", 0) ?: currentEpisode.id
         currentEpisode.audioUrl = intent?.getStringExtra("audioUrl") ?: currentEpisode.audioUrl
         currentEpisode.title = intent?.getStringExtra("title") ?: currentEpisode.title
@@ -112,22 +125,22 @@ class AudioService3 : Service() {
     private fun startPlaying() {
         audioFocusHelper.requestAudioFocus()
 
-        // Se já há um player ativo, pare a reprodução anterior
         if (player != null) {
             player?.stop()
             player?.reset()
             player?.release()
         }
 
-        // Inicialize um novo MediaPlayer
         player = MediaPlayer().apply {
+            log(currentEpisode)
             try {
                 setDataSource(currentEpisode.audioUrl)
                 setOnPreparedListener {
-                    it.seekTo(currentPosition) // Começa de onde parou
+                    // Use a posição salva em currentEpisode.elapsedTime
+                    it.seekTo(currentEpisode.elapsedTime)
                     it.start()
                     this@AudioService3.isPlaying = true
-                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentPosition)
+                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentEpisode.elapsedTime)
                     showNotification()
                     startProgressUpdateJob()
                     sendPlayerStatusUpdate()
@@ -157,18 +170,26 @@ class AudioService3 : Service() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun resumePlaying() {
-        if (player == null) return
+        if (player == null) {
+            // Se o player for nulo, inicie uma nova reprodução
+            startPlaying()
+            return
+        }
 
         if (isPaused) {
+            // Garante que a posição correta seja mantida
+            val savedPosition = currentEpisode.elapsedTime
+            player?.seekTo(savedPosition)
             player?.start()
             isPaused = false
             isPlaying = true
-            player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, it) }
+            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, savedPosition)
             showNotification()
+            sendPlayerStatusUpdate()
+            startProgressUpdateJob()
         }
-        sendPlayerStatusUpdate()
-        startProgressUpdateJob()
     }
 
 
@@ -199,8 +220,11 @@ class AudioService3 : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onDestroy() {
+        currentEpisode = EpisodeViewModel()
+        isFirstTime = true
         super.onDestroy()
         stopPlaying()
+        stopProgressUpdateJob()
         mediaSessionHelper.release()
     }
 
@@ -240,12 +264,14 @@ class AudioService3 : Service() {
             albumArtBitmap = withContext(Dispatchers.IO) {
                 currentEpisode.imageUrl?.let { loadBitmapFromUrl(it, this@AudioService3) } ?: albumArt
             }
-            val notification = notificationHelper.createNotification(
-                currentEpisode,
-                albumArtBitmap,
-                isPlaying,
-                mediaSessionHelper.mediaSession?.sessionToken
-            )
+            val notification = mediaSessionHelper.mediaSession?.let {
+                notificationHelper.createNotification(
+                    currentEpisode,
+                    albumArtBitmap,
+                    isPlaying,
+                    it
+                )
+            }
             startForeground(1, notification)
         }
     }

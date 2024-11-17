@@ -1,5 +1,6 @@
 package core.extensions
 
+import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
@@ -9,6 +10,7 @@ import android.graphics.drawable.LayerDrawable
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +22,8 @@ import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import com.example.renerd.R
+import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.extentions.dpToPx
 import java.util.concurrent.atomic.AtomicLong
 
@@ -311,6 +315,61 @@ fun View.setHeightInDp(heightInDp: Float) {
     requestLayout()
 }
 
+
+
+
+
+
+fun View.changeBackgroundColorWithGradient(color1: String, color2: String) {
+    // Obtenção das cores atuais a partir da lógica existente (ou você pode passar como parâmetros, se necessário)
+    val currentColor1 = ContextManager.getColorHex(1)
+    val startColors = intArrayOf(
+        Color.parseColor(currentColor1),
+        Color.parseColor(currentColor1)
+    )
+
+    val endColors = intArrayOf(
+        Color.parseColor(color1),
+        Color.parseColor(color2)
+    )
+
+    // Criar o GradientDrawable
+    val gradientDrawable = GradientDrawable(
+        GradientDrawable.Orientation.BL_TR,
+        startColors
+    )
+
+    // Obter displayMetrics para cálculo da posição do centro e raio do gradiente
+    val displayMetrics: DisplayMetrics = this.resources.displayMetrics
+    val gradientCenter = 500f / (displayMetrics.widthPixels / displayMetrics.density)
+
+    // Definir o ponto central do gradiente
+    gradientDrawable.setGradientCenter(gradientCenter, 0.5f)
+
+    // Definir o raio do gradiente em pixels
+    val gradientRadius = 500 * displayMetrics.density
+    gradientDrawable.gradientRadius = gradientRadius
+
+    // Aplicar o fundo com o gradiente
+    this.background = gradientDrawable
+
+    // Definir animação para transição das cores
+    val colorAnimation = ValueAnimator.ofFloat(0f, 1f).apply {
+        duration = 1500
+        addUpdateListener { animator ->
+            val animatedValue = animator.animatedValue as Float
+            val currentColors = startColors.indices.map { i ->
+                ArgbEvaluator().evaluate(animatedValue, startColors[i], endColors[i]) as Int
+            }.toIntArray()
+
+            gradientDrawable.colors = currentColors
+            this@changeBackgroundColorWithGradient.background = gradientDrawable
+        }
+    }
+
+    // Iniciar a animação
+    colorAnimation.start()
+}
 
 
 

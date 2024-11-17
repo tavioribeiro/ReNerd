@@ -13,7 +13,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.example.renerd.R
-import com.example.renerd.features.player.PlayerActivity
+import com.example.renerd.features.episodes.EpisodesActivity
+import android.support.v4.media.MediaMetadataCompat
 import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 
@@ -36,7 +37,7 @@ class NotificationHelper(private val context: Context) {
         episode: EpisodeViewModel,
         albumArtBitmap: Bitmap,
         isPlaying: Boolean,
-        mediaSessionToken: MediaSessionCompat.Token?
+        mediaSession: MediaSessionCompat
     ): Notification {
         val playPauseIntent = Intent(context, AudioService3::class.java).apply {
             action = if (isPlaying) "PAUSE" else "PLAY"
@@ -49,24 +50,42 @@ class NotificationHelper(private val context: Context) {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val notificationIcon = if (!isPlaying) R.drawable.ic_play else R.drawable.ic_pause
+        val notificationIcon = if (!isPlaying) R.drawable.icon_play else R.drawable.icon_pause
         val notificationActionTitle = if (isPlaying) "Pausar" else "Reproduzir"
 
-        val intent = Intent(context, PlayerActivity::class.java)
+        val intent = Intent(context, EpisodesActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+
+        val mediaMetadata = MediaMetadataCompat.Builder()
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, episode.title)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, episode.product)
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, episode.title)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, episode.productName)
+            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArtBitmap)
+            .build()
+
+
+        // 3. Defina o MediaMetadataCompat no MediaSession
+        mediaSession.setMetadata(mediaMetadata)
+
 
         return NotificationCompat.Builder(context, channelId)
             .setContentTitle(episode.title)
             .setContentText(episode.productName)
-            .setSmallIcon(R.drawable.ic_play)
-            .setLargeIcon(albumArtBitmap)
+            .setSmallIcon(R.drawable.icon_play)
+            .setSmallIcon(R.drawable.icon_play)
             .setContentIntent(pendingIntent)
             .setStyle(
                 MediaStyle()
-                    .setMediaSession(mediaSessionToken)
+                    .setMediaSession(mediaSession.sessionToken)
                     .setShowActionsInCompactView(0)
             )
             .addAction(NotificationCompat.Action(notificationIcon, notificationActionTitle, playPausePendingIntent))
+            .apply {
+
+            }
             .build()
+
     }
 }

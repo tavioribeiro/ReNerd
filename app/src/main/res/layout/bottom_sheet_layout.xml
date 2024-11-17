@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container"
     android:background="@color/color1"
     android:orientation="vertical">
 
@@ -11,7 +12,6 @@
         android:id="@+id/mini_player"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:background="@color/color2"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -28,7 +28,7 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/background" />
+                android:src="@drawable/background"/>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -63,7 +63,7 @@
                 android:id="@+id/mini_player_play_pause_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_pause" />
+                android:src="@drawable/icon_pause" />
         </LinearLayout>
 
         <ProgressBar
@@ -79,26 +79,39 @@
         android:id="@+id/main_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color1"
         android:alpha="0"
+        android:paddingHorizontal="20dp"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/main_player_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/geist_regular_fontfamily"
+            android:textColor="@color/color5"
+            android:textAlignment="textStart"
+            android:textSize="20sp"/>
 
         <ImageView
             android:id="@+id/main_player_poster"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:src="@drawable/background" />
 
+        <TextView
+            android:id="@+id/main_player_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/geist_regular_fontfamily"
+            android:textColor="@color/color5"
+            android:textAlignment="textStart"
+            android:textSize="16sp"/>
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/main_player_current_time"
@@ -123,17 +136,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:progressTint="#FFA500"
-                android:thumbTint="#FFA500" />
+                android:progressTint="@color/color5"
+                android:progressBackgroundTint="@color/color5"
+                android:thumbTint="@color/color6"/>
+        </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="30dp"
+            android:layout_height="50dp">
 
-            <com.google.android.material.button.MaterialButton
+            <com.example.renerd.components.buttons.DefaultButton
                 android:id="@+id/main_player_play_pause_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_marginTop="100dp"
-                android:gravity="center"
-                app:icon="@drawable/ic_play" />
+                app:icon="@drawable/icon_play"
+                app:label="Play"/>
+
+
+            <com.example.renerd.components.buttons.DefaultButton
+                android:id="@+id/buttom_jump_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:icon="@drawable/icon_jump"
+                app:label="Pular Intro"/>
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

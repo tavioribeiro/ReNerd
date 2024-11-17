@@ -15,7 +15,6 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.database.DatabaseHelper
-import com.example.renerd.core.database.Episode
 import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.utils.formatTime
 import com.example.renerd.core.utils.log
@@ -62,12 +61,12 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
 
                 val recivePause = intent.getStringExtra("paused")
                 recivePause?.let {
-                    binding.fabPlayOrPause.setImageResource(R.drawable.ic_play)
+                    binding.fabPlayOrPause.setImageResource(R.drawable.icon_play)
                 }
 
                 val recivePlay = intent.getStringExtra("played")
                 recivePlay?.let {
-                    binding.fabPlayOrPause.setImageResource(R.drawable.ic_pause)
+                    binding.fabPlayOrPause.setImageResource(R.drawable.icon_pause)
                 }
             }
             else{
@@ -119,11 +118,11 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
             val intent = Intent(this, AudioService::class.java)
             if (currentAction == "PLAY"){
                 intent.action = "PLAY"
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_pause)
+                binding.fabPlayOrPause.setImageResource(R.drawable.icon_pause)
                 currentAction = "PAUSE"
             } else {
                 intent.action = "PAUSE"
-                binding.fabPlayOrPause.setImageResource(R.drawable.ic_play)
+                binding.fabPlayOrPause.setImageResource(R.drawable.icon_play)
                 currentAction = "PLAY"
             }
 

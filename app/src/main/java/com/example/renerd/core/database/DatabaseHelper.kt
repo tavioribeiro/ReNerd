@@ -10,10 +10,8 @@ import com.example.renerd.view_models.toEpisodeViewModel
 
 
 class DatabaseHelper(context: Context) {
-    private val driver: SqlDriver = AndroidSqliteDriver(Database.Schema, context, "episode.db")
+    private val driver: SqlDriver = AndroidSqliteDriver(Database.Schema, context, "renerd.db")
     private val database: Database = Database(driver)
-
-
 
 
     // Pega todos os episódios

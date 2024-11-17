@@ -46,7 +46,7 @@ class AudioService : Service() {
 
     // Notificação
     private lateinit var albumArtBitmap: Bitmap
-    private var notificationIcon: Int = R.drawable.ic_play
+    private var notificationIcon: Int = R.drawable.icon_play
     private lateinit var notificationActionTitle: String
     private lateinit var playPausePendingIntent: PendingIntent
 
@@ -211,7 +211,7 @@ class AudioService : Service() {
         val playPauseIntent = Intent("PLAY_PAUSE")
         playPausePendingIntent = PendingIntent.getBroadcast(this, 0, playPauseIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        notificationIcon = if (!isPlaying) R.drawable.ic_play else R.drawable.ic_pause
+        notificationIcon = if (!isPlaying) R.drawable.icon_play else R.drawable.icon_pause
         notificationActionTitle = if (isPlaying) "Pausar" else "Reproduzir"
 
         GlobalScope.launch(Dispatchers.Main) {
@@ -257,7 +257,7 @@ class AudioService : Service() {
         return NotificationCompat.Builder(this, "media_playback_channel")
             .setContentTitle(title)
             .setContentText(artist)
-            .setSmallIcon(R.drawable.ic_play)
+            .setSmallIcon(R.drawable.icon_play)
             .setContentIntent(pendingIntent)
             .setStyle(
                 MediaStyle()
