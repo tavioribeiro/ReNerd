@@ -238,7 +238,7 @@ class FloatingPlayer @JvmOverloads constructor(
             isPlaying = true
         }
 
-        //log("Floating Player: $currentEpisode")
+
         log("")
         log("--------------------------")
         log("\n\nFloating Player playPauseClicked currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
