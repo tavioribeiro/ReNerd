@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     private fun setUpUi(){
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(6))
+        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(1))
         window.apply {
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 
@@ -41,6 +41,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun goTo(destiny: Class<EpisodesActivity>){
         val intent = Intent(this, destiny)
+        // Usando FLAG para evitar que MainActivity permaneça na pilha
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
 

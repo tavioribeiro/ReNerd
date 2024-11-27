@@ -44,7 +44,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     private fun setUpUi(){
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(6))
+        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(1))
         window.apply {
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 
