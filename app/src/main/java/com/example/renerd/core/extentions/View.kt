@@ -320,12 +320,16 @@ fun View.setHeightInDp(heightInDp: Float) {
 
 
 
-fun View.changeBackgroundColorWithGradient(color1: String, color2: String) {
+fun View.changeBackgroundColorWithGradient(
+    color1: String,
+    color2: String,
+    originalColor1 : String = ContextManager.getColorHex(0),
+    originalColor2 : String = ContextManager.getColorHex(1)
+) {
     // Obtenção das cores atuais a partir da lógica existente (ou você pode passar como parâmetros, se necessário)
-    val currentColor1 = ContextManager.getColorHex(1)
     val startColors = intArrayOf(
-        Color.parseColor(currentColor1),
-        Color.parseColor(currentColor1)
+        Color.parseColor(originalColor1),
+        Color.parseColor(originalColor2)
     )
 
     val endColors = intArrayOf(

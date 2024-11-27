@@ -1,24 +1,21 @@
 package com.example.renerd.features.episodes
 
-import android.content.Intent
+
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.renerd.components.filters_dialog.FiltersDialog
 import com.example.renerd.core.extentions.ContextManager
-import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityEpisodesBinding
 import com.example.renerd.features.episodes.adapters.EpisodesAdapter
-import com.example.renerd.features.player.PlayerActivity
 import com.example.renerd.view_models.EpisodeViewModel
 import com.example.renerd.view_models.FiltersTabsListModel
 import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.toast
 import org.koin.android.ext.android.inject
+import android.content.pm.ActivityInfo
 
 
 class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
@@ -27,6 +24,11 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     private val presenter: EpisodesContract.Presenter by inject()
 
     private lateinit var filtersTabsListModel:FiltersTabsListModel
+
+
+    private var originalColor1 = ContextManager.getColorHex(0)
+    private var originalColor2 = ContextManager.getColorHex(0)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,11 +42,14 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
     private fun setUpUi(){
-        window.statusBarColor = Color.parseColor(ContextManager.getColorHex(0))
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-        )
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(6))
+        window.apply {
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+
+            statusBarColor = Color.parseColor(ContextManager.getColorHex(0))
+        }
     }
 
 
@@ -108,7 +113,42 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         )
         binding.recyclerviewEpisodes.adapter = adapter
 
-        //this.allowSwipeRefreshLayout()
+
+        /*binding.recyclerviewEpisodes.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                // Obtenha a posição do item visível mais à esquerda (primeiro item visível)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                // A partir da posição, obtenha o item no adapter
+                val viewHolder = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition)
+
+                // Verifique se a posição é válida e o viewHolder não é nulo
+                if (viewHolder != null) {
+                    val item = viewHolder.itemView
+                    // Supondo que o título do item seja um TextView
+                    val imageView: ImageView = item.findViewById(R.id.imageView)
+
+                    imageView.getPalletColors { colors ->
+                        val (color1, color2) = colors
+                        try {
+                            binding.mainContainer.changeBackgroundColorWithGradient(
+                                color1 = darkenColor(color1, 90.0),
+                                color2 = darkenColor(color2, 70.0)
+                            )
+
+                            originalColor1 = darkenColor(color1, 90.0)
+                            originalColor2 = darkenColor(color2, 90.0)
+                        } catch (e: Exception) {
+                            log(e)
+                        }
+                    }
+                }
+            }
+        })*/
+
     }
 
 
