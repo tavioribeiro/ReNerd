@@ -77,8 +77,8 @@
         </FrameLayout>
     </LinearLayout>
 
-    <com.example.renerd.components.player.FloatingPlayer
-        android:id="@+id/customBottomSheet"
+    <com.example.renerd.components.floating_player.FloatingPlayer
+        android:id="@+id/floating_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"

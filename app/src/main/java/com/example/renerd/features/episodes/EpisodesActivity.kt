@@ -53,6 +53,12 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     }
 
 
+    /*private fun setUpCallbacks(){
+        binding.floatingPlayer.setonBackgroundCollorsChangeListener{ color1, color2 ->
+
+        }
+    }*/
+
     override fun showActionButtons(tempFiltersTabsListModel:FiltersTabsListModel) {
         filtersTabsListModel = tempFiltersTabsListModel
 
@@ -96,7 +102,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
     override fun onDestroy() {
-        binding.customBottomSheet.stopService()
+        binding.floatingPlayer.stopService()
         presenter.detachView()
         super.onDestroy()
     }
@@ -153,7 +159,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
     private fun goTo(episode: EpisodeViewModel){
-        binding.customBottomSheet.startEpisode(episode)
+        binding.floatingPlayer.startEpisode(episode)
 
         /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("episode", episode)
@@ -163,7 +169,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
     override fun onBackPressed() {
         if (0 == 0) {
-            binding.customBottomSheet.collapse()
+            binding.floatingPlayer.collapse()
         } else {
             super.onBackPressed()
         }

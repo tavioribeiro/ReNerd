@@ -15,66 +15,89 @@
         android:gravity="center_vertical"
         android:orientation="vertical">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="15dp">
-
-            <ImageView
-                android:id="@+id/mini_player_poster"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/background"/>
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginStart="10dp">
+                android:id="@+id/linearLayout_mini_player"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="15dp">
 
-                <TextView
-                    android:id="@+id/mini_player_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/geist_regular_fontfamily"
-                    android:textFontWeight="600"
-                    android:textColor="@color/color5"
-                    android:textSize="16sp"
-                    android:ellipsize="marquee"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:scrollHorizontally="true"
-                    android:singleLine="true"/>
+                <ImageView
+                    android:id="@+id/mini_player_poster"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/background"/>
 
-                <TextView
-                    android:id="@+id/mini_player_product_name"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/geist_regular_fontfamily"
-                    android:textFontWeight="500"
-                    android:text="Lauer"
-                    android:textColor="@color/color4"
-                    android:textSize="14sp" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginStart="10dp">
+
+                    <TextView
+                        android:id="@+id/mini_player_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_regular_fontfamily"
+                        android:textFontWeight="600"
+                        android:textColor="@color/color5"
+                        android:textSize="16sp"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"/>
+
+                    <TextView
+                        android:id="@+id/mini_player_product_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_regular_fontfamily"
+                        android:textFontWeight="500"
+                        android:text="Lauer"
+                        android:textColor="@color/color4"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/mini_player_play_pause_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/icon_pause"
+                    android:layout_marginHorizontal="5dp"/>
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/mini_player_play_pause_button"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/icon_pause"/>
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/linearLayout_arrow_down"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom|left"
+                android:orientation="horizontal"
+                android:alpha="0"
+                android:paddingHorizontal="15dp">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/icon_arrow_down"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="3dp"/>
+            </LinearLayout>
+        </FrameLayout>
 
-        <ProgressBar
+
+       <!-- <ProgressBar
             android:id="@+id/mini_player_progesss_bar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="4dp"
-            android:progressTint="@color/color5" />
+            android:progressTint="@color/color5"/> -->
     </LinearLayout>
 
 
@@ -91,8 +114,9 @@
             android:id="@+id/main_player_poster"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="30dp"
             android:layout_marginBottom="8dp"
+            android:scaleType="fitXY"
             android:src="@drawable/background" />
 
         <TextView

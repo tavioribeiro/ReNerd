@@ -12,7 +12,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import com.example.renerd.R
-import com.example.renerd.components.player.FloatingPlayer
+import com.example.renerd.components.floating_player.FloatingPlayer
 import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
 import com.example.renerd.helpers.audio_focus.AudioFocusHelper
@@ -173,7 +173,7 @@ class AudioService3 : Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun resumePlaying() {
         if (player == null) {
-            // Se o player for nulo, inicie uma nova reprodução
+            // Se o floating_player for nulo, inicie uma nova reprodução
             startPlaying()
             return
         }

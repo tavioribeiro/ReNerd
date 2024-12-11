@@ -1,4 +1,4 @@
-package com.example.renerd.components.player
+package com.example.renerd.components.floating_player
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -14,18 +14,19 @@ import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.load
 import com.example.renerd.R
+import com.example.renerd.core.utils.convertMillisecondsToTime
 import com.example.renerd.core.utils.formatTime
 import com.example.renerd.core.utils.log
-import com.example.renerd.databinding.BottomSheetLayoutBinding
+import com.example.renerd.databinding.CFloatingPlayerLayoutBinding
 import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import core.extensions.changeBackgroundColorWithGradient
+import core.extensions.convertToTime
 import core.extensions.cropCenterSection
 import core.extensions.darkenColor
 import core.extensions.fadeInAnimation
 import core.extensions.fadeInAnimationNoRepeat
-import core.extensions.fadeOutAnimation
 import core.extensions.fadeOutAnimationNoRepeat
 import core.extensions.getPalletColors
 import core.extensions.getSizes
@@ -46,7 +47,9 @@ class FloatingPlayer @JvmOverloads constructor(
     private var onExpandedCallback: (() -> Unit)? = null
     private var onCollapsedCallback: (() -> Unit)? = null
 
-    private val binding: BottomSheetLayoutBinding = BottomSheetLayoutBinding.inflate(LayoutInflater.from(context), this, true)
+    private var onBackgroundCollorsChangeCallback: ((String, String) -> Unit)? = null
+
+    private val binding: CFloatingPlayerLayoutBinding = CFloatingPlayerLayoutBinding.inflate(LayoutInflater.from(context), this, true)
     private val presenter: FloatingPlayerContract.Presenter by inject(clazz = FloatingPlayerContract.Presenter::class.java)
 
     private var isPlaying = false
@@ -68,7 +71,7 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
     override fun updateInfosUi(episode: EpisodeViewModel){
-        // Atualizar a UI do player
+        // Atualizar a UI do floating_player
         binding.miniPlayerTitle.text = episode.title
         binding.mainPlayerTitle.text = episode.title
 
@@ -85,7 +88,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
 
-        binding.miniPlayerPoster.startSkeletonAnimation(30f)
+        binding.miniPlayerPoster.startSkeletonAnimation(20f)
         binding.mainPlayerPoster.startSkeletonAnimation(30f)
 
 
@@ -94,10 +97,11 @@ class FloatingPlayer @JvmOverloads constructor(
 
                 onSuccess = { drawable ->
                     //Define a imagem com borda curva e para o skeleton
-                    binding.miniPlayerPoster.getSizes{ width, height ->
+                    binding.miniPlayerPoster.getSizes { width, height ->
                         val crop = drawable.cropCenterSection(widthDp = width, heightDp = height, resources)
+                        //val resized = drawable.resize(width = width, height = height, resources)
 
-                        binding.miniPlayerPoster.setImageDrawable(crop.toAllRoundedDrawable(30f))
+                        binding.miniPlayerPoster.setImageDrawable(crop.toAllRoundedDrawable(20f))
                         binding.miniPlayerPoster.stopSkeletonAnimation()
                     }
 
@@ -106,9 +110,9 @@ class FloatingPlayer @JvmOverloads constructor(
 
                     //Define a imagem com borda curva e para o skeleton
                     binding.mainPlayerPoster.getSizes{ width, height ->
-                        val resized = drawable.resize(width = width, height = height, resources)
+                        val crop = drawable.cropCenterSection(widthDp = width, heightDp = height, resources)
 
-                        binding.mainPlayerPoster.setImageDrawable(resized.toAllRoundedDrawable(15f))
+                        binding.mainPlayerPoster.setImageDrawable(drawable.toAllRoundedDrawable(16f))
                         binding.mainPlayerPoster.stopSkeletonAnimation()
                     }
 
@@ -123,6 +127,8 @@ class FloatingPlayer @JvmOverloads constructor(
                                 color1 = darkenColor(color1, 90.0),
                                 color2 = darkenColor(color2, 70.0)
                             )
+
+                            onBackgroundCollorsChangeCallback?.invoke(darkenColor(color1, 90.0), darkenColor(color2, 70.0))
                         } catch (e: Exception) {
                             log(e)
                         }
@@ -153,7 +159,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
                 updatePlayerTimerUI(currentTime, totalTime)
 
-                log("\n\nFloating Player playerStatusReceiver currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
+                //log("\n\nFloating Player playerStatusReceiver currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
             }
         }
     }
@@ -184,8 +190,8 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     private fun updatePlayerTimerUI(currentTime: Int, totalTime: Int) {
-        binding.mainPlayerCurrentTime.text = formatTime(currentTime)
-        binding.mainPlayerTotalTime.text = formatTime(totalTime)
+        binding.mainPlayerCurrentTime.text = convertMillisecondsToTime(currentTime)
+        binding.mainPlayerTotalTime.text = convertMillisecondsToTime(totalTime)
         binding.mainPlayerSeekBar.max = totalTime
         binding.mainPlayerSeekBar.progress = currentTime
     }
@@ -205,12 +211,20 @@ class FloatingPlayer @JvmOverloads constructor(
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.miniPlayer.alpha = 1 - slideOffset
+                binding.linearLayoutMiniPlayer.alpha = 1 - slideOffset
                 binding.mainPlayer.alpha = slideOffset
+                binding.linearLayoutArrowDown.alpha = slideOffset
             }
         })
         onInitialized()
     }
+
+
+
+    fun setonBackgroundCollorsChangeListener(listener: (String, String) -> Unit) {
+        this.onBackgroundCollorsChangeCallback = listener
+    }
+
 
 
 
@@ -261,9 +275,9 @@ class FloatingPlayer @JvmOverloads constructor(
         }
 
 
-        log("")
-        log("--------------------------")
-        log("\n\nFloating Player playPauseClicked currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
+        //log("")
+        //log("--------------------------")
+        //log("\n\nFloating Player playPauseClicked currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
 
         log(context.packageName)
         intent.putExtra("id", currentEpisode.id)
@@ -306,13 +320,13 @@ class FloatingPlayer @JvmOverloads constructor(
         intent.putExtra("imageUrl", episode.imageUrl)
         intent.putExtra("elapsedTime", episode.elapsedTime)
 
-        log("")
-        log("--------------------------")
-        log("\n\nFloating Player startEpisode currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
+//        log("")
+//        log("--------------------------")
+//        log("\n\nFloating Player startEpisode currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
 
         context.startService(intent)
 
-        // Atualizar a UI do player
+        // Atualizar a UI do floating_player
         updateInfosUi(episode)
 
         isPlaying = true
@@ -421,7 +435,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     companion object {
-        const val PLAYER_STATUS_UPDATE = "com.example.renerd.components.player.PLAYER_STATUS_UPDATE"
+        const val PLAYER_STATUS_UPDATE = "com.example.renerd.components.floating_player.PLAYER_STATUS_UPDATE"
         const val IS_PLAYING = "isPlaying"
         const val CURRENT_TIME = "currentTime"
         const val TOTAL_TIME = "totalTime"

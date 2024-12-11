@@ -73,3 +73,18 @@ fun normalizeText(input: String): String {
             word.capitalize()
         }
 }
+
+
+
+
+fun convertToTime(time: String): String {
+    val parts = time.split(":")
+
+    val minutes = parts[0].toInt()
+    val seconds = parts[1].toInt()
+
+    val hours = minutes / 60
+    val remainingMinutes = minutes % 60
+
+    return String.format("%02d:%02d:%02d", hours, remainingMinutes, seconds)
+}

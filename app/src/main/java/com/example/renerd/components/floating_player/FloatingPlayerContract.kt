@@ -1,4 +1,4 @@
-package com.example.renerd.components.player
+package com.example.renerd.components.floating_player
 
 import com.example.renerd.view_models.EpisodeViewModel
 

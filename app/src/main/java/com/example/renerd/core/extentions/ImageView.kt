@@ -12,6 +12,7 @@ import android.graphics.Canvas
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
@@ -19,6 +20,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.view.animation.LinearInterpolator
+import androidx.core.graphics.drawable.toBitmap
 import com.example.renerd.core.extentions.ContextManager
 
 
@@ -333,43 +335,43 @@ fun Drawable.resize(width: Int, height: Int, resources: Resources): Drawable {
 
 
 fun Drawable.cropCenterSection(widthDp: Int, heightDp: Int, resources: Resources): BitmapDrawable {
+    // Converter DP para pixels
     val widthPx = (widthDp * resources.displayMetrics.density).toInt()
     val heightPx = (heightDp * resources.displayMetrics.density).toInt()
 
-
+    // Obter o bitmap do Drawable
     val bitmap = if (this is BitmapDrawable) {
         this.bitmap
     } else {
-        Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight, Bitmap.Config.ARGB_8888).also { bmp ->
-            val canvas = Canvas(bmp)
+        Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888).also {
+            val canvas = Canvas(it)
             this.setBounds(0, 0, canvas.width, canvas.height)
             this.draw(canvas)
         }
     }
 
-    val bitmapWidth = bitmap.width
-    val bitmapHeight = bitmap.height
+    // Calcular as coordenadas do recorte central
+    val left = ((bitmap.width - widthPx) / 2).coerceAtLeast(0)
+    val top = ((bitmap.height - heightPx) / 2).coerceAtLeast(0)
+    val right = (left + widthPx).coerceAtMost(bitmap.width)
+    val bottom = (top + heightPx).coerceAtMost(bitmap.height)
 
-    val startX = (bitmapWidth / 2) - (widthPx / 2)
-    val startY = (bitmapHeight / 2) - (heightPx / 2)
-    val endX = startX + widthPx
-    val endY = startY + heightPx
+    // Criar o bitmap recortado
+    val croppedBitmap = Bitmap.createBitmap(bitmap, left, top, right - left, bottom - top)
 
-    val validStartX = startX.coerceAtLeast(0)
-    val validStartY = startY.coerceAtLeast(0)
-    val validEndX = endX.coerceAtMost(bitmapWidth)
-    val validEndY = endY.coerceAtMost(bitmapHeight)
-
-    val croppedBitmap = Bitmap.createBitmap(
-        bitmap,
-        validStartX,
-        validStartY,
-        validEndX - validStartX,
-        validEndY - validStartY
-    )
-
+    // Retornar como um BitmapDrawable
     return BitmapDrawable(resources, croppedBitmap)
 }
+
+
+
+
+fun Drawable.getSizes(callback: (width: Int, height: Int) -> Unit) {
+    val width = intrinsicWidth
+    val height = intrinsicHeight
+    callback(width, height)
+}
+
 
 
 
