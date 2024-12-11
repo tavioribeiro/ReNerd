@@ -9,6 +9,7 @@ interface FloatingPlayerContract {
         fun showUi()
         fun updateCurrentEpisode(episode: EpisodeViewModel)
         fun updateButtonsUi(isPlaying: Boolean, currentTime: Int, totalTime: Int)
+        fun updatePlayerTimerUI(currentTime: Int, totalTime: Int)
     }
 
     interface Presenter {

@@ -22,7 +22,6 @@ import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import core.extensions.changeBackgroundColorWithGradient
-import core.extensions.convertToTime
 import core.extensions.cropCenterSection
 import core.extensions.darkenColor
 import core.extensions.fadeInAnimation
@@ -30,7 +29,6 @@ import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.fadeOutAnimationNoRepeat
 import core.extensions.getPalletColors
 import core.extensions.getSizes
-import core.extensions.resize
 import core.extensions.startSkeletonAnimation
 import core.extensions.stopSkeletonAnimation
 import core.extensions.toAllRoundedDrawable
@@ -189,7 +187,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
 
-    private fun updatePlayerTimerUI(currentTime: Int, totalTime: Int) {
+    override fun updatePlayerTimerUI(currentTime: Int, totalTime: Int) {
         binding.mainPlayerCurrentTime.text = convertMillisecondsToTime(currentTime)
         binding.mainPlayerTotalTime.text = convertMillisecondsToTime(totalTime)
         binding.mainPlayerSeekBar.max = totalTime

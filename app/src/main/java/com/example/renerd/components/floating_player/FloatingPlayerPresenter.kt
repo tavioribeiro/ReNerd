@@ -44,6 +44,7 @@ class FloatingPlayerPresenter(private val repository: FloatingPlayerContract.Rep
                     view?.updateInfosUi(currentEpisodePlaying)
                     view?.updateButtonsUi(false, currentEpisodePlaying.elapsedTime, currentEpisodePlaying.duration)
                     view?.showUi()
+                    view?.updatePlayerTimerUI(currentEpisodePlaying.elapsedTime, currentEpisodePlaying.duration)
                 }
             }
         } catch (e: Exception) {
