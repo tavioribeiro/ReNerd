@@ -311,6 +311,19 @@ class EpisodesRepository: EpisodesContract.Repository {
     }
 
 
+    override fun setRecyclerviewEpisodesCurrentPosition(currentPosition: Int) {
+        editor.putString("recyclerviewEpisodesCurrentPosition", currentPosition.toString())
+        editor.apply()
+    }
+
+
+    override fun getRecyclerviewEpisodesCurrentPosition(): String {
+        var recyclerviewEpisodesCurrentPosition = sharedPref.getString("recyclerviewEpisodesCurrentPosition", "") ?: "0"
+
+        return recyclerviewEpisodesCurrentPosition
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setAfter() {
         editor.putString("current_after_search", getCurrentDateFormatted())

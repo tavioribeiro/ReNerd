@@ -9,7 +9,7 @@ interface EpisodesContract {
 
     interface View {
         fun setUpFilterModal(filtersTabsListModel:FiltersTabsListModel)
-        fun showEpisodes(episodes: MutableList<EpisodeViewModel>)
+        fun showEpisodes(episodes: MutableList<EpisodeViewModel>, scrollTo: Int = 0)
         fun showError(message: String)
         fun showLoading()
         fun hideLoading()
@@ -27,6 +27,8 @@ interface EpisodesContract {
         fun getFiltersTabsList()
         fun updateFiltersTabsList(tempFiltersTabsListModel:FiltersTabsListModel)
         fun updateFiltersTabsItemList(mixedFiltersTabsItemModel: MutableList<FiltersTabsItemModel>)
+
+        fun recyclerviewEpisodesCurrentPosition(currentPosition: Int)
     }
 
     interface Repository {
@@ -49,5 +51,8 @@ interface EpisodesContract {
         suspend fun getAllFilterYearTabItems(): MutableList<FiltersTabsListItemModel>
 */
         suspend fun getLastEpisodes(): MutableList<EpisodeViewModel>
+
+        fun setRecyclerviewEpisodesCurrentPosition(currentPosition: Int)
+        fun getRecyclerviewEpisodesCurrentPosition(): String
     }
 }

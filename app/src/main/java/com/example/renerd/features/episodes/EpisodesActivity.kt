@@ -16,6 +16,8 @@ import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.toast
 import org.koin.android.ext.android.inject
 import android.content.pm.ActivityInfo
+import androidx.recyclerview.widget.RecyclerView
+import com.example.renerd.core.utils.log
 
 
 class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
@@ -29,6 +31,8 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     private var originalColor1 = ContextManager.getColorHex(0)
     private var originalColor2 = ContextManager.getColorHex(0)
 
+    private var currentRecyclerViewPoition = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +42,7 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         this.setUpUi()
         presenter.attachView(this)
         presenter.getFiltersTabsList()
+        this.recyclerviewEpisodesMonitor()
     }
 
 
@@ -108,7 +113,8 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     }
 
 
-    override fun showEpisodes(episodes: MutableList<EpisodeViewModel>) {
+
+    override fun showEpisodes(episodes: MutableList<EpisodeViewModel>, scrollTo: Int) {
         binding.recyclerviewEpisodes.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         val adapter = EpisodesAdapter(
             context = this,
@@ -118,6 +124,8 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
             }
         )
         binding.recyclerviewEpisodes.adapter = adapter
+
+        binding.recyclerviewEpisodes.scrollToPosition(scrollTo)
 
 
         /*binding.recyclerviewEpisodes.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -155,6 +163,26 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
             }
         })*/
 
+    }
+
+
+    private fun recyclerviewEpisodesMonitor(){
+        binding.recyclerviewEpisodes.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                // Obtenha o LayoutManager da RecyclerView
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+
+                // Obtenha o índice do primeiro e último item visível
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                if(firstVisibleItemPosition != currentRecyclerViewPoition) {
+                    presenter.recyclerviewEpisodesCurrentPosition(firstVisibleItemPosition)
+                    currentRecyclerViewPoition = firstVisibleItemPosition
+                }
+            }
+        })
     }
 
 

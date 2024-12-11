@@ -55,6 +55,11 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
 
 
 
+    override fun recyclerviewEpisodesCurrentPosition(currentPosition: Int){
+        repository.setRecyclerviewEpisodesCurrentPosition(currentPosition)
+    }
+
+
 
     private suspend fun getFiltersTabsListModelFromRepository(): FiltersTabsListModel{
         var allMixedFilters = repository.getAllFilterTabItems()
@@ -191,7 +196,9 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
                 val filteredByYears = filterEpisodesByYearInclude(filteredByGuests, getLabelsWithStatusTrue(getFiltersTabsListModelFromRepository().yearsList)).toMutableList() ?: mutableListOf<EpisodeViewModel>()
 
 
-                view?.showEpisodes(filteredByYears)
+                val recyclerviewEpisodesCurrentPosition = repository.getRecyclerviewEpisodesCurrentPosition()
+
+                view?.showEpisodes(filteredByYears, recyclerviewEpisodesCurrentPosition.toInt())
                 view?.hideLoading()
             }
         } catch (e: Exception) {
@@ -213,7 +220,11 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
                 val filteredBySubjects = filterEpisodesBySubjectInclude(filteredByProducts, listOf("Ciências, Cinema")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
                 val filteredByGuests = filterEpisodesByGuestInclude(filteredBySubjects, listOf("Affonso Solano")).toMutableList() ?: mutableListOf<EpisodeViewModel>()
 
-                view?.showEpisodes(filteredByGuests)
+
+
+                val recyclerviewEpisodesCurrentPosition = repository.getRecyclerviewEpisodesCurrentPosition()
+
+                view?.showEpisodes(filteredByGuests, recyclerviewEpisodesCurrentPosition.toInt())
             }
         } catch (e: Exception) {
             view?.showError("Erro ao carregar episódios")
