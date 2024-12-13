@@ -318,7 +318,7 @@ class EpisodesRepository: EpisodesContract.Repository {
 
 
     override fun getRecyclerviewEpisodesCurrentPosition(): String {
-        var recyclerviewEpisodesCurrentPosition = sharedPref.getString("recyclerviewEpisodesCurrentPosition", "") ?: "0"
+        var recyclerviewEpisodesCurrentPosition = sharedPref.getString("recyclerviewEpisodesCurrentPosition", "0") ?: "0"
 
         return recyclerviewEpisodesCurrentPosition
     }
