@@ -15,13 +15,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.utils.convertMillisecondsToTime
-import com.example.renerd.core.utils.formatTime
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.CFloatingPlayerLayoutBinding
 import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import core.extensions.changeBackgroundColorWithGradient
 import core.extensions.cropCenterSection
 import core.extensions.darkenColor
 import core.extensions.fadeInAnimation
@@ -32,6 +30,7 @@ import core.extensions.getSizes
 import core.extensions.resize
 import core.extensions.startSkeletonAnimation
 import core.extensions.stopSkeletonAnimation
+import core.extensions.styleBackground
 import core.extensions.toAllRoundedDrawable
 import org.koin.java.KoinJavaComponent.inject
 
@@ -42,14 +41,16 @@ class FloatingPlayer @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), FloatingPlayerContract.View {
 
+    private val binding: CFloatingPlayerLayoutBinding = CFloatingPlayerLayoutBinding.inflate(LayoutInflater.from(context), this, true)
+    private val presenter: FloatingPlayerContract.Presenter by inject(clazz = FloatingPlayerContract.Presenter::class.java)
+
+
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private var onExpandedCallback: (() -> Unit)? = null
     private var onCollapsedCallback: (() -> Unit)? = null
 
     private var onBackgroundCollorsChangeCallback: ((String, String) -> Unit)? = null
 
-    private val binding: CFloatingPlayerLayoutBinding = CFloatingPlayerLayoutBinding.inflate(LayoutInflater.from(context), this, true)
-    private val presenter: FloatingPlayerContract.Presenter by inject(clazz = FloatingPlayerContract.Presenter::class.java)
 
     private var isPlaying = false
 
@@ -57,6 +58,7 @@ class FloatingPlayer @JvmOverloads constructor(
 
     init {
         binding.mainContainer.visibility = View.GONE
+
 
         presenter.attachView(this)
         presenter.getCurrentPlayingEpisode()
@@ -98,13 +100,10 @@ class FloatingPlayer @JvmOverloads constructor(
                     //Define a imagem com borda curva e para o skeleton
                     binding.miniPlayerPoster.getSizes { width, height ->
                         val crop = drawable.cropCenterSection(widthDp = width, heightDp = height, resources)
-                        //val resized = drawable.resize(width = width, height = height, resources)
 
                         binding.miniPlayerPoster.setImageDrawable(crop.toAllRoundedDrawable(20f))
                         binding.miniPlayerPoster.stopSkeletonAnimation()
                     }
-
-
 
 
 
@@ -123,9 +122,15 @@ class FloatingPlayer @JvmOverloads constructor(
                     binding.mainPlayerPoster.getPalletColors { colors ->
                         val (color1, color2) = colors
                         try {
-                            binding.mainContainer.changeBackgroundColorWithGradient(
-                                color1 = darkenColor(color1, 90.0),
-                                color2 = darkenColor(color2, 70.0)
+//                            binding.mainContainer.changeBackgroundColorWithGradient(
+//                                color1 = darkenColor(color1, 90.0),
+//                                color2 = darkenColor(color2, 70.0)
+//                            )
+
+                            binding.mainContainer.styleBackground(
+                                backgroundColorsList = mutableListOf(darkenColor(color1, 97.0), darkenColor(color2, 65.0)),
+                                topLeftRadius = 40f,
+                                topRightRadius = 40f
                             )
 
                             onBackgroundCollorsChangeCallback?.invoke(darkenColor(color1, 90.0), darkenColor(color2, 70.0))
