@@ -376,14 +376,17 @@ fun Drawable.getSizes(callback: (width: Int, height: Int) -> Unit) {
 
 
 
-
 fun Drawable.toTopRoundedDrawable(radius: Float): BitmapDrawable {
     val bitmap = if (this is BitmapDrawable) {
         this.bitmap
     } else {
-        Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight, Bitmap.Config.ARGB_8888).also { bmp ->
+
+        val width = this.intrinsicWidth
+        val height = this.intrinsicHeight
+
+        Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { bmp ->
             val canvas = Canvas(bmp)
-            this.setBounds(0, 0, canvas.width, canvas.height)
+            this.setBounds(0, 0, width, height)
             this.draw(canvas)
         }
     }
@@ -402,8 +405,9 @@ fun Drawable.toTopRoundedDrawable(radius: Float): BitmapDrawable {
     }
 
     canvas.drawPath(path, paint)
-    return BitmapDrawable(output)
+    return BitmapDrawable(Resources.getSystem(), output)
 }
+
 
 
 

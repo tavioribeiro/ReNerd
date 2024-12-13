@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="1dp">
+    android:orientation="vertical"
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginVertical="20dp">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop" />
+        android:layout_height="220dp"
+        android:scaleType="fitXY" />
 
     <LinearLayout
+        android:id="@+id/bottom_info"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:visibility="invisible"
         android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:background="@drawable/a_gradient_episode_title">
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/play_icon_background"
@@ -39,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom"
-            android:gravity="bottom"
+            android:gravity="center_vertical"
             android:orientation="vertical">
 
             <TextView
@@ -47,7 +50,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:textSize="15dp" />
+                android:textSize="15dp"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:singleLine="true"/>
 
             <TextView
                 android:id="@+id/texView_info"
@@ -58,4 +65,4 @@
                 android:textSize="14dp"/>
         </LinearLayout>
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>
