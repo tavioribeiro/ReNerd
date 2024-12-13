@@ -29,6 +29,7 @@ import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.fadeOutAnimationNoRepeat
 import core.extensions.getPalletColors
 import core.extensions.getSizes
+import core.extensions.resize
 import core.extensions.startSkeletonAnimation
 import core.extensions.stopSkeletonAnimation
 import core.extensions.toAllRoundedDrawable
@@ -106,11 +107,12 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
 
+
                     //Define a imagem com borda curva e para o skeleton
                     binding.mainPlayerPoster.getSizes{ width, height ->
-                        val crop = drawable.cropCenterSection(widthDp = width, heightDp = height, resources)
+                        val resize = drawable.resize(width = width, height = (width / 1.682242991).toInt() , resources)
 
-                        binding.mainPlayerPoster.setImageDrawable(drawable.toAllRoundedDrawable(16f))
+                        binding.mainPlayerPoster.setImageDrawable(resize.toAllRoundedDrawable(16f))
                         binding.mainPlayerPoster.stopSkeletonAnimation()
                     }
 
