@@ -88,3 +88,18 @@ fun convertToTime(time: String): String {
 
     return String.format("%02d:%02d:%02d", hours, remainingMinutes, seconds)
 }
+
+
+
+
+fun String.toTitleCase(): String {
+    return split("-").joinToString(" ") { it.capitalize() }
+}
+
+fun String.capitalize(): String {
+    return if (isNotEmpty()) {
+        substring(0, 1).uppercase() + substring(1)
+    } else {
+        this
+    }
+}

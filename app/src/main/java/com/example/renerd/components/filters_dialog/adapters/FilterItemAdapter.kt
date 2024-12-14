@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.renerd.R
 import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.FiltersTabsItemModel
+import core.extensions.toTitleCase
 
 class FilterItemAdapter(
     private val filtersTabsListItemModel: List<FiltersTabsItemModel>,
@@ -28,7 +29,7 @@ class FilterItemAdapter(
 
     override fun onBindViewHolder(holder: FilterItemViewHolder, position: Int) {
         val item = filtersTabsListItemModel[position]
-        holder.textView.text = item.label
+        holder.textView.text = item.label.toTitleCase()
 
         holder.checkBox.setOnCheckedChangeListener(null)
         holder.checkBox.isChecked = item.status

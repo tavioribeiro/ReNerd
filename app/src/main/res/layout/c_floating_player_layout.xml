@@ -11,7 +11,7 @@
     <LinearLayout
         android:id="@+id/mini_player"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="75dp"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -207,7 +207,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
                 android:visibility="gone"
-                app:icon="@drawable/icon_replay_15"/>
+                app:icon="@drawable/icon_backward"/>
 
             <com.example.renerd.components.buttons.IconButton
                 android:id="@+id/main_player_play_pause_button"
@@ -222,7 +222,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
                 android:visibility="gone"
-                app:icon="@drawable/icon_foward_15"/>
+                app:icon="@drawable/icon_forward"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

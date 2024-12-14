@@ -26,6 +26,9 @@ import core.extensions.stopSkeletonAnimation
 import core.extensions.styleBackground
 import core.extensions.toAllRoundedDrawable
 import core.extensions.toTopRoundedDrawable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class EpisodesAdapter(
     private val context: Context,
@@ -45,81 +48,64 @@ class EpisodesAdapter(
         val imageView_play_icon: ImageView = itemView.findViewById(R.id.imageView_play_icon)
         val texView_name: TextView = itemView.findViewById(R.id.texView_name)
         val texView_info : TextView = itemView.findViewById(R.id.texView_info)
+
+        var imageColor1: String = ContextManager.getColorHex(2)
+        var imageColor2: String = ContextManager.getColorHex(2)
     }
 
 
 
     override fun onBindViewHolder(holder: EpisodeViewHolder, position: Int) {
-
-        holder.bottom_info.visibility = View.INVISIBLE
-
-        // Parar animação de skeleton e resetar imagem
-        holder.imageView.stopSkeletonAnimation()
-        holder.imageView.setImageResource(0) // Limpa a imagem para evitar flickering
-
-        // Resetar estilos de background
-        holder.bottom_info.styleBackground(
-            backgroundColor = ContextManager.getColorHex(0),
-            bottomLeftRadius = 0f,
-            bottomRightRadius = 0f
-        )
-        holder.bottom_info.alpha = 1f // Resetar a transparência, caso tenha sido alterada pela animação
-
-        holder.play_icon_background.styleBackground(
-            backgroundColor = ContextManager.getColorHex(0),
-            radius = 50f
-        )
-
-        // Resetar texto (caso não seja necessário, pode remover)
-        holder.texView_name.text = ""
-        holder.texView_info.text = ""
-
-
-
-
-        // **FIM DO RESET**
-
         holder.texView_name.isSelected = true
 
-        holder.imageView.startSkeletonAnimation(36f)
+        holder.imageView.setImageResource(R.drawable.media_cover)
 
         holder.imageView.load(episodes[position].imageUrl){
             target(
                 onSuccess = { drawable ->
-                    //Define a imagem com borda curva e para o skeleton
                     holder.imageView.getSizes{ width, height ->
-                        val resize = drawable.resize(width = width, height = (width / 1.682242991).toInt() , context.resources)
+                        //val resize = drawable.resize(width = width, height = (width / 1.682242991).toInt() , context.resources)
 
-                        holder.imageView.setImageDrawable(resize.toTopRoundedDrawable(36f))
-                        holder.imageView.stopSkeletonAnimation()
+                        holder.imageView.setImageDrawable(drawable.toTopRoundedDrawable(36f))
                     }
 
-                    //Obter a paleta de cores da imagem
-                    holder.imageView.getPalletColors { colors ->
-                        val (color1, color2) = colors
-                        try {
-                            holder.bottom_info.styleBackground(
-                                backgroundColorsList = mutableListOf(darkenColor(color1, 85.0), darkenColor(color2, 65.0)),
-                                bottomLeftRadius = 36f,
-                                bottomRightRadius = 36f
-                            )
-                        } catch (e: Exception) {
-                            log(e)
+
+
+                    if(holder.imageColor1 == holder.imageColor2){
+                        CoroutineScope(Dispatchers.IO).launch {
+                            holder.imageView.getPalletColors { colors ->
+                                val (color1, color2) = colors
+                                try {
+                                    holder.imageColor1 = color1
+                                    holder.imageColor2 = color2
+
+
+                                    holder.bottom_info.styleBackground(
+                                        backgroundColorsList = mutableListOf(
+                                            darkenColor(
+                                                color1,
+                                                85.0
+                                            ), darkenColor(color2, 65.0)
+                                        ),
+                                        bottomLeftRadius = 36f,
+                                        bottomRightRadius = 36f
+                                    )
+                                } catch (e: Exception) {
+                                    log(e)
+                                }
+                            }
                         }
                     }
-                    holder.bottom_info.fadeInAnimationNoRepeat()
+
+                    if(holder.bottom_info.visibility != View.VISIBLE) holder.bottom_info.fadeInAnimationNoRepeat()
                 },
                 onError = {
                     holder.imageView.setImageResource(R.drawable.background)
 
+                    if(holder.bottom_info.visibility != View.VISIBLE) holder.bottom_info.fadeInAnimationNoRepeat()
                 }
             )
         }
-
-        holder.play_icon_background.styleBackground(
-            backgroundColor = ContextManager.getColorHex(1),
-            radius = 50f
-        )
 
         holder.texView_name.text = episodes[position].title
         holder.texView_info.text = episodes[position].productName

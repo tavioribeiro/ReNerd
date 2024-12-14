@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Filtros"
-                style="@style/TS_Title2"
+                style="@style/TS_Title1"
                 android:textColor="@color/color5"
                 android:layout_alignParentTop="true"/>
 
@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 app:default_width="false"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/icon_play"
+                app:icon="@drawable/icon_save"
                 app:label="Salvar"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"/>
