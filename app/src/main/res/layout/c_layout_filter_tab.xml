@@ -14,12 +14,12 @@
         android:layout_height="wrap_content"
         android:text="Filtros"
         style="@style/TS_Title3"
+        android:visibility="gone"
         android:textColor="@color/color5"
         android:layout_alignParentTop="true"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_base"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"/>
+        android:layout_height="wrap_content"/>
 </LinearLayout>

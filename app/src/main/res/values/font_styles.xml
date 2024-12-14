@@ -7,8 +7,8 @@
     </style>
 
     <style name="TS_Title1" parent="Widget.AppCompat.TextView">
-        <item name="android:fontFamily">@font/geist_regular_fontfamily</item>
-        <item name="android:textSize">27sp</item>
+        <item name="android:fontFamily">@font/geist_extra_bold_fontfamily</item>
+        <item name="android:textSize">25sp</item>
         <item name="android:textStyle">normal</item>
     </style>
 
