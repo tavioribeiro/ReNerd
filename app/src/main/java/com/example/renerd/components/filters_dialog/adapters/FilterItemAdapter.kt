@@ -39,13 +39,13 @@ class FilterItemAdapter(
         if (item.status) {
             holder.textView.styleBackground(
                 backgroundColor = ContextManager.getColorHex(6),
-                radius = 50f
+                radius = 100f
             )
             holder.textView.setTextColor(Color.parseColor(ContextManager.getColorHex(1)))
         } else {
             holder.textView.styleBackground(
                 backgroundColor = ContextManager.getColorHex(2),
-                radius = 50f
+                radius = 100f
             )
             holder.textView.setTextColor(Color.parseColor(ContextManager.getColorHex(5)))
         }
