@@ -24,14 +24,19 @@ import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
 import com.example.renerd.features.player.PlayerActivity
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.IOException
+import java.util.LinkedList
 
 class AudioService : Service() {
 
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val mediaPlayerDispatcher = Dispatchers.IO // Dedicated dispatcher for MediaPlayer operations
     private val context = this
     private var player: MediaPlayer? = null
-    private var isPlaying: Boolean = false
-    private var isPaused = false
+    private var playbackState: PlaybackState = PlaybackState.IDLE // Using state machine
+    private val playbackStateMutex = Mutex() // Mutex for state transitions
 
     private var url = ""
     private var title = ""
@@ -41,7 +46,6 @@ class AudioService : Service() {
 
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: AudioFocusRequest? = null
-    private var job: Job? = null
     private var mediaSession: MediaSessionCompat? = null
 
     // Notificação
@@ -50,22 +54,28 @@ class AudioService : Service() {
     private lateinit var notificationActionTitle: String
     private lateinit var playPausePendingIntent: PendingIntent
 
+    // Audio Focus Queue (Implementação da fila de AudioFocus sugerida)
+    private val audioFocusQueue = LinkedList<AudioFocusRequest>()
+    private var currentFocusRequest: AudioFocusRequest? = null
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private val focusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
         when (focusChange) {
-            AudioManager.AUDIOFOCUS_LOSS -> pausePlaying()
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> pausePlaying()
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> player?.setVolume(0.2f, 0.2f)
-            AudioManager.AUDIOFOCUS_GAIN -> {
-                player?.setVolume(1.0f, 1.0f)
-                if (!isPlaying && !isPaused) player?.start()
-            }
+            AudioManager.AUDIOFOCUS_LOSS -> onAudioFocusLoss()
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> onAudioFocusLossTransient()
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> onAudioFocusLossTransientCanDuck()
+            AudioManager.AUDIOFOCUS_GAIN -> onAudioFocusGain()
         }
     }
 
     private val playPauseReceiver = object : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context, intent: Intent) {
-            if (isPlaying) pausePlaying() else startPlaying()
+            when (playbackState) {
+                PlaybackState.PLAYING -> pausePlaying()
+                PlaybackState.PAUSED, PlaybackState.PREPARED -> startPlaying()
+                else -> startPlaying() // Handle other states if needed
+            }
         }
     }
 
@@ -83,6 +93,7 @@ class AudioService : Service() {
         }
 
         registerReceiver(playPauseReceiver, IntentFilter("PLAY_PAUSE"), RECEIVER_EXPORTED)
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -115,78 +126,127 @@ class AudioService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun startPlaying(position: Int = 0) {
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        requestAudioFocus()
-
-        if (audioFocusRequest != null && audioManager.requestAudioFocus(audioFocusRequest!!) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            isPaused = false
-            initializeMediaPlayer(position)
-        } else {
-            log("Failed to obtain audio focus")
+        serviceScope.launch {
+            if (requestAudioFocus()) {
+                initializeMediaPlayer(position)
+            } else {
+                log("Failed to obtain audio focus")
+            }
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun requestAudioFocus() {
-        audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build()
-            )
-            .setOnAudioFocusChangeListener(focusChangeListener)
-            .build()
+    private suspend fun requestAudioFocus(): Boolean {
+        return suspendCancellableCoroutine { continuation ->
+            audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                .setOnAudioFocusChangeListener(focusChangeListener)
+                .build()
+
+            val result = audioManager.requestAudioFocus(audioFocusRequest!!)
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                continuation.resume(true, null)
+            } else {
+                continuation.resume(false, null)
+            }
+        }
     }
 
-    private fun initializeMediaPlayer(position: Int) {
-        if (!isPlaying) {
-            if (player == null) {
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun initializeMediaPlayer(position: Int) {
+        playbackStateMutex.withLock {
+            if (playbackState == PlaybackState.IDLE || playbackState == PlaybackState.STOPPED || playbackState == PlaybackState.ERROR) {
+                player?.reset() // Reset if reusing MediaPlayer
                 player = MediaPlayer().apply {
                     try {
                         setDataSource(url)
+                        setAudioAttributes(AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build())
                         setOnPreparedListener {
-                            handleMediaPlayerPrepared(position)
+                            serviceScope.launch(Dispatchers.Main) { handleMediaPlayerPrepared(position) }
                         }
-                        prepareAsync()
+                        setOnErrorListener { _, _, _ ->
+                            serviceScope.launch(Dispatchers.Main) { handleMediaPlayerError() }
+                            true // Indicate that we handled the error
+                        }
+                        playbackState = PlaybackState.PREPARING
+                        prepareAsync() // Prepare asynchronously in IO dispatcher
                     } catch (e: IOException) {
-                        log("Error setting data source")
+                        playbackState = PlaybackState.ERROR
+                        log("Error setting data source: ${e.message}")
+                        handleMediaPlayerError() // Handle error state
                     }
                 }
-            } else {
-                player?.start()
-                isPlaying = true
-                player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, it) }
-                showNotification()
+            } else if (playbackState == PlaybackState.PAUSED || playbackState == PlaybackState.PREPARED) {
+                startMediaPlayerPlayback(position)
+            } else if (playbackState == PlaybackState.PLAYING) {
+                seekMediaPlayer(position)
             }
-        } else {
-            player?.seekTo(position)
         }
     }
 
-    private fun handleMediaPlayerPrepared(position: Int) {
-        player?.let {
-            it.start()
-            sendTotalTime(it.duration.toString())
-            startProgressUpdateJob()
-            it.seekTo(position)
-            isPlaying = true
-            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, position)
-            showNotification()
+
+    private suspend fun handleMediaPlayerPrepared(position: Int) {
+        playbackStateMutex.withLock {
+            if (playbackState == PlaybackState.PREPARING) {
+                playbackState = PlaybackState.PREPARED
+                startMediaPlayerPlayback(position)
+            }
         }
+    }
+
+    private suspend fun startMediaPlayerPlayback(position: Int) {
+        withContext(mediaPlayerDispatcher) {
+            player?.apply {
+                start()
+                seekTo(position)
+            }
+        }
+        playbackStateMutex.withLock {
+            playbackState = PlaybackState.PLAYING
+        }
+        sendTotalTimeOnUiThread(player?.duration?.toString() ?: "0")
+        startProgressUpdateJob()
+        updatePlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING, position)
+        showNotificationOnUiThread()
+    }
+
+
+    private suspend fun seekMediaPlayer(position: Int) {
+        withContext(mediaPlayerDispatcher) {
+            player?.seekTo(position)
+        }
+        updatePlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING, position)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun handleMediaPlayerError() {
+        playbackStateMutex.withLock {
+            playbackState = PlaybackState.ERROR
+        }
+        stopPlayingInternal()
     }
 
 
     private fun startProgressUpdateJob() {
-        job = CoroutineScope(Dispatchers.Default).launch {
-            while (isActive) {
-                if (!isPaused) {
-                    player?.let {
-                        val currentPosition = it.currentPosition
-                        sendCurrentTime(currentPosition.toString())
-                        sendTotalTime(it.duration.toString())
-                        sendPlay()
-                        updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentPosition)
+        serviceScope.launch(mediaPlayerDispatcher) { // Run on IO dispatcher for background tasks
+            while (isActive && playbackState == PlaybackState.PLAYING) { // Check state for thread-safety
+                player?.let { p ->
+                    if (p.isPlaying) { // Double check isPlaying
+                        val currentPosition = p.currentPosition
+                        sendCurrentTimeOnUiThread(currentPosition.toString())
+                        sendTotalTimeOnUiThread(p.duration.toString())
+                        sendPlayOnUiThread()
+                        updatePlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING, currentPosition)
                     }
                 }
                 delay(1000L)
@@ -194,11 +254,12 @@ class AudioService : Service() {
         }
     }
 
-    private fun updatePlaybackState(state: Int, position: Int) {
+    private fun updatePlaybackStateCompat(state: Int, position: Int) {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
             .setActions(
                 PlaybackStateCompat.ACTION_PLAY or
-                        PlaybackStateCompat.ACTION_PAUSE
+                        PlaybackStateCompat.ACTION_PAUSE or
+                        PlaybackStateCompat.ACTION_STOP
             )
             .setState(state, position.toLong(), 1f)
 
@@ -206,15 +267,28 @@ class AudioService : Service() {
     }
 
 
+    private fun showNotificationOnUiThread() {
+        serviceScope.launch { // Ensure notification updates are on Main thread
+            showNotification()
+        }
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     private fun showNotification() {
         val playPauseIntent = Intent("PLAY_PAUSE")
         playPausePendingIntent = PendingIntent.getBroadcast(this, 0, playPauseIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        notificationIcon = if (!isPlaying) R.drawable.icon_play else R.drawable.icon_pause
-        notificationActionTitle = if (isPlaying) "Pausar" else "Reproduzir"
+        notificationIcon = when (playbackState) {
+            PlaybackState.PLAYING -> R.drawable.icon_pause
+            else -> R.drawable.icon_play
+        }
+        notificationActionTitle = when (playbackState) {
+            PlaybackState.PLAYING -> "Pausar"
+            else -> "Reproduzir"
+        }
 
-        GlobalScope.launch(Dispatchers.Main) {
+
+        GlobalScope.launch(Dispatchers.Main) { // Use GlobalScope carefully, consider serviceScope if possible for bitmap loading as well.
             albumArtBitmap = loadBitmapFromUrl(backgroundImageUrl, context) ?: albumArt
             val notification = createNotification()
             startForeground(1, notification)
@@ -225,12 +299,16 @@ class AudioService : Service() {
     private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onPlay() {
-            handlePlayAction(null)
-            sendPlay()
+            serviceScope.launch { startPlaying() }
+            sendPlayOnUiThread()
         }
         override fun onPause() {
             pausePlaying()
-            sendPause()
+            sendPauseOnUiThread()
+        }
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onStop() {
+            stopPlaying()
         }
         override fun onSkipToNext() = log("NEXT")
     }
@@ -241,7 +319,7 @@ class AudioService : Service() {
 
     private fun createNotification(): Notification {
 
-        val intent = Intent(this, PlayerActivity::class.java) // Substitua ActivityX pela sua Activity
+        val intent = Intent(this, PlayerActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         val mediaMetadata = MediaMetadataCompat.Builder()
@@ -250,10 +328,8 @@ class AudioService : Service() {
             .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArtBitmap)
             .build()
 
-        // 3. Defina o MediaMetadataCompat no MediaSession
         mediaSession?.setMetadata(mediaMetadata)
 
-        // 4. Crie a notificação
         return NotificationCompat.Builder(this, "media_playback_channel")
             .setContentTitle(title)
             .setContentText(artist)
@@ -271,8 +347,21 @@ class AudioService : Service() {
                 }
             }
             .build()
-
     }
+
+    private fun sendTotalTimeOnUiThread(time: String) {
+        serviceScope.launch(Dispatchers.Main) { sendTotalTime(time) }
+    }
+    private fun sendPauseOnUiThread() {
+        serviceScope.launch(Dispatchers.Main) { sendPause() }
+    }
+    private fun sendPlayOnUiThread() {
+        serviceScope.launch(Dispatchers.Main) { sendPlay() }
+    }
+    private fun sendCurrentTimeOnUiThread(time: String) {
+        serviceScope.launch(Dispatchers.Main) { sendCurrentTime(time) }
+    }
+
 
     private fun sendTotalTime(time: String) {
         sendBroadcast(Intent("MY_ACTION").putExtra("playerTotalTime", time))
@@ -298,39 +387,113 @@ class AudioService : Service() {
 
     private fun sendCurrentTime(time: String) {
         sendBroadcast(Intent("MY_ACTION").putExtra("playerCurrentTime", time))
-        showNotification()
+        showNotificationOnUiThread() // Consider if notification on every time update is needed.
     }
 
+
     private fun pausePlaying() {
-        isPaused = true
-        if (isPlaying && player != null) {
-            player?.pause()
-            isPlaying = false
-            player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PAUSED, it) }
-            showNotification()
+        serviceScope.launch {
+            pausePlayingInternal()
         }
     }
+
+    private suspend fun pausePlayingInternal() {
+        playbackStateMutex.withLock {
+            if (playbackState == PlaybackState.PLAYING) {
+                withContext(mediaPlayerDispatcher) {
+                    player?.pause()
+                }
+                playbackState = PlaybackState.PAUSED
+                updatePlaybackStateCompat(PlaybackStateCompat.STATE_PAUSED, player?.currentPosition ?: 0)
+                showNotificationOnUiThread()
+            }
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun stopPlaying() {
-        player?.let {
-            it.release()
-            player = null
-            isPlaying = false
-            if (audioFocusRequest != null) {
-                audioManager.abandonAudioFocusRequest(audioFocusRequest!!)
+        serviceScope.launch(Dispatchers.Main) { // Stop needs to update foreground service etc, so run on Main
+            stopPlayingInternal()
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun stopPlayingInternal() {
+        playbackStateMutex.withLock {
+            if (playbackState != PlaybackState.IDLE && playbackState != PlaybackState.STOPPED) {
+                withContext(mediaPlayerDispatcher) {
+                    player?.apply {
+                        stop()
+                        release()
+                    }
+                    player = null
+                }
+                playbackState = PlaybackState.STOPPED
+                abandonAudioFocus()
+                stopForeground(true)
+                mediaSession?.release()
+                mediaSession = null
             }
         }
-
-        stopForeground(true)
-        mediaSession?.release()
-        mediaSession = null
     }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun abandonAudioFocus() {
+        audioFocusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
+        audioFocusRequest = null
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onDestroy() {
-        super.onDestroy()
-        stopPlaying()
+        serviceScope.launch {
+            stopPlayingInternal()
+            serviceScope.cancel()
+        }
         unregisterReceiver(playPauseReceiver)
+        super.onDestroy()
+    }
+
+
+    // Audio Focus Handling Methods
+    private fun onAudioFocusLoss() {
+        pausePlaying()
+    }
+
+    private fun onAudioFocusLossTransient() {
+        pausePlaying()
+    }
+
+    private fun onAudioFocusLossTransientCanDuck() {
+        player?.setVolume(0.2f, 0.2f)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun onAudioFocusGain() {
+        player?.setVolume(1.0f, 1.0f)
+        serviceScope.launch {
+            playbackStateMutex.withLock {
+                if (playbackState == PlaybackState.PAUSED || playbackState == PlaybackState.PREPARED) {
+                    startMediaPlayerPlayback(player?.currentPosition ?: 0)
+                } else if (playbackState == PlaybackState.STOPPED){
+                    startPlaying() // Restart if stopped after focus loss. Adapt logic as needed.
+                }
+            }
+        }
+    }
+
+
+    // Playback State Enum
+    private enum class PlaybackState {
+        IDLE,
+        PREPARING,
+        PREPARED,
+        PLAYING,
+        PAUSED,
+        STOPPED,
+        ERROR
     }
 }
