@@ -24,7 +24,6 @@ import com.example.renerd.services.AudioService
 import com.example.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class PlayerActivity: AppCompatActivity(), PlayerContract.View {
@@ -48,7 +47,7 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
     private val myReceiver = object : BroadcastReceiver() {
         override fun onReceive(contexta: Context, intent: Intent) {
             if(isTheSameEpisodePlaying) {
-                lifecycleScope.launch(Dispatchers.Main) { // Ensure UI updates are on main thread
+                lifecycleScope.launch(Dispatchers.Main) {
                     val playerTotalTime = intent.getStringExtra("playerTotalTime")
                     playerTotalTime?.let {
                         totalDuration = it.toInt()
