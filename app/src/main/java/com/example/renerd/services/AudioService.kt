@@ -32,11 +32,11 @@ import java.util.LinkedList
 class AudioService : Service() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val mediaPlayerDispatcher = Dispatchers.IO // Dedicated dispatcher for MediaPlayer operations
+    private val mediaPlayerDispatcher = Dispatchers.IO
     private val context = this
     private var player: MediaPlayer? = null
-    private var playbackState: PlaybackState = PlaybackState.IDLE // Using state machine
-    private val playbackStateMutex = Mutex() // Mutex for state transitions
+    private var playbackState: PlaybackState = PlaybackState.IDLE
+    private val playbackStateMutex = Mutex()
 
     private var url = ""
     private var title = ""
@@ -54,7 +54,7 @@ class AudioService : Service() {
     private lateinit var notificationActionTitle: String
     private lateinit var playPausePendingIntent: PendingIntent
 
-    // Audio Focus Queue (Implementação da fila de AudioFocus sugerida)
+
     private val audioFocusQueue = LinkedList<AudioFocusRequest>()
     private var currentFocusRequest: AudioFocusRequest? = null
 
@@ -74,7 +74,7 @@ class AudioService : Service() {
             when (playbackState) {
                 PlaybackState.PLAYING -> pausePlaying()
                 PlaybackState.PAUSED, PlaybackState.PREPARED -> startPlaying()
-                else -> startPlaying() // Handle other states if needed
+                else -> startPlaying()
             }
         }
     }
@@ -163,7 +163,7 @@ class AudioService : Service() {
     private suspend fun initializeMediaPlayer(position: Int) {
         playbackStateMutex.withLock {
             if (playbackState == PlaybackState.IDLE || playbackState == PlaybackState.STOPPED || playbackState == PlaybackState.ERROR) {
-                player?.reset() // Reset if reusing MediaPlayer
+                player?.reset()
                 player = MediaPlayer().apply {
                     try {
                         setDataSource(url)
@@ -176,14 +176,14 @@ class AudioService : Service() {
                         }
                         setOnErrorListener { _, _, _ ->
                             serviceScope.launch(Dispatchers.Main) { handleMediaPlayerError() }
-                            true // Indicate that we handled the error
+                            true
                         }
                         playbackState = PlaybackState.PREPARING
-                        prepareAsync() // Prepare asynchronously in IO dispatcher
+                        prepareAsync()
                     } catch (e: IOException) {
                         playbackState = PlaybackState.ERROR
                         log("Error setting data source: ${e.message}")
-                        handleMediaPlayerError() // Handle error state
+                        handleMediaPlayerError()
                     }
                 }
             } else if (playbackState == PlaybackState.PAUSED || playbackState == PlaybackState.PREPARED) {
@@ -238,10 +238,10 @@ class AudioService : Service() {
 
 
     private fun startProgressUpdateJob() {
-        serviceScope.launch(mediaPlayerDispatcher) { // Run on IO dispatcher for background tasks
-            while (isActive && playbackState == PlaybackState.PLAYING) { // Check state for thread-safety
+        serviceScope.launch(mediaPlayerDispatcher) {
+            while (isActive && playbackState == PlaybackState.PLAYING) {
                 player?.let { p ->
-                    if (p.isPlaying) { // Double check isPlaying
+                    if (p.isPlaying) {
                         val currentPosition = p.currentPosition
                         sendCurrentTimeOnUiThread(currentPosition.toString())
                         sendTotalTimeOnUiThread(p.duration.toString())
@@ -268,7 +268,7 @@ class AudioService : Service() {
 
 
     private fun showNotificationOnUiThread() {
-        serviceScope.launch { // Ensure notification updates are on Main thread
+        serviceScope.launch {
             showNotification()
         }
     }
@@ -288,7 +288,7 @@ class AudioService : Service() {
         }
 
 
-        GlobalScope.launch(Dispatchers.Main) { // Use GlobalScope carefully, consider serviceScope if possible for bitmap loading as well.
+        GlobalScope.launch(Dispatchers.Main) {
             albumArtBitmap = loadBitmapFromUrl(backgroundImageUrl, context) ?: albumArt
             val notification = createNotification()
             startForeground(1, notification)
@@ -387,7 +387,7 @@ class AudioService : Service() {
 
     private fun sendCurrentTime(time: String) {
         sendBroadcast(Intent("MY_ACTION").putExtra("playerCurrentTime", time))
-        showNotificationOnUiThread() // Consider if notification on every time update is needed.
+        showNotificationOnUiThread()
     }
 
 
@@ -413,7 +413,7 @@ class AudioService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun stopPlaying() {
-        serviceScope.launch(Dispatchers.Main) { // Stop needs to update foreground service etc, so run on Main
+        serviceScope.launch(Dispatchers.Main) {
             stopPlayingInternal()
         }
     }
@@ -479,14 +479,13 @@ class AudioService : Service() {
                 if (playbackState == PlaybackState.PAUSED || playbackState == PlaybackState.PREPARED) {
                     startMediaPlayerPlayback(player?.currentPosition ?: 0)
                 } else if (playbackState == PlaybackState.STOPPED){
-                    startPlaying() // Restart if stopped after focus loss. Adapt logic as needed.
+                    startPlaying()
                 }
             }
         }
     }
 
 
-    // Playback State Enum
     private enum class PlaybackState {
         IDLE,
         PREPARING,
