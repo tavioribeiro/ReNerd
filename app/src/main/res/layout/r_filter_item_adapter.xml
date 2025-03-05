@@ -8,7 +8,6 @@
     android:clickable="true"
     android:layout_margin="8dp">
 
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
@@ -20,5 +19,4 @@
         style="@style/TS_Body"
         android:textAlignment="center"
         android:textColor="@color/color5"/>
-
 </LinearLayout>

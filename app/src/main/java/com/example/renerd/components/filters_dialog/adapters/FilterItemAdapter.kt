@@ -35,8 +35,19 @@ class FilterItemAdapter(
         val item = filtersTabsListItemModel[position]
         holder.textView.text = item.label.toTitleCase()
 
-        // Estiliza o fundo do itemLayout com base no status do item
-        if (item.status) {
+        styleOnStatus(item.status, holder)
+
+        // Adiciona um OnClickListener para alternar o status
+        holder.textView.setOnClickListener {
+            item.status = !item.status
+            onClick(item)
+            //notifyItemChanged(position)
+            styleOnStatus(item.status, holder)
+        }
+    }
+
+    private fun styleOnStatus(status: Boolean, holder: FilterItemViewHolder){
+        if (status) {
             holder.textView.styleBackground(
                 backgroundColor = ContextManager.getColorHex(6),
                 radius = 100f
@@ -48,13 +59,6 @@ class FilterItemAdapter(
                 radius = 100f
             )
             holder.textView.setTextColor(Color.parseColor(ContextManager.getColorHex(5)))
-        }
-
-        // Adiciona um OnClickListener para alternar o status
-        holder.textView.setOnClickListener {
-            item.status = !item.status
-            onClick(item)
-            notifyItemChanged(position)
         }
     }
 
