@@ -51,8 +51,7 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
     }
 
     private fun setupRecyclerView() {
-        binding.recyclerviewEpisodes.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerviewEpisodes.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.recyclerviewEpisodes.recyclerviewEpisodesMonitor()
     }
 
@@ -84,10 +83,7 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
         })
     }
 
-    override fun setListsData(
-        tempFiltersTabsListModel: FiltersTabsListModel?,
-        tempEpisodesList: List<EpisodeViewModel>?
-    ) {
+    override fun setListsData(tempFiltersTabsListModel: FiltersTabsListModel?, tempEpisodesList: List<EpisodeViewModel>?) {
         tempFiltersTabsListModel?.let { filtersTabsListModel = it }
         tempEpisodesList?.let { episodesList = it }
     }
@@ -107,7 +103,9 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
         val searchModal = SearchDialog(
             context = this,
             episodesList = episodesList,
-            onSave = { /* Implemente se necessário */ }
+            onSave = {
+
+            }
         )
         searchModal.show(supportFragmentManager, "searchModal")
     }
@@ -127,7 +125,7 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
     }
 
     override fun onBackPressed() {
-        if (/* condição para colapsar o floatingPlayer, se necessário */ false) {
+        if (false) {
             binding.floatingPlayer.collapse()
         } else {
             super.onBackPressed()
@@ -136,11 +134,6 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
 
     override fun showError(message: String) {
         toast(message)
-        allowSwipeRefreshLayout()
-    }
-
-    private fun allowSwipeRefreshLayout() {
-        // Habilite o SwipeRefreshLayout se necessário
     }
 
     override fun showLoading() {
