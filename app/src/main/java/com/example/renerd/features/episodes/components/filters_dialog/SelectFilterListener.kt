@@ -1,4 +1,4 @@
-package com.example.renerd.components.filters_dialog
+package com.example.renerd.features.episodes.components.filters_dialog
 
 import com.example.renerd.view_models.FiltersTabsItemModel
 

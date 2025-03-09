@@ -12,7 +12,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import com.example.renerd.R
-import com.example.renerd.components.floating_player.FloatingPlayer
+import com.example.renerd.features.episodes.components.floating_player.FloatingPlayer
 import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
 import com.example.renerd.helpers.audio_focus.AudioFocusHelper

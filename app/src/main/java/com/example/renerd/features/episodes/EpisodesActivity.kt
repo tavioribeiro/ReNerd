@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.renerd.components.filters_dialog.FiltersDialog
+import com.example.renerd.features.episodes.components.filters_dialog.FiltersDialog
 import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.databinding.ActivityEpisodesBinding
 import com.example.renerd.features.episodes.adapters.EpisodesAdapter

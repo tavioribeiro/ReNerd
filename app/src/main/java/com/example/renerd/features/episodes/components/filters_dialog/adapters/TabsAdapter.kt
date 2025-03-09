@@ -1,13 +1,13 @@
-package com.example.renerd.components.filters_dialog.adapters
+package com.example.renerd.features.episodes.components.filters_dialog.adapters
 
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.renerd.components.filters_dialog.FilterTabListener
-import com.example.renerd.components.filters_dialog.tabs.FiltersGuestTabFragment
-import com.example.renerd.components.filters_dialog.tabs.FiltersProductTabFragment
-import com.example.renerd.components.filters_dialog.tabs.FiltersSubjectTabFragment
-import com.example.renerd.components.filters_dialog.tabs.FiltersYearTabFragment
+import com.example.renerd.features.episodes.components.filters_dialog.FilterTabListener
+import com.example.renerd.features.episodes.components.filters_dialog.tabs.FiltersGuestTabFragment
+import com.example.renerd.features.episodes.components.filters_dialog.tabs.FiltersProductTabFragment
+import com.example.renerd.features.episodes.components.filters_dialog.tabs.FiltersSubjectTabFragment
+import com.example.renerd.features.episodes.components.filters_dialog.tabs.FiltersYearTabFragment
 import com.example.renerd.view_models.FiltersTabsListModel
 
 

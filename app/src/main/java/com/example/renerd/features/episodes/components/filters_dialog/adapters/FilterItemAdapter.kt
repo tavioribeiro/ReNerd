@@ -1,4 +1,4 @@
-package com.example.renerd.components.filters_dialog.adapters
+package com.example.renerd.features.episodes.components.filters_dialog.adapters
 
 import android.graphics.Color
 import android.view.LayoutInflater

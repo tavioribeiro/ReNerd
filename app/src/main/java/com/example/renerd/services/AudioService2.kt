@@ -19,7 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.example.renerd.R
-import com.example.renerd.components.floating_player.FloatingPlayer
+import com.example.renerd.features.episodes.components.floating_player.FloatingPlayer
 import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
 import com.example.renerd.features.player.PlayerActivity
