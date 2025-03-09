@@ -60,7 +60,6 @@ class FiltersDialog(
 
 
         binding.saveButtom.setOnClickListener(){
-            //log(mixedFiltersItens)
             onSave(mixedFiltersItens)
             this.dismiss()
         }
