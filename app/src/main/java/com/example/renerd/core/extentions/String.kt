@@ -63,3 +63,43 @@ fun String.capitalizeWords(): String {
             }
         }
 }
+
+
+
+fun normalizeText(input: String): String {
+    return input
+        .split("-")
+        .joinToString(" ") { word ->
+            word.capitalize()
+        }
+}
+
+
+
+
+fun convertToTime(time: String): String {
+    val parts = time.split(":")
+
+    val minutes = parts[0].toInt()
+    val seconds = parts[1].toInt()
+
+    val hours = minutes / 60
+    val remainingMinutes = minutes % 60
+
+    return String.format("%02d:%02d:%02d", hours, remainingMinutes, seconds)
+}
+
+
+
+
+fun String.toTitleCase(): String {
+    return split("-").joinToString(" ") { it.capitalize() }
+}
+
+fun String.capitalize(): String {
+    return if (isNotEmpty()) {
+        substring(0, 1).uppercase() + substring(1)
+    } else {
+        this
+    }
+}

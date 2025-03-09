@@ -1,4 +1,4 @@
-package com.example.renerd.components.player
+package com.example.renerd.components.floating_player
 
 
 import com.example.renerd.view_models.EpisodeViewModel
@@ -42,8 +42,9 @@ class FloatingPlayerPresenter(private val repository: FloatingPlayerContract.Rep
                 if(currentEpisodePlaying.id != 0){
                     view?.updateCurrentEpisode(currentEpisodePlaying)
                     view?.updateInfosUi(currentEpisodePlaying)
-                    view?.updatePlayPauseButtonUi(false, currentEpisodePlaying.elapsedTime, currentEpisodePlaying.duration)
+                    view?.updateButtonsUi(false, currentEpisodePlaying.elapsedTime, currentEpisodePlaying.duration)
                     view?.showUi()
+                    view?.updatePlayerTimerUI(currentEpisodePlaying.elapsedTime, currentEpisodePlaying.duration)
                 }
             }
         } catch (e: Exception) {

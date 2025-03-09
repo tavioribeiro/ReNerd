@@ -261,6 +261,8 @@ fun View.setWidthInDp(widthInDp: Float) {
  */
 fun View.styleBackground(
     backgroundColor: String? = "#00FFFFFF",
+    backgroundColorsList: List<String>? = null,
+    orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.BL_TR,
     radius: Float = 0f,
     borderWidth: Int = 0,
     borderColor: String? = "#00FFFFFF",
@@ -271,42 +273,73 @@ fun View.styleBackground(
     widthInDp: Float? = null,
     heightInDp: Float? = null,
     marginInDp: Float? = null,
-    paddingInDp: Float? = null
+    paddingInDp: Float? = null,
+    marginStartInDp: Float? = null,
+    marginTopInDp: Float? = null,
+    marginEndInDp: Float? = null,
+    marginBottomInDp: Float? = null,
+    paddingStartInDp: Float? = null,
+    paddingTopInDp: Float? = null,
+    paddingEndInDp: Float? = null,
+    paddingBottomInDp: Float? = null
 ) {
-    // Configuração do background com GradientDrawable.
     val shape = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
+
+        // Configura o gradiente ou cor de fundo
+        if (backgroundColorsList != null && backgroundColorsList.isNotEmpty()) {
+            colors = backgroundColorsList.map { Color.parseColor(it) }.toIntArray()
+            this.orientation = orientation
+        } else {
+            setColor(Color.parseColor(backgroundColor))
+        }
+
+        // Configura os cantos arredondados
         cornerRadii = floatArrayOf(
             topLeftRadius, topLeftRadius,
             topRightRadius, topRightRadius,
             bottomRightRadius, bottomRightRadius,
             bottomLeftRadius, bottomLeftRadius
         )
-        setColor(Color.parseColor(backgroundColor))
+
+        // Configura a borda
         setStroke(borderWidth, Color.parseColor(borderColor))
     }
+
+    // Aplica o GradientDrawable como background
     this.background = shape
 
-    // Configuração de largura e altura (caso especificado).
-    widthInDp?.let { setWidthInDp(it) }
-    heightInDp?.let { setHeightInDp(it) }
+    // Configura as dimensões da View
+    val density = context.resources.displayMetrics.density
+    widthInDp?.let { layoutParams.width = (it * density).toInt() }
+    heightInDp?.let { layoutParams.height = (it * density).toInt() }
 
-    // Configuração de padding.
-    paddingInDp?.let {
-        val paddingPx = context.dpToPx(it)
-        setPadding(paddingPx, paddingPx, paddingPx, paddingPx)
-    }
-
-    // Configuração de margin.
-    marginInDp?.let {
-        val marginPx = context.dpToPx(it)
-        (layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
-            params.setMargins(marginPx, marginPx, marginPx, marginPx)
-            layoutParams = params
+    // Configura margens
+    val layoutParams = this.layoutParams as? ViewGroup.MarginLayoutParams
+    layoutParams?.let {
+        marginInDp?.let {
+            val marginPx = (it * density).toInt()
+            layoutParams.setMargins(marginPx, marginPx, marginPx, marginPx)
         }
+        marginStartInDp?.let { layoutParams.marginStart = (it * density).toInt() }
+        marginTopInDp?.let { layoutParams.topMargin = (it * density).toInt() }
+        marginEndInDp?.let { layoutParams.marginEnd = (it * density).toInt() }
+        marginBottomInDp?.let { layoutParams.bottomMargin = (it * density).toInt() }
     }
-}
 
+    // Configura paddings
+    val paddingStartPx = paddingStartInDp?.let { (it * density).toInt() } ?: this.paddingStart
+    val paddingTopPx = paddingTopInDp?.let { (it * density).toInt() } ?: this.paddingTop
+    val paddingEndPx = paddingEndInDp?.let { (it * density).toInt() } ?: this.paddingEnd
+    val paddingBottomPx = paddingBottomInDp?.let { (it * density).toInt() } ?: this.paddingBottom
+    val paddingPx = paddingInDp?.let { (it * density).toInt() }
+    this.setPadding(
+        paddingPx ?: paddingStartPx,
+        paddingPx ?: paddingTopPx,
+        paddingPx ?: paddingEndPx,
+        paddingPx ?: paddingBottomPx
+    )
+}
 // Função auxiliar para definir altura em DP.
 fun View.setHeightInDp(heightInDp: Float) {
     layoutParams = (layoutParams ?: ViewGroup.LayoutParams(0, 0)).apply {
@@ -320,12 +353,16 @@ fun View.setHeightInDp(heightInDp: Float) {
 
 
 
-fun View.changeBackgroundColorWithGradient(color1: String, color2: String) {
+fun View.changeBackgroundColorWithGradient(
+    color1: String,
+    color2: String,
+    originalColor1 : String = ContextManager.getColorHex(0),
+    originalColor2 : String = ContextManager.getColorHex(1)
+) {
     // Obtenção das cores atuais a partir da lógica existente (ou você pode passar como parâmetros, se necessário)
-    val currentColor1 = ContextManager.getColorHex(1)
     val startColors = intArrayOf(
-        Color.parseColor(currentColor1),
-        Color.parseColor(currentColor1)
+        Color.parseColor(originalColor1),
+        Color.parseColor(originalColor2)
     )
 
     val endColors = intArrayOf(

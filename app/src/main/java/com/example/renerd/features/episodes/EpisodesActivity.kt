@@ -1,24 +1,23 @@
 package com.example.renerd.features.episodes
 
-import android.content.Intent
+
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.renerd.components.filters_dialog.FiltersDialog
 import com.example.renerd.core.extentions.ContextManager
-import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityEpisodesBinding
 import com.example.renerd.features.episodes.adapters.EpisodesAdapter
-import com.example.renerd.features.player.PlayerActivity
 import com.example.renerd.view_models.EpisodeViewModel
 import com.example.renerd.view_models.FiltersTabsListModel
 import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.toast
 import org.koin.android.ext.android.inject
+import android.content.pm.ActivityInfo
+import androidx.recyclerview.widget.RecyclerView
+import com.example.renerd.core.utils.log
 
 
 class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
@@ -28,6 +27,13 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
     private lateinit var filtersTabsListModel:FiltersTabsListModel
 
+
+    private var originalColor1 = ContextManager.getColorHex(0)
+    private var originalColor2 = ContextManager.getColorHex(0)
+
+    private var currentRecyclerViewPoition = 0
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEpisodesBinding.inflate(layoutInflater)
@@ -36,17 +42,27 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         this.setUpUi()
         presenter.attachView(this)
         presenter.getFiltersTabsList()
+        this.recyclerviewEpisodesMonitor()
     }
 
 
     private fun setUpUi(){
-        window.statusBarColor = Color.parseColor(ContextManager.getColorHex(0))
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-        )
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(1))
+        window.apply {
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+
+            statusBarColor = Color.parseColor(ContextManager.getColorHex(0))
+        }
     }
 
+
+    /*private fun setUpCallbacks(){
+        binding.floatingPlayer.setonBackgroundCollorsChangeListener{ color1, color2 ->
+
+        }
+    }*/
 
     override fun showActionButtons(tempFiltersTabsListModel:FiltersTabsListModel) {
         filtersTabsListModel = tempFiltersTabsListModel
@@ -91,13 +107,14 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
 
 
     override fun onDestroy() {
-        binding.customBottomSheet.stopService()
+        binding.floatingPlayer.stopService()
         presenter.detachView()
         super.onDestroy()
     }
 
 
-    override fun showEpisodes(episodes: MutableList<EpisodeViewModel>) {
+
+    override fun showEpisodes(episodes: MutableList<EpisodeViewModel>, scrollTo: Int) {
         binding.recyclerviewEpisodes.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         val adapter = EpisodesAdapter(
             context = this,
@@ -108,12 +125,69 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
         )
         binding.recyclerviewEpisodes.adapter = adapter
 
-        //this.allowSwipeRefreshLayout()
+        binding.recyclerviewEpisodes.scrollToPosition(scrollTo)
+
+
+        /*binding.recyclerviewEpisodes.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                // Obtenha a posição do item visível mais à esquerda (primeiro item visível)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                // A partir da posição, obtenha o item no adapter
+                val viewHolder = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition)
+
+                // Verifique se a posição é válida e o viewHolder não é nulo
+                if (viewHolder != null) {
+                    val item = viewHolder.itemView
+                    // Supondo que o título do item seja um TextView
+                    val imageView: ImageView = item.findViewById(R.id.imageView)
+
+                    imageView.getPalletColors { colors ->
+                        val (color1, color2) = colors
+                        try {
+                            binding.mainContainer.changeBackgroundColorWithGradient(
+                                color1 = darkenColor(color1, 90.0),
+                                color2 = darkenColor(color2, 70.0)
+                            )
+
+                            originalColor1 = darkenColor(color1, 90.0)
+                            originalColor2 = darkenColor(color2, 90.0)
+                        } catch (e: Exception) {
+                            log(e)
+                        }
+                    }
+                }
+            }
+        })*/
+
+    }
+
+
+    private fun recyclerviewEpisodesMonitor(){
+        binding.recyclerviewEpisodes.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                // Obtenha o LayoutManager da RecyclerView
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+
+                // Obtenha o índice do primeiro e último item visível
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                if(firstVisibleItemPosition != currentRecyclerViewPoition) {
+                    presenter.recyclerviewEpisodesCurrentPosition(firstVisibleItemPosition)
+                    currentRecyclerViewPoition = firstVisibleItemPosition
+                }
+            }
+        })
     }
 
 
     private fun goTo(episode: EpisodeViewModel){
-        binding.customBottomSheet.startEpisode(episode)
+        binding.floatingPlayer.startEpisode(episode)
 
         /*val intent = Intent(this, PlayerActivity::class.java)
         intent.putExtra("episode", episode)
@@ -121,21 +195,14 @@ class EpisodesActivity: AppCompatActivity(), EpisodesContract.View{
     }
 
 
-
     override fun onBackPressed() {
-        //trocar isso para um dialog de confirmação customizado
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage("Você tem certeza que quer sair?")
-            .setCancelable(false)
-            .setPositiveButton("Sim") { dialog, id ->
-                super.onBackPressed()
-            }
-            .setNegativeButton("Não") { dialog, id ->
-                dialog.dismiss()
-            }
-        val alert = builder.create()
-        alert.show()
+        if (0 == 0) {
+            binding.floatingPlayer.collapse()
+        } else {
+            super.onBackPressed()
+        }
     }
+
 
 
     override fun showError(message: String) {

@@ -6,7 +6,7 @@
     <color name="color2">#242424</color> <!--Botões de voltar, cancelar..-->
     <color name="color3">#4C4C4C</color> <!--Algum componente que for ficar por cima do BG-->
 
-    <color name="color4">#626262</color> <!--Letra cinza-->
+    <color name="color4">#797979</color> <!--Letra cinza-->
     <color name="color5">#EAEAEA</color> <!--Letra branca-->
 
     <color name="color6">#02E26B</color> <!--Botões de ação positiva, confirmar, ir..-->

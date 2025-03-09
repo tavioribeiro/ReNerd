@@ -55,7 +55,7 @@ class EpisodesRepository: EpisodesContract.Repository {
                                 product = episode.product ?: "",
                                 productName = episode.productName ?: "",
                                 subject = episode.subject ?: "",
-                                jumpToTime = episode.jumpToTime.startTime,
+                                jumpToTime = episode.jumpToTime.endTime,
                                 guests = episode.guests ?: "",
                                 postTypeClass = episode.postTypeClass ?: "",
                             )
@@ -308,6 +308,19 @@ class EpisodesRepository: EpisodesContract.Repository {
         }
 
         return current_after_search
+    }
+
+
+    override fun setRecyclerviewEpisodesCurrentPosition(currentPosition: Int) {
+        editor.putString("recyclerviewEpisodesCurrentPosition", currentPosition.toString())
+        editor.apply()
+    }
+
+
+    override fun getRecyclerviewEpisodesCurrentPosition(): String {
+        var recyclerviewEpisodesCurrentPosition = sharedPref.getString("recyclerviewEpisodesCurrentPosition", "0") ?: "0"
+
+        return recyclerviewEpisodesCurrentPosition
     }
 
 

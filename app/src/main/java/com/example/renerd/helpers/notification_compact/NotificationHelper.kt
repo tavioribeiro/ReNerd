@@ -73,8 +73,7 @@ class NotificationHelper(private val context: Context) {
         return NotificationCompat.Builder(context, channelId)
             .setContentTitle(episode.title)
             .setContentText(episode.productName)
-            .setSmallIcon(R.drawable.icon_play)
-            .setSmallIcon(R.drawable.icon_play)
+            .setSmallIcon(R.drawable.icon)
             .setContentIntent(pendingIntent)
             .setStyle(
                 MediaStyle()

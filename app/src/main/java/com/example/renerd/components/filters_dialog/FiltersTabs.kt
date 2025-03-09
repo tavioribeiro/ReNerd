@@ -56,7 +56,7 @@ class FiltersTabs(
     private fun setUpInitialSelectedTabStyle(){
         binding.textViewButtonProduct.styleBackground(
             backgroundColor = ContextManager.getColorHex(2),
-            radius = 50f
+            radius = 100f
         )
     }
 
@@ -81,28 +81,28 @@ class FiltersTabs(
                     0 -> {
                         binding.textViewButtonProduct.styleBackground(
                             backgroundColor = ContextManager.getColorHex(2),
-                            radius = 50f
+                            radius = 100f
                         )
                         scrollTo(binding.textViewButtonProduct)
                     }
                     1 -> {
                         binding.textViewButtonSubject.styleBackground(
                             backgroundColor = ContextManager.getColorHex(2),
-                            radius = 50f
+                            radius = 100f
                         )
                         scrollTo(binding.textViewButtonSubject)
                     }
                     2 -> {
                         binding.textViewButtonGuest.styleBackground(
                             backgroundColor = ContextManager.getColorHex(2),
-                            radius = 50f
+                            radius = 100f
                         )
                         scrollTo(binding.textViewButtonGuest)
                     }
                     3 -> {
                         binding.textViewButtonYear.styleBackground(
                             backgroundColor = ContextManager.getColorHex(2),
-                            radius = 50f
+                            radius = 100f
                         )
                         scrollTo(binding.textViewButtonYear)
                     }

@@ -53,12 +53,13 @@ class FiltersDialog(
 
         binding.boxContainer.styleBackground(
             backgroundColor = ContextManager.getColorHex(1),
-            radius = 40f
+            borderColor = ContextManager.getColorHex(2),
+            borderWidth = 5,
+            radius = 80f
         )
 
 
         binding.saveButtom.setOnClickListener(){
-            log(mixedFiltersItens)
             onSave(mixedFiltersItens)
             this.dismiss()
         }

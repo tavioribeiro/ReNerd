@@ -12,6 +12,7 @@ import android.widget.SeekBar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.database.DatabaseHelper
@@ -21,6 +22,8 @@ import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityPlayerBinding
 import com.example.renerd.services.AudioService
 import com.example.renerd.view_models.EpisodeViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class PlayerActivity: AppCompatActivity(), PlayerContract.View {
@@ -44,33 +47,32 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
     private val myReceiver = object : BroadcastReceiver() {
         override fun onReceive(contexta: Context, intent: Intent) {
             if(isTheSameEpisodePlaying) {
-                log("devo mostrar att na ui")
-                val playerTotalTime = intent.getStringExtra("playerTotalTime")
-                playerTotalTime?.let {
-                    totalDuration = it.toInt()
-                    setSeekBarMax(it.toInt())
-                    setTotalTime(it.toInt())
-                }
+                lifecycleScope.launch(Dispatchers.Main) {
+                    val playerTotalTime = intent.getStringExtra("playerTotalTime")
+                    playerTotalTime?.let {
+                        totalDuration = it.toInt()
+                        setSeekBarMax(it.toInt())
+                        setTotalTime(it.toInt())
+                    }
 
+                    val playerCurrentTime = intent.getStringExtra("playerCurrentTime")
+                    playerCurrentTime?.let {
+                        setCurrentTime(it.toInt())
+                        setSeekBarPosition(it.toInt())
+                    }
 
-                val playerCurrentTime = intent.getStringExtra("playerCurrentTime")
-                playerCurrentTime?.let {
-                    setCurrentTime(it.toInt())
-                    setSeekBarPosition(it.toInt())
-                }
+                    val recivePause = intent.getStringExtra("paused")
+                    recivePause?.let {
+                        binding.fabPlayOrPause.setImageResource(R.drawable.icon_play)
+                        currentAction = "PLAY" // Update currentAction on pause
+                    }
 
-                val recivePause = intent.getStringExtra("paused")
-                recivePause?.let {
-                    binding.fabPlayOrPause.setImageResource(R.drawable.icon_play)
+                    val recivePlay = intent.getStringExtra("played")
+                    recivePlay?.let {
+                        binding.fabPlayOrPause.setImageResource(R.drawable.icon_pause)
+                        currentAction = "PAUSE" // Update currentAction on play
+                    }
                 }
-
-                val recivePlay = intent.getStringExtra("played")
-                recivePlay?.let {
-                    binding.fabPlayOrPause.setImageResource(R.drawable.icon_pause)
-                }
-            }
-            else{
-                log("nn devo mostrar att na ui")
             }
         }
     }
@@ -88,14 +90,9 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
         presenter.attachView(this)
 
         val episodeModel = intent.getParcelableExtra<EpisodeViewModel>("episode")
-        if(episodeModel != null){
-            if(episodeModel.audioUrl == presenter.getCurrentEpisodePlaying()){
-                isTheSameEpisodePlaying = true
-            }
-            else{
-                isTheSameEpisodePlaying = false
-            }
-            this.setUpPodcast(episodeModel)
+        episodeModel?.let {
+            isTheSameEpisodePlaying = it.audioUrl == presenter.getCurrentEpisodePlaying()
+            setUpPodcast(it)
         }
     }
 
@@ -118,30 +115,20 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
             val intent = Intent(this, AudioService::class.java)
             if (currentAction == "PLAY"){
                 intent.action = "PLAY"
-                binding.fabPlayOrPause.setImageResource(R.drawable.icon_pause)
-                currentAction = "PAUSE"
             } else {
                 intent.action = "PAUSE"
-                binding.fabPlayOrPause.setImageResource(R.drawable.icon_play)
-                currentAction = "PLAY"
             }
 
             if(!isTheSameEpisodePlaying){
                 stopService(Intent(this, AudioService::class.java))
                 presenter.setCurrentEpisodePlaying(episode.audioUrl)
 
-
-
-
-
                 val dbHelper = DatabaseHelper(context)
                 //dbHelper.insertEpisode(episode)
                 log(dbHelper.getAllEpisodes().size)
 
-
                 isTheSameEpisodePlaying = true
             }
-
 
             intent.putExtra("title", episode.title)
             intent.putExtra("artist", "Nerdcast")
@@ -155,8 +142,6 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    //val position = calculatePartFromPercentage(progress.toDouble(), totalDuration.toDouble())
-
                     val intent = Intent(thisActivity, AudioService::class.java)
                     intent.action = "PLAY"
                     intent.putExtra("position", progress.toString())
@@ -167,9 +152,6 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
-
-
-
 
 
     private fun setCurrentTime(milliseconds: Int){
@@ -207,6 +189,3 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
         presenter.detachView()
     }
 }
-
-
-

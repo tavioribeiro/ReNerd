@@ -1,9 +1,8 @@
-package com.example.renerd.components.player
+package com.example.renerd.components.floating_player
 
 import android.content.Context
 import com.example.renerd.core.database.DatabaseHelper
 import com.example.renerd.core.extentions.ContextManager
-import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
 
 

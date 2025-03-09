@@ -19,7 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.example.renerd.R
-import com.example.renerd.components.player.FloatingPlayer
+import com.example.renerd.components.floating_player.FloatingPlayer
 import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
 import com.example.renerd.features.player.PlayerActivity
@@ -286,7 +286,7 @@ class AudioService2 : Service() {
     private fun stopPlaying() {
         player?.let {
             it.stop()
-            it.reset() // Reseta o player sem liberar
+            it.reset() // Reseta o floating_player sem liberar
             isPlaying = false
             updatePlaybackState(PlaybackStateCompat.STATE_STOPPED, 0)
             showNotification() // Atualiza a notificação sem pará-la
