@@ -15,60 +15,20 @@ import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 import java.net.URLDecoder
 
-class EpisodesRepository: EpisodesContract.Repository {
-    val context = ContextManager.getGlobalContext()
-
-    val sharedPref = context.getSharedPreferences("SharedPrefsReNerd", Context.MODE_PRIVATE)
-    val editor = sharedPref.edit()
-
-    val dbHelper = DatabaseHelper(context)
-
+class EpisodesRepository : EpisodesContract.Repository {
+    private val context: Context = ContextManager.getGlobalContext()
+    private val sharedPref = context.getSharedPreferences("SharedPrefsReNerd", Context.MODE_PRIVATE)
+    private val editor = sharedPref.edit()
+    private val dbHelper = DatabaseHelper(context)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getEpisodes(): MutableList<EpisodeViewModel> {
         return withContext(Dispatchers.IO) {
             try {
                 val localEpisodes = dbHelper.getAllEpisodes().toMutableList()
-                if (localEpisodes.isNotEmpty()) {
-                    return@withContext localEpisodes
-                }
+                if (localEpisodes.isNotEmpty()) return@withContext localEpisodes
 
-                val after = getAfter()
-                val afterDecoded = URLDecoder.decode(after, "UTF-8")
-                val response = PodcastClient.api.getNerdcasts(after = afterDecoded, before = "").execute()
-
-                if (response.isSuccessful) {
-                    val podcasts = response.body()
-                    val episodesViewModel = mutableListOf<EpisodeViewModel>()
-                    if (!podcasts.isNullOrEmpty()) {
-                        for (episode in podcasts) {
-                            val episodeViewModel = EpisodeViewModel(
-                                id = episode.id,
-                                title = episode.title ?: "",
-                                description = episode.description ?: "",
-                                imageUrl = episode.image ?: "",
-                                audioUrl = episode.audioHigh ?: "",
-                                duration = episode.duration,
-                                publishedAt = episode.publishedAt ?: "",
-                                slug = episode.slug ?: "",
-                                episode = episode.episode ?: "",
-                                product = episode.product ?: "",
-                                productName = episode.productName ?: "",
-                                subject = episode.subject ?: "",
-                                jumpToTime = episode.jumpToTime.endTime,
-                                guests = episode.guests ?: "",
-                                postTypeClass = episode.postTypeClass ?: "",
-                            )
-
-                            dbHelper.insertEpisode(episodeViewModel)
-                            episodesViewModel.add(episodeViewModel)
-                        }
-                    }
-                    setAfter()
-                    episodesViewModel
-                } else {
-                    mutableListOf()
-                }
+                fetchEpisodesFromNetwork()
             } catch (e: SocketTimeoutException) {
                 log(e)
                 mutableListOf()
@@ -79,10 +39,38 @@ class EpisodesRepository: EpisodesContract.Repository {
         }
     }
 
-
-
-
-
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun fetchEpisodesFromNetwork(): MutableList<EpisodeViewModel> {
+        val after = URLDecoder.decode(getAfter(), "UTF-8")
+        val response = PodcastClient.api.getNerdcasts(after = after, before = "").execute()
+        val episodesViewModel = mutableListOf<EpisodeViewModel>()
+        if (response.isSuccessful) {
+            val podcasts = response.body()
+            podcasts?.forEach { episode ->
+                val episodeViewModel = EpisodeViewModel(
+                    id = episode.id,
+                    title = episode.title ?: "",
+                    description = episode.description ?: "",
+                    imageUrl = episode.image ?: "",
+                    audioUrl = episode.audioHigh ?: "",
+                    duration = episode.duration,
+                    publishedAt = episode.publishedAt ?: "",
+                    slug = episode.slug ?: "",
+                    episode = episode.episode ?: "",
+                    product = episode.product ?: "",
+                    productName = episode.productName ?: "",
+                    subject = episode.subject ?: "",
+                    jumpToTime = episode.jumpToTime.endTime,
+                    guests = episode.guests ?: "",
+                    postTypeClass = episode.postTypeClass ?: ""
+                )
+                dbHelper.insertEpisode(episodeViewModel)
+                episodesViewModel.add(episodeViewModel)
+            }
+            setAfter()
+        }
+        return episodesViewModel
+    }
 
     override suspend fun insertFilterTabItem(filtersTabsItemModel: FiltersTabsItemModel) {
         withContext(Dispatchers.IO) {
@@ -98,18 +86,14 @@ class EpisodesRepository: EpisodesContract.Repository {
         return withContext(Dispatchers.IO) {
             try {
                 val localFilterTabItems = dbHelper.getAllFilterTabItems().toMutableList()
-                if (localFilterTabItems.isNotEmpty()) {
-                    return@withContext localFilterTabItems
-                }
-
-                return@withContext mutableListOf()
+                if (localFilterTabItems.isNotEmpty()) return@withContext localFilterTabItems
+                mutableListOf()
             } catch (e: SocketTimeoutException) {
                 log(e)
                 mutableListOf()
             }
         }
     }
-
 
     override suspend fun updateFilterTabItem(filtersTabsItemModel: FiltersTabsItemModel) {
         withContext(Dispatchers.IO) {
@@ -121,174 +105,39 @@ class EpisodesRepository: EpisodesContract.Repository {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-
-    override suspend fun insertFilterProductTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
-        withContext(Dispatchers.IO) {
-            try {
-                dbHelper.insertFilterProductTabItem(filterProductTabItem = filtersTabsListItemModel)
-                //log(filtersTabsListItemModel.label)
-            } catch (e: SocketTimeoutException) {
-                log(e)
-            }
-        }
-    }
-
-    override suspend fun getAllFilterProductTabItems(): MutableList<FiltersTabsListItemModel> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val localFilterProductTabItems = dbHelper.getAllFilterProductTabItems().toMutableList()
-                if (localFilterProductTabItems.isNotEmpty()) {
-                    return@withContext localFilterProductTabItems
-                }
-
-                return@withContext mutableListOf()
-            } catch (e: SocketTimeoutException) {
-                log(e)
-                mutableListOf()
-            }
-        }
-    }
-
-    override suspend fun insertFilterSubjectTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
-        withContext(Dispatchers.IO) {
-            try {
-                dbHelper.insertFilterSubjectTabItem(filterSubjectTabItem = filtersTabsListItemModel)
-                //log(filtersTabsListItemModel.label)
-            } catch (e: SocketTimeoutException) {
-                log(e)
-            }
-        }
-    }
-
-    override suspend fun getAllFilterSubjectTabItems(): MutableList<FiltersTabsListItemModel> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val localFilterSubjectTabItems = dbHelper.getAllFilterSubjectTabItems().toMutableList()
-                if (localFilterSubjectTabItems.isNotEmpty()) {
-                    return@withContext localFilterSubjectTabItems
-                }
-
-                return@withContext mutableListOf()
-            } catch (e: SocketTimeoutException) {
-                log(e)
-                mutableListOf()
-            }
-        }
-    }
-
-    override suspend fun insertFilterGuestTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
-        withContext(Dispatchers.IO) {
-            try {
-                dbHelper.insertFilterGuestTabItem(filterGuestTabItem = filtersTabsListItemModel)
-                //log(filtersTabsListItemModel.label)
-            } catch (e: SocketTimeoutException) {
-                log(e)
-            }
-        }
-    }
-
-    override suspend fun getAllFilterGuestTabItems(): MutableList<FiltersTabsListItemModel> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val localFilterGuestTabItems = dbHelper.getAllFilterGuestTabItems().toMutableList()
-                if (localFilterGuestTabItems.isNotEmpty()) {
-                    return@withContext localFilterGuestTabItems
-                }
-
-                return@withContext mutableListOf()
-            } catch (e: SocketTimeoutException) {
-                log(e)
-                mutableListOf()
-            }
-        }
-    }
-
-
-    override suspend fun insertFilterYearTabItem(filtersTabsListItemModel: FiltersTabsListItemModel) {
-        withContext(Dispatchers.IO) {
-            try {
-                dbHelper.insertFilterYearTabItem(filterYearTabItem = filtersTabsListItemModel)
-                //log(filtersTabsListItemModel.label)
-            } catch (e: SocketTimeoutException) {
-                log(e)
-            }
-        }
-    }
-
-
-    override suspend fun getAllFilterYearTabItems(): MutableList<FiltersTabsListItemModel> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val localFilterYearTabItems = dbHelper.getAllFilterYearTabItems().toMutableList()
-                if (localFilterYearTabItems.isNotEmpty()) {
-                    return@withContext localFilterYearTabItems
-                }
-
-                return@withContext mutableListOf()
-            } catch (e: SocketTimeoutException) {
-                log(e)
-                mutableListOf()
-            }
-        }
-    }
-
-
-*/
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getLastEpisodes(): MutableList<EpisodeViewModel> {
         return withContext(Dispatchers.IO) {
             try {
                 val localEpisodes = dbHelper.getAllEpisodes().toMutableList()
-
-                val after = getAfter()
-                val afterDecoded = URLDecoder.decode(after, "UTF-8")
-                val response = PodcastClient.api.getNerdcasts(after = afterDecoded, before = "").execute()
-
+                val after = URLDecoder.decode(getAfter(), "UTF-8")
+                val response = PodcastClient.api.getNerdcasts(after = after, before = "").execute()
                 if (response.isSuccessful) {
                     val podcasts = response.body()
-
-                    if (!podcasts.isNullOrEmpty()) {
-                        for (episode in podcasts) {
-                            val episodeViewModel = EpisodeViewModel(
-                                id = episode.id,
-                                title = episode.title ?: "",
-                                description = episode.description ?: "",
-                                imageUrl = episode.image ?: "",
-                                audioUrl = episode.audioHigh ?: "",
-                                duration = episode.duration,
-                                publishedAt = episode.publishedAt ?: "",
-                                slug = episode.slug ?: "",
-                                episode = episode.episode ?: "",
-                                product = episode.product ?: "",
-                                productName = episode.productName ?: "",
-                                subject = episode.subject ?: "",
-                                jumpToTime = episode.jumpToTime.startTime,
-                                guests = episode.guests ?: "",
-                                postTypeClass = episode.postTypeClass ?: "",
-                            )
-
-                            dbHelper.insertEpisode(episodeViewModel)
-                            localEpisodes.add(episodeViewModel)
-                        }
+                    podcasts?.forEach { episode ->
+                        val episodeViewModel = EpisodeViewModel(
+                            id = episode.id,
+                            title = episode.title ?: "",
+                            description = episode.description ?: "",
+                            imageUrl = episode.image ?: "",
+                            audioUrl = episode.audioHigh ?: "",
+                            duration = episode.duration,
+                            publishedAt = episode.publishedAt ?: "",
+                            slug = episode.slug ?: "",
+                            episode = episode.episode ?: "",
+                            product = episode.product ?: "",
+                            productName = episode.productName ?: "",
+                            subject = episode.subject ?: "",
+                            jumpToTime = episode.jumpToTime.startTime,
+                            guests = episode.guests ?: "",
+                            postTypeClass = episode.postTypeClass ?: ""
+                        )
+                        dbHelper.insertEpisode(episodeViewModel)
+                        localEpisodes.add(episodeViewModel)
                     }
                     setAfter()
-                    localEpisodes
-                } else {
-                    mutableListOf()
                 }
+                localEpisodes
             } catch (e: SocketTimeoutException) {
                 log(e)
                 mutableListOf()
@@ -299,30 +148,22 @@ class EpisodesRepository: EpisodesContract.Repository {
         }
     }
 
-
     private fun getAfter(): String {
-        var current_after_search = sharedPref.getString("current_after_search", "") ?: ""
-
-        if(current_after_search == ""){
-            current_after_search = "2000-01-01%2000%3A00%3A00"
+        var after = sharedPref.getString("current_after_search", "") ?: ""
+        if (after.isEmpty()) {
+            after = "2000-01-01%2000%3A00%3A00"
         }
-
-        return current_after_search
+        return after
     }
-
 
     override fun setRecyclerviewEpisodesCurrentPosition(currentPosition: Int) {
         editor.putString("recyclerviewEpisodesCurrentPosition", currentPosition.toString())
         editor.apply()
     }
 
-
     override fun getRecyclerviewEpisodesCurrentPosition(): String {
-        var recyclerviewEpisodesCurrentPosition = sharedPref.getString("recyclerviewEpisodesCurrentPosition", "0") ?: "0"
-
-        return recyclerviewEpisodesCurrentPosition
+        return sharedPref.getString("recyclerviewEpisodesCurrentPosition", "0") ?: "0"
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setAfter() {
@@ -330,4 +171,3 @@ class EpisodesRepository: EpisodesContract.Repository {
         editor.apply()
     }
 }
-

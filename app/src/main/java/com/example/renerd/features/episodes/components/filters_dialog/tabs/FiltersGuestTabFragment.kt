@@ -25,7 +25,6 @@ class FiltersGuestTabFragment(
     ): View {
         binding = CLayoutFilterTabBinding.inflate(inflater, container, false)
 
-
         return binding.root
     }
 

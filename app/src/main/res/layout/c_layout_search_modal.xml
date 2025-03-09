@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:clickable="true"
+    android:background="@color/color0">
+
+    <!-- A transparência Vai ser feito no kotlin-->
+
+    <LinearLayout
+        android:id="@+id/box_container"
+        android:layout_width="match_parent"
+        android:layout_height="700dp"
+        android:layout_margin="25dp"
+        android:padding="35dp"
+        android:clickable="false"
+        android:allowClickWhenDisabled="false"
+        android:longClickable="false"
+        android:focusable="false"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pesquisa"
+                style="@style/TS_Title1"
+                android:textColor="@color/color5"
+                android:layout_centerHorizontal="true"/>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_base"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:id="@+id/button_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="20dp"
+                    android:background="@color/color3"/>
+
+                <com.example.renerd.components.buttons.DefaultButton
+                    android:id="@+id/save_buttom"
+                    android:layout_width="match_parent"
+                    app:default_width="false"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/icon_save"
+                    app:label="Salvar"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>
