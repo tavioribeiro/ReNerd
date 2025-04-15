@@ -45,6 +45,7 @@ class AudioService3 : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
+        log("aaaaaaaaaaaaaa")
         super.onCreate()
         albumArt = BitmapFactory.decodeResource(resources, R.drawable.background)
 
