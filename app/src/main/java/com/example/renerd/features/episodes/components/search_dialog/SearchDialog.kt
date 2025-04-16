@@ -70,7 +70,8 @@ class SearchDialog(
         binding.seachInput.styleBackground(
             backgroundColor = ContextManager.getColorHex(2),
             radius = 12f,
-            borderWidth = 0
+            borderWidth = 1,
+            borderColor = ContextManager.getColorHex(5)
         )
     }
 

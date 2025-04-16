@@ -14,9 +14,9 @@
     <LinearLayout
         android:id="@+id/box_container"
         android:layout_width="match_parent"
-        android:layout_height="700dp"
-        android:layout_margin="25dp"
-        android:padding="35dp"
+        android:layout_height="550dp"
+        android:layout_margin="30dp"
+        android:padding="25dp"
         android:clickable="false"
         android:allowClickWhenDisabled="false"
         android:longClickable="false"
@@ -44,10 +44,9 @@
                 <EditText
                     android:id="@+id/seach_input"
                     android:layout_width="match_parent"
-                    android:background="@color/blue"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="20dp"
-                    android:paddingHorizontal="4dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="25dp"
+                    android:paddingHorizontal="6dp"
                     style="@style/TS_Body"
                     android:hint="Digite sua busca"/>
 
