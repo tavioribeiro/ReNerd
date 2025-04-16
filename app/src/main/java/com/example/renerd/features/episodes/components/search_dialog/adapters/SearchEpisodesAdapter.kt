@@ -1,54 +1,45 @@
 package com.example.renerd.features.episodes.components.search_dialog.adapters
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.example.renerd.R
-import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.view_models.EpisodeViewModel
-import core.extensions.styleBackground
 
 class SearchEpisodesAdapter(
     private val episodesList: List<EpisodeViewModel>,
     private val onClick: (EpisodeViewModel) -> Unit
 ) : RecyclerView.Adapter<SearchEpisodesAdapter.FilterItemViewHolder>() {
 
-    // Não é mais necessário, pois o status agora está no FiltersTabsItemModel
-    // var currentStatus: Boolean = true
-
     class FilterItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        //val main_container: LinearLayout = itemView.findViewById(R.id.main_container)
-        val textView: TextView = itemView.findViewById(R.id.textView)
+        val posterImageView: ImageView = itemView.findViewById(R.id.mini_player_poster)
+        val titleTextView: TextView = itemView.findViewById(R.id.mini_player_title)
+        val productNameTextView: TextView = itemView.findViewById(R.id.mini_player_product_name)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterItemViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.r_filter_item_adapter, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.r_search_dialog_item_adapter, parent, false)
         return FilterItemViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: FilterItemViewHolder, position: Int) {
-        episodesList[position]
+        val episode = episodesList[position]
 
-    }
+        holder.titleTextView.text = episode.title
+        holder.titleTextView.isSelected = true
+        holder.productNameTextView.text = episode.productName
 
-    private fun styleOnStatus(status: Boolean, holder: FilterItemViewHolder){
-        if (status) {
-            holder.textView.styleBackground(
-                backgroundColor = ContextManager.getColorHex(6),
-                radius = 100f
-            )
-            holder.textView.setTextColor(Color.parseColor(ContextManager.getColorHex(1)))
-        } else {
-            holder.textView.styleBackground(
-                backgroundColor = ContextManager.getColorHex(2),
-                radius = 100f
-            )
-            holder.textView.setTextColor(Color.parseColor(ContextManager.getColorHex(5)))
+        holder.posterImageView.load(episode.imageUrl)
+
+        holder.itemView.setOnClickListener {
+            onClick(episode)
         }
     }
+
 
     override fun getItemCount(): Int {
         return episodesList.size

@@ -103,8 +103,8 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
         val searchModal = SearchDialog(
             context = this,
             episodesList = episodesList,
-            onSave = {
-
+            onClick = {
+                this.goToEpisode(it)
             }
         )
         searchModal.show(supportFragmentManager, "searchModal")
