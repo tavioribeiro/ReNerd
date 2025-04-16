@@ -46,6 +46,7 @@ class SearchDialog(
         this.styleCenterBox()
         this.setUpTitle()
         this.setUpRecyclerView()
+        this.setyleInputBox()
     }
 
 
@@ -65,9 +66,16 @@ class SearchDialog(
         )
     }
 
+    private fun setyleInputBox(){
+        binding.seachInput.styleBackground(
+            backgroundColor = ContextManager.getColorHex(2),
+            radius = 12f,
+            borderWidth = 0
+        )
+    }
 
     private fun setUpTitle(){
-        binding.title.text = "Filtro de Convidados"
+        binding.title.text = "Pesquisa"
     }
 
 
