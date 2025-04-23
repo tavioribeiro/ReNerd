@@ -95,7 +95,6 @@ class FloatingPlayer @JvmOverloads constructor(
 
         binding.miniPlayerPoster.load(episode.imageUrl){
             target(
-
                 onSuccess = { drawable ->
                     //Define a imagem com borda curva e para o skeleton
                     binding.miniPlayerPoster.getSizes { width, height ->

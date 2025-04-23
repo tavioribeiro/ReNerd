@@ -107,6 +107,7 @@ class SearchDialog(
         binding.recyclerviewBase.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         val searchEpisodesAdapter = SearchEpisodesAdapter(
+            resources = resources,
             episodesList = episodesList,
             onClick = { filtersTabsListItemModel ->
 
@@ -168,6 +169,7 @@ class SearchDialog(
         binding.recyclerviewBase.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         val searchEpisodesAdapter = SearchEpisodesAdapter(
+            resources = resources,
             episodesList = episodes,
             onClick = { episode ->
                 onClick(episode)
