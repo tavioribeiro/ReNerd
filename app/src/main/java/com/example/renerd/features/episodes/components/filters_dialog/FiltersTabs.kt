@@ -1,4 +1,4 @@
-package com.example.renerd.components.filters_dialog
+package com.example.renerd.features.episodes.components.filters_dialog
 
 
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.example.renerd.components.filters_dialog.adapters.TabsAdapter
+import com.example.renerd.features.episodes.components.filters_dialog.adapters.TabsAdapter
 import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.databinding.FragmentTabListHeadBinding
 import com.example.renerd.view_models.FiltersTabsListModel

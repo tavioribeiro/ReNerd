@@ -20,7 +20,7 @@ import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.utils.formatTime
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityPlayerBinding
-import com.example.renerd.services.AudioService
+import com.example.renerd.services.AudioService3
 import com.example.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -112,7 +112,7 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
         }
 
         binding.fabPlayOrPause.setOnClickListener {
-            val intent = Intent(this, AudioService::class.java)
+            val intent = Intent(this, AudioService3::class.java)
             if (currentAction == "PLAY"){
                 intent.action = "PLAY"
             } else {
@@ -120,7 +120,7 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
             }
 
             if(!isTheSameEpisodePlaying){
-                stopService(Intent(this, AudioService::class.java))
+                stopService(Intent(this, AudioService3::class.java))
                 presenter.setCurrentEpisodePlaying(episode.audioUrl)
 
                 val dbHelper = DatabaseHelper(context)
@@ -142,7 +142,7 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    val intent = Intent(thisActivity, AudioService::class.java)
+                    val intent = Intent(thisActivity, AudioService3::class.java)
                     intent.action = "PLAY"
                     intent.putExtra("position", progress.toString())
                     startService(intent)

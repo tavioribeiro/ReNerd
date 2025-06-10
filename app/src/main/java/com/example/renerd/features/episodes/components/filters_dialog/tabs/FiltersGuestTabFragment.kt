@@ -1,4 +1,4 @@
-package com.example.renerd.components.filters_dialog.tabs
+package com.example.renerd.features.episodes.components.filters_dialog.tabs
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,15 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.renerd.components.filters_dialog.FilterTabListener
-import com.example.renerd.components.filters_dialog.adapters.FilterItemAdapter
+import com.example.renerd.features.episodes.components.filters_dialog.FilterTabListener
+import com.example.renerd.features.episodes.components.filters_dialog.adapters.FilterItemAdapter
 import com.example.renerd.databinding.CLayoutFilterTabBinding
 import com.example.renerd.view_models.FiltersTabsItemModel
 
 
-class FiltersProductTabFragment(
-    private val productsList: List<FiltersTabsItemModel>,
-    private val filterTabListener: FilterTabListener,
+class FiltersGuestTabFragment(
+    private val guestsList: List<FiltersTabsItemModel>,
+    private val filterTabListener: FilterTabListener
 ) : Fragment() {
 
     private lateinit var binding: CLayoutFilterTabBinding
@@ -43,7 +43,7 @@ class FiltersProductTabFragment(
 
 
     private fun setUpTitle(){
-        binding.title.text = "Filtro de Produtores"
+        binding.title.text = "Filtro de Convidados"
     }
 
 
@@ -52,7 +52,7 @@ class FiltersProductTabFragment(
         binding.recyclerviewBase.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         val filterItemAdapter = FilterItemAdapter(
-            filtersTabsListItemModel = productsList,
+            filtersTabsListItemModel = guestsList,
             onClick = { filtersTabsListItemModel ->
                 filterTabListener.onItemValeuChange(filtersTabsListItemModel)
             }
@@ -62,9 +62,10 @@ class FiltersProductTabFragment(
     }
 
 
+
     companion object {
-        fun newInstance(productsList: List<FiltersTabsItemModel>, filterTabListener: FilterTabListener):FiltersProductTabFragment {
-            return FiltersProductTabFragment(productsList, filterTabListener)
+        fun newInstance(guestsList: List<FiltersTabsItemModel>, filterTabListener: FilterTabListener): FiltersGuestTabFragment {
+            return FiltersGuestTabFragment(guestsList, filterTabListener)
         }
     }
 }

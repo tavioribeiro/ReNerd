@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:clickable="true"
+    android:background="@color/color0">
+
+    <!-- A transparência Vai ser feito no kotlin-->
+
+    <LinearLayout
+        android:id="@+id/box_container"
+        android:layout_width="match_parent"
+        android:layout_height="550dp"
+        android:layout_margin="30dp"
+        android:padding="25dp"
+        android:clickable="false"
+        android:allowClickWhenDisabled="false"
+        android:longClickable="false"
+        android:focusable="false"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/TS_Title1"
+                    android:textColor="@color/color5"
+                    android:layout_centerHorizontal="true"/>
+
+                <EditText
+                    android:id="@+id/seach_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="25dp"
+                    android:paddingHorizontal="6dp"
+                    style="@style/TS_Body"
+                    android:hint="Digite sua busca"/>
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerview_base"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -12,7 +12,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import com.example.renerd.R
-import com.example.renerd.components.floating_player.FloatingPlayer
+import com.example.renerd.features.episodes.components.floating_player.FloatingPlayer
 import com.example.renerd.core.extentions.loadBitmapFromUrl
 import com.example.renerd.core.utils.log
 import com.example.renerd.helpers.audio_focus.AudioFocusHelper
@@ -45,6 +45,7 @@ class AudioService3 : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
+        log("aaaaaaaaaaaaaa")
         super.onCreate()
         albumArt = BitmapFactory.decodeResource(resources, R.drawable.background)
 

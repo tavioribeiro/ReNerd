@@ -1,4 +1,4 @@
-package com.example.renerd.components.floating_player
+package com.example.renerd.features.episodes.components.floating_player
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -95,7 +95,6 @@ class FloatingPlayer @JvmOverloads constructor(
 
         binding.miniPlayerPoster.load(episode.imageUrl){
             target(
-
                 onSuccess = { drawable ->
                     //Define a imagem com borda curva e para o skeleton
                     binding.miniPlayerPoster.getSizes { width, height ->
@@ -181,7 +180,7 @@ class FloatingPlayer @JvmOverloads constructor(
         }
         this.setUpTouch()
 
-        val intentFilter = IntentFilter(FloatingPlayer.PLAYER_STATUS_UPDATE)
+        val intentFilter = IntentFilter(PLAYER_STATUS_UPDATE)
         context.registerReceiver(playerStatusReceiver, intentFilter, Context.RECEIVER_EXPORTED)
     }
 

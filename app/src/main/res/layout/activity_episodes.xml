@@ -73,7 +73,7 @@
         </FrameLayout>
     </LinearLayout>
 
-    <com.example.renerd.components.floating_player.FloatingPlayer
+    <com.example.renerd.features.episodes.components.floating_player.FloatingPlayer
         android:id="@+id/floating_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

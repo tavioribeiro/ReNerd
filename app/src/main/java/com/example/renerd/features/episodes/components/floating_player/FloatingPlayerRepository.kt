@@ -1,4 +1,4 @@
-package com.example.renerd.components.floating_player
+package com.example.renerd.features.episodes.components.floating_player
 
 import android.content.Context
 import com.example.renerd.core.database.DatabaseHelper

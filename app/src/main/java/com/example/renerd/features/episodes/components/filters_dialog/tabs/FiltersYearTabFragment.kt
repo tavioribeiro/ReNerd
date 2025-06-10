@@ -1,4 +1,4 @@
-package com.example.renerd.components.filters_dialog.tabs
+package com.example.renerd.features.episodes.components.filters_dialog.tabs
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.renerd.components.filters_dialog.FilterTabListener
-import com.example.renerd.components.filters_dialog.adapters.FilterItemAdapter
+import com.example.renerd.features.episodes.components.filters_dialog.FilterTabListener
+import com.example.renerd.features.episodes.components.filters_dialog.adapters.FilterItemAdapter
 import com.example.renerd.databinding.CLayoutFilterTabBinding
 import com.example.renerd.view_models.FiltersTabsItemModel
 
@@ -68,7 +68,7 @@ class FiltersYearTabFragment(
 
 
     companion object {
-        fun newInstance(yearsList: List<FiltersTabsItemModel>, filterTabListener: FilterTabListener):FiltersYearTabFragment {
+        fun newInstance(yearsList: List<FiltersTabsItemModel>, filterTabListener: FilterTabListener): FiltersYearTabFragment {
             return FiltersYearTabFragment(yearsList, filterTabListener)
         }
     }

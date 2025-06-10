@@ -1,4 +1,4 @@
-package com.example.renerd.components.filters_dialog
+package com.example.renerd.features.episodes.components.filters_dialog
 
 import android.app.Dialog
 import android.content.Context
