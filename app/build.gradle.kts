@@ -10,6 +10,7 @@ val localProps = Properties().apply {
     load(rootProject.file("local.properties").inputStream())
 }
 
+
 android {
     namespace = "com.example.renerd"
     compileSdk = 35
