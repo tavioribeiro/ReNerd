@@ -35,7 +35,6 @@ android {
             "BASE_URL_DEV",
             "\"${localProps.getProperty("BASE_URL_DEV")}\""
         )
-
     }
 
     buildTypes {

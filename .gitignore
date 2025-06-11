@@ -1,6 +1,6 @@
 *.iml
 .gradle
-/local.properties
+
 /.idea
 /.idea/*
 /.idea/caches
@@ -14,5 +14,4 @@
 /captures
 .externalNativeBuild
 .cxx
-local.properties
 /.idea/studiobot.xml
