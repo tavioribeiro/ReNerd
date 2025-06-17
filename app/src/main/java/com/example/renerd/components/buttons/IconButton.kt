@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,9 +20,14 @@ import com.example.renerd.databinding.LayoutDefaultButtonBinding
 import com.example.renerd.databinding.LayoutIconButtonBinding
 import core.extensions.blockDPadActions
 import core.extensions.darkenColor
+import core.extensions.fadeInAnimationNoRepeat
+import core.extensions.fadeOutAnimationNoRepeat
+import core.extensions.gone
+import core.extensions.hide
 import core.extensions.lightenColor
 import core.extensions.setHeightInDp
 import core.extensions.setWidthInDp
+import core.extensions.show
 import core.extensions.styleBackground
 
 
@@ -74,6 +80,8 @@ class IconButton @JvmOverloads constructor(
             }
         }
 
+        if(backgroundColor == "#0") backgroundColor = "#00000000"
+
         setupComponent()
     }
 
@@ -89,7 +97,6 @@ class IconButton @JvmOverloads constructor(
     //Configura o ícone, se disponível
     private fun configureIcon() {
         binding.imageViewIcon.apply {
-            visibility = View.VISIBLE
             setImageResource(icon!!)
             setColorFilter(getIconColor())
         }
@@ -191,9 +198,30 @@ class IconButton @JvmOverloads constructor(
     }
 
 
-
     fun setOnClickListener(listener: () -> Unit) {
         this.onClickListener = listener
+    }
+
+
+    fun showLoading(show: Boolean){
+        if (show){
+            binding.mainContainer.isClickable = false
+
+            binding.imageViewIcon.fadeOutAnimationNoRepeat(200){
+                binding.imageViewIcon.gone()
+                binding.loading.fadeInAnimationNoRepeat(200)
+            }
+        }
+        else{
+            binding.loading.fadeOutAnimationNoRepeat(200){
+                binding.loading.gone()
+                binding.imageViewIcon.fadeInAnimationNoRepeat(200){
+                    binding.imageViewIcon.show()
+                }
+
+                binding.mainContainer.isClickable = true
+            }
+        }
     }
 
 
