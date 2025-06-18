@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.renerd.R
+import com.example.renerd.components.buttons.IconButtonSmall
 import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
@@ -45,7 +46,7 @@ class EpisodesAdapter(
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
         val bottom_info: LinearLayout = itemView.findViewById(R.id.bottom_info)
         val play_icon_background: LinearLayout= itemView.findViewById(R.id.play_icon_background)
-        val imageView_play_icon: ImageView = itemView.findViewById(R.id.imageView_play_icon)
+        val playButton: IconButtonSmall = itemView.findViewById(R.id.imageView_play_icon)
         val texView_name: TextView = itemView.findViewById(R.id.texView_name)
         val texView_info : TextView = itemView.findViewById(R.id.texView_info)
 
@@ -114,7 +115,7 @@ class EpisodesAdapter(
             )
         }
 
-        holder.imageView_play_icon.setOnClickListener {
+        holder.playButton.setOnClickListener {
             onClick(episode)
         }
     }
