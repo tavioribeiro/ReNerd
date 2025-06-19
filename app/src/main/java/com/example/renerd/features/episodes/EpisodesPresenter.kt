@@ -9,7 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class EpisodesPresenter(private val repository: EpisodesContract.Repository) : EpisodesContract.Presenter {
+class EpisodesPresenter(
+    private val repository: EpisodesContract.Repository
+): EpisodesContract.Presenter {
 
     private var view: EpisodesContract.View? = null
     private var filtersTabsListModel: FiltersTabsListModel = FiltersTabsListModel(
@@ -31,16 +33,15 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
         view?.showLoading()
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                // Carrega (ou inicializa) os filtros
                 val filtersModel = loadOrInitializeFilters()
-                // Obtém todos os episódios
+
                 val episodes = repository.getEpisodes()
-                // Extrai os filtros ativos
+
                 val activeProducts = EpisodeFilterUtil.getActiveLabels(filtersModel.productsList)
                 val activeSubjects = EpisodeFilterUtil.getActiveLabels(filtersModel.subjectsList)
                 val activeGuests = EpisodeFilterUtil.getActiveLabels(filtersModel.guestsList)
                 val activeYears = EpisodeFilterUtil.getActiveLabels(filtersModel.yearsList)
-                // Aplica os filtros aos episódios
+
                 val filteredEpisodes = episodes
                     .let { EpisodeFilterUtil.filterEpisodesByProductsInclude(it, activeProducts) }
                     .let { EpisodeFilterUtil.filterEpisodesBySubjectInclude(it, activeSubjects) }
@@ -49,9 +50,9 @@ class EpisodesPresenter(private val repository: EpisodesContract.Repository) : E
                     .toMutableList()
                 val currentPosition = repository.getRecyclerviewEpisodesCurrentPosition().toIntOrNull() ?: 0
 
-                // Atualiza a view com os dados (para uso nos modais, por exemplo)
+
                 view?.setListsData(tempFiltersTabsListModel = filtersModel, tempEpisodesList = filteredEpisodes)
-                // Exibe os episódios na RecyclerView
+
                 view?.showEpisodes(filteredEpisodes, currentPosition)
             } catch (e: Exception) {
                 view?.showError("Erro ao carregar episódios")

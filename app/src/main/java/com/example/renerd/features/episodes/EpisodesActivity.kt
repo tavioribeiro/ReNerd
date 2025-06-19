@@ -66,6 +66,12 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
                 setUpSearchModal(episodesList)
             }
         }
+
+        binding.iconUpdate.fadeInAnimationNoRepeat(1000) {
+            binding.iconUpdate.setOnClickListener {
+
+            }
+        }
     }
 
     // Função de extensão para monitorar o RecyclerView

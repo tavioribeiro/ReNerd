@@ -21,7 +21,16 @@
             android:paddingHorizontal="12dp"
             android:gravity="center_vertical"
             android:layout_gravity="center_vertical"
-            android:layout_height="38dp">
+            android:layout_height="40dp">
+
+            <com.example.renerd.components.buttons.IconButtonSmall
+                android:id="@+id/icon_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:visibility="gone"
+                android:layout_alignParentStart="true"
+                app:icon="@drawable/icon_arrow_down"/>
 
             <ImageView
                 android:layout_width="wrap_content"

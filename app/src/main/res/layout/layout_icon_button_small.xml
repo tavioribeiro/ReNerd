@@ -19,16 +19,16 @@
 
         <ImageView
             android:id="@+id/imageView_icon"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_gravity="center"
             app:tint="@color/gray_light"/>
 
 
         <ProgressBar
             android:id="@+id/loading"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:indeterminateTint="@color/color5"
             android:layout_gravity="center"
             android:visibility="gone"/>
