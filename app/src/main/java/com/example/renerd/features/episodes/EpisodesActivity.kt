@@ -17,6 +17,7 @@ import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.toast
 import org.koin.android.ext.android.inject
 import android.content.pm.ActivityInfo
+import com.example.renerd.features.episodes.components.last_episodes_dialog.LastEpisodesDialog
 
 class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
 
@@ -58,18 +59,18 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
     private fun setupListeners() {
         binding.iconFilter.fadeInAnimationNoRepeat(1000) {
             binding.iconFilter.setOnClickListener {
-                setUpFilterModal(filtersTabsListModel)
+                this.setUpFilterModal(filtersTabsListModel)
             }
         }
         binding.iconSearch.fadeInAnimationNoRepeat(1000) {
             binding.iconSearch.setOnClickListener {
-                setUpSearchModal(episodesList)
+                this.setUpSearchModal(episodesList)
             }
         }
 
         binding.iconUpdate.fadeInAnimationNoRepeat(1000) {
             binding.iconUpdate.setOnClickListener {
-
+                this.setUpLastEpisodesModal()
             }
         }
     }
@@ -114,6 +115,16 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
             }
         )
         searchModal.show(supportFragmentManager, "searchModal")
+    }
+
+    private fun setUpLastEpisodesModal() {
+        val lastEpisodesDialog = LastEpisodesDialog(
+            context = this,
+            onClick = {
+                this.goToEpisode(it)
+            }
+        )
+        lastEpisodesDialog.show(supportFragmentManager, "lastEpisodesDialog")
     }
 
     override fun showEpisodes(episodes: MutableList<EpisodeViewModel>, scrollTo: Int) {
