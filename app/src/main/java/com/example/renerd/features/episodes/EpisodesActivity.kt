@@ -17,6 +17,8 @@ import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.toast
 import org.koin.android.ext.android.inject
 import android.content.pm.ActivityInfo
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.renerd.features.episodes.components.last_episodes_dialog.LastEpisodesDialog
 
 class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
@@ -117,6 +119,7 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
         searchModal.show(supportFragmentManager, "searchModal")
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setUpLastEpisodesModal() {
         val lastEpisodesDialog = LastEpisodesDialog(
             context = this,

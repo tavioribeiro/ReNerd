@@ -100,7 +100,7 @@ class DatabaseHelper(context: Context) {
     // Pega todos os FilterProductTabItem
     fun getAllFilterTabItems(): List<FiltersTabsItemModel> {
         return database.filterTabItemQueries.selectAllFilterTabItem().executeAsList().map { dbModel ->
-            com.example.renerd.view_models.FiltersTabsItemModel(
+            FiltersTabsItemModel(
                 id = dbModel.id.toInt(),
                 label = dbModel.label ?: "",
                 type = dbModel.type ?: "",
@@ -120,5 +120,4 @@ class DatabaseHelper(context: Context) {
             )
         }
     }
-
 }

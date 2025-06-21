@@ -1,74 +1,70 @@
 package com.example.renerd.features.episodes.components.last_episodes_dialog
 
-import com.example.renerd.core.utils.log
-import com.example.renerd.features.episodes.EpisodesContract
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.text.Normalizer
+import kotlinx.coroutines.withContext
 
-class LastEpisodesDialogPresenter(private val repository: EpisodesContract.Repository) : LastEpisodesDialogContract.Presenter {
+class LastEpisodesDialogPresenter(
+    private val repository: LastEpisodesDialogContract.Repository
+) : LastEpisodesDialogContract.Presenter {
 
     private var view: LastEpisodesDialogContract.View? = null
-    private var allEpisodes: List<EpisodeViewModel> = emptyList() // Cache para todos os episódios
+    private val presenterScope = CoroutineScope(Job() + Dispatchers.Main)
 
     override fun attachView(view: LastEpisodesDialogContract.View) {
         this.view = view
-        loadAllEpisodes() // Carrega todos os episódios ao attachar a view para a busca
     }
 
     override fun detachView() {
         this.view = null
     }
 
-    private fun loadAllEpisodes() {
-        view?.showLoading()
-        CoroutineScope(Dispatchers.Main).launch {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun loadNewEpisodes() {
+        presenterScope.launch {
+            view?.showLoading(true)
             try {
-                allEpisodes = repository.getEpisodes() // Carrega todos os episódios
-                view?.hideLoading() // Esconde loading após carregar inicialmente
+                val newEpisodes = repository.fetchLastEpisodesSinceLastUpdate()
+                view?.showLoading(false)
+
+                if (newEpisodes.isNotEmpty()) {
+                    view?.displayNewEpisodes(newEpisodes)
+                    view?.setSaveButtonEnabled(true)
+                } else {
+                    view?.displayNewEpisodes(emptyList())
+                    view?.setSaveButtonEnabled(false)
+                    view?.showFeedbackMessage("Nenhum episódio novo encontrado.")
+                }
             } catch (e: Exception) {
-                view?.showError("Erro ao carregar episódios para busca.")
-                log(e)
-                view?.hideLoading()
+                view?.showLoading(false)
+                view?.setSaveButtonEnabled(false)
+                view?.showFeedbackMessage("Erro ao buscar episódios.")
             }
         }
     }
 
-
-    override fun lastEpisodesEpisodesByName(query: String) {
-        if (query.isEmpty()) {
-            view?.showEpisodes(emptyList(), 0) // Mostra lista vazia se a query estiver vazia
-            return
-        }
-
-        view?.showLoading()
-        CoroutineScope(Dispatchers.Main).launch {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onSaveButtonClicked(episodesToSave: List<EpisodeViewModel>) {
+        presenterScope.launch {
+            view?.showLoading(true)
             try {
-                val filteredEpisodes = filterEpisodesByName(allEpisodes, query)
-                view?.showEpisodes(filteredEpisodes, 0) // Posição 0 para nova busca
+                repository.saveNewEpisodes(episodesToSave)
+                withContext(Dispatchers.Main) {
+                    view?.showLoading(false)
+                    view?.showFeedbackMessage("Episódios salvos com sucesso!")
+                    view?.closeView()
+                }
             } catch (e: Exception) {
-                view?.showError("Erro ao buscar episódios.")
-                log(e)
-            } finally {
-                view?.hideLoading()
+                withContext(Dispatchers.Main) {
+                    view?.showLoading(false)
+                    view?.showFeedbackMessage("Falha ao salvar os episódios.")
+                }
             }
         }
-    }
-
-    private fun filterEpisodesByName(episodes: List<EpisodeViewModel>, query: String): List<EpisodeViewModel> {
-        val normalizedQuery = normalizeString(query)
-
-        return episodes.filter { episode ->
-            val normalizedTitle = normalizeString(episode.title)
-            normalizedTitle.contains(normalizedQuery)
-        }
-    }
-
-    // Função utilitária para normalizar strings (remover acentos e case insensitive)
-    private fun normalizeString(str: String): String {
-        val normalized = Normalizer.normalize(str, Normalizer.Form.NFD)
-        return "[^\\p{ASCII}]".toRegex().replace(normalized, "").lowercase()
     }
 }

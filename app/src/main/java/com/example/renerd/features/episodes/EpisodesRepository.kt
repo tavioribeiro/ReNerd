@@ -135,7 +135,7 @@ class EpisodesRepository : EpisodesContract.Repository {
                         dbHelper.insertEpisode(episodeViewModel)
                         localEpisodes.add(episodeViewModel)
                     }
-                    setAfter()
+                    this@EpisodesRepository.setAfter()
                 }
                 localEpisodes
             } catch (e: SocketTimeoutException) {
