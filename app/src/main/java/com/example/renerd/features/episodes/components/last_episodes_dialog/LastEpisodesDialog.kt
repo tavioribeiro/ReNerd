@@ -16,6 +16,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.CLayoutLastEpisodesModalBinding
 import com.example.renerd.features.episodes.components.last_episodes_dialog.adapters.LastEpisodesEpisodesAdapter
 import com.example.renerd.view_models.EpisodeViewModel
@@ -70,9 +71,9 @@ class LastEpisodesDialog(
     }
 
     private fun buttonMonit(){
-        binding.saveButtom.setOnClickListener {
+        /*binding.saveButtom.setOnClickListener {
             presenter.onSaveButtonClicked(newEpisodesList)
-        }
+        }*/
     }
 
     private fun setUpTitle(){
@@ -98,7 +99,7 @@ class LastEpisodesDialog(
         binding.recyclerviewBase.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         lastEpisodesAdapter = LastEpisodesEpisodesAdapter(
             resources = resources,
-            episodesList = emptyList(),
+            episodesList = episodes,
             onClick = { episode ->
                 onClick(episode)
             }
@@ -107,8 +108,8 @@ class LastEpisodesDialog(
     }
 
     override fun setSaveButtonEnabled(isEnabled: Boolean) {
-        binding.saveButtom.isEnabled = isEnabled
-        binding.saveButtom.alpha = if (isEnabled) 1.0f else 0.5f
+        //binding.saveButtom.isEnabled = isEnabled
+        //binding.saveButtom.alpha = if (isEnabled) 1.0f else 0.5f
     }
 
     override fun closeView() {

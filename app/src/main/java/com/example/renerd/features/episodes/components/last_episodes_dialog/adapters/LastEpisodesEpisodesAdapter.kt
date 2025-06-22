@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
 import core.extensions.cropCenterSection
 import core.extensions.getSizes
@@ -48,6 +49,7 @@ class LastEpisodesEpisodesAdapter(
 
     override fun onBindViewHolder(holder: FilterItemViewHolder, position: Int) {
         val episode = episodesList[position]
+        log(episode)
 
         holder.titleTextView.text = episode.title
         holder.titleTextView.isSelected = true

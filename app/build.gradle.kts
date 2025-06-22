@@ -35,6 +35,11 @@ android {
             "BASE_URL_DEV",
             "\"${localProps.getProperty("BASE_URL_DEV")}\""
         )
+        buildConfigField(
+            "String",
+            "BASE_ROUTE_DEV",
+            "\"${localProps.getProperty("BASE_ROUTE_DEV")}\""
+        )
     }
 
     buildTypes {

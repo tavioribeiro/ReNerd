@@ -2,6 +2,7 @@ package com.example.renerd.features.episodes.components.last_episodes_dialog
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,7 @@ class LastEpisodesDialogPresenter(
                     view?.displayNewEpisodes(emptyList())
                     view?.setSaveButtonEnabled(false)
                     view?.showFeedbackMessage("Nenhum episódio novo encontrado.")
+                    view?.closeView()
                 }
             } catch (e: Exception) {
                 view?.showLoading(false)
