@@ -45,7 +45,6 @@ class AudioService3 : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
-        log("aaaaaaaaaaaaaa")
         super.onCreate()
         albumArt = BitmapFactory.decodeResource(resources, R.drawable.background)
 
@@ -77,28 +76,22 @@ class AudioService3 : Service() {
             elapsedTime = intent?.getIntExtra("elapsedTime", 0) ?: 0
         )
 
-        log("")
-        log("\n\nAudio Service tempEpisode: ${tempEpisode.title} | ${tempEpisode.elapsedTime}")
-        log("\n\nAudio Service currentEpisode: ${currentEpisode.title} | ${currentEpisode.elapsedTime}")
 
         when (intent?.action) {
             "PLAY" -> when {
                 tempEpisode.id != currentEpisode.id && tempEpisode.id != 0 -> {
-                    log("1°")
                     currentEpisode = tempEpisode
                     this.uptadeCurrentEpisodeInfo(intent)
                     this.stopPlaying()
                     this.startPlaying()
                 }
                 isFirstTime -> {
-                    log("2°")
                     currentEpisode = tempEpisode
                     this.uptadeCurrentEpisodeInfo(intent)
                     this.startPlaying()
                     isFirstTime = false
                 }
                 else -> {
-                    log("3°")
                     //tempEpisode = currentEpisode
                     this.uptadeCurrentEpisodeInfo(intent)
                     this.startPlaying()

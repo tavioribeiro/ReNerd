@@ -92,8 +92,6 @@ class DefaultButton @JvmOverloads constructor(
 
     //Configura o rótulo do botão
     private fun configureLabel() {
-
-        log("label $label")
         if(label == ""){
             binding.imageViewIcon.apply {
                 visibility = View.GONE
