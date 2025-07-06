@@ -49,7 +49,6 @@ class LastEpisodesEpisodesAdapter(
 
     override fun onBindViewHolder(holder: FilterItemViewHolder, position: Int) {
         val episode = episodesList[position]
-        log(episode)
 
         holder.titleTextView.text = episode.title
         holder.titleTextView.isSelected = true
@@ -99,7 +98,6 @@ class LastEpisodesEpisodesAdapter(
                 borderColor = ContextManager.getColorHex(0)
             )
         }
-
     }
 
     override fun getItemCount(): Int {
