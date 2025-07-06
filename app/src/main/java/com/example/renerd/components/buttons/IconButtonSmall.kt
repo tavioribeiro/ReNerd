@@ -18,6 +18,7 @@ import com.example.renerd.core.extentions.dpToPx
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.LayoutDefaultButtonBinding
 import com.example.renerd.databinding.LayoutIconButtonBinding
+import com.example.renerd.databinding.LayoutIconButtonSmallBinding
 import core.extensions.blockDPadActions
 import core.extensions.darkenColor
 import core.extensions.fadeInAnimationNoRepeat
@@ -29,9 +30,13 @@ import core.extensions.setHeightInDp
 import core.extensions.setWidthInDp
 import core.extensions.show
 import core.extensions.styleBackground
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
-class IconButton @JvmOverloads constructor(
+class IconButtonSmall @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -49,9 +54,12 @@ class IconButton @JvmOverloads constructor(
     private var nextFocusDownId: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: LayoutIconButtonBinding = LayoutIconButtonBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding: LayoutIconButtonSmallBinding = LayoutIconButtonSmallBinding.inflate(LayoutInflater.from(context), this, true)
     private var onClickListener: (() -> Unit)? = null
     private val handler = Handler(Looper.getMainLooper())
+
+    private var isFocused = false
+    private var isClicked = false
 
     init {
         context.theme.obtainStyledAttributes(
@@ -64,7 +72,7 @@ class IconButton @JvmOverloads constructor(
                 icon = icon ?: getResourceId(R.styleable.DefaultButton_icon, 0)
                 width = width ?: getFloat(R.styleable.DefaultButton_width, 0f)
                 default_width = default_width ?: getBoolean(R.styleable.DefaultButton_default_width, true)
-                backgroundColor = backgroundColor ?: getString(R.styleable.DefaultButton_bgdColor) ?: ContextManager.getColorHex(2)
+                backgroundColor = backgroundColor ?: getString(R.styleable.DefaultButton_bgdColor) ?: ContextManager.getColorHex(0)
                 borderColorOnFocus = borderColorOnFocus ?: getString(R.styleable.DefaultButton_borderColorOnFocus) ?: ContextManager.getColorHex(5)
                 iconColor = iconColor ?: getString(R.styleable.DefaultButton_iconColor)
                 nextFocusLeftId = if (nextFocusLeftId == 0) getResourceId(R.styleable.DefaultButton_nextFocusLeft, 0) else nextFocusLeftId
@@ -82,19 +90,17 @@ class IconButton @JvmOverloads constructor(
 
         if(backgroundColor == "#0") backgroundColor = "#00000000"
 
-        setupComponent()
+        this.setupComponent()
     }
 
-    //Configuração inicial do componente
+
     private fun setupComponent() {
         this.configureIcon()
-        this.configureFocusNavigation()
         this.configureBackground()
         this.configureClickAction()
     }
 
 
-    //Configura o ícone, se disponível
     private fun configureIcon() {
         binding.imageViewIcon.apply {
             setImageResource(icon!!)
@@ -103,8 +109,6 @@ class IconButton @JvmOverloads constructor(
     }
 
 
-
-    //Obtém a cor do ícone, com fallback para um tom mais claro do background
     private fun getIconColor(): Int {
         return if (iconColor == null) {
             Color.parseColor(backgroundColor?.let { lightenColor(it, 70.0) })
@@ -113,87 +117,38 @@ class IconButton @JvmOverloads constructor(
         }
     }
 
-    //Configura a navegação por foco
-    @SuppressLint("ResourceType")
-    private fun configureFocusNavigation() {
-        binding.mainContainer.apply {
-            if (nextFocusLeftId > 0) nextFocusLeftId = this@IconButton.nextFocusLeftId
-            if (nextFocusRightId > 0) nextFocusRightId = this@IconButton.nextFocusRightId
-            if (nextFocusUpId > 0) nextFocusUpId = this@IconButton.nextFocusUpId
-            if (nextFocusDownId > 0) nextFocusDownId = this@IconButton.nextFocusDownId
-            if (blockActions.isNotEmpty()) blockDPadActions(blockActions)
-        }
-    }
 
-    //Configura o background e comportamento de foco
     private fun configureBackground() {
-        binding.mainContainer.apply {
-            //Estilo padrão
-            styleBackground(
-                backgroundColor = backgroundColor,
-                radius = 100f,
-                widthInDp = DEFAULT_BUTTON_WIDTH_DP,
-                heightInDp = DEFAULT_BUTTON_HEIGHT_DP
+        if(isClicked){
+            binding.mainContainer.styleBackground(
+                backgroundColor = ContextManager.getColorHex(3),
+                radius = 500f
             )
-
-            //Estilo baseado no foco
-            setOnFocusChangeListener { _, hasFocus ->
-                val borderWidth = if (hasFocus) 3 else 0
-                val borderColor = if (hasFocus) borderColorOnFocus else "#00000000"
-                val bgColor = if (hasFocus) backgroundColor?.let { darkenColor(it, 10.0) } else backgroundColor
-
-                styleBackground(
-                    bgColor,
-                    radius = 100f,
-                    borderWidth = borderWidth,
-                    borderColor = borderColor,
-                    widthInDp = DEFAULT_BUTTON_WIDTH_DP,
-                    heightInDp = DEFAULT_BUTTON_HEIGHT_DP
-                )
-            }
+        }
+        else{
+            binding.mainContainer.styleBackground(
+                backgroundColor = backgroundColor,
+                radius = 0f
+            )
         }
     }
 
-    //Configura a ação de clique
-    // Atualiza a configuração de clique
+
+
     private fun configureClickAction() {
         binding.mainContainer.setOnClickListener {
-            // Verifica se o botão tem foco
-            val hasFocus = binding.mainContainer.isFocused
-            val originalBackgroundColor = backgroundColor
-            val lightenBackgroundColor = backgroundColor?.let { lightenColor(it, 5.toDouble()) }
+            CoroutineScope(Dispatchers.Main).launch {
+                isClicked = true
+                this@IconButtonSmall.configureBackground()
 
-            val borderWidth = if (hasFocus) 3 else 0
-            val borderColor = if (hasFocus) borderColorOnFocus ?: ContextManager.getColorHex(0) else "#00000000"
+                delay(100)
 
-            // Simula o "click" visualmente clareando o fundo
-            if (lightenBackgroundColor != null) {
-                binding.mainContainer.styleBackground(
-                    backgroundColor = lightenBackgroundColor,
-                    radius = 100f,
-                    borderWidth = borderWidth,
-                    borderColor = borderColor,
-                    widthInDp = DEFAULT_BUTTON_WIDTH_DP,
-                    heightInDp = DEFAULT_BUTTON_HEIGHT_DP
-                )
-            }
+                isClicked = false
+                this@IconButtonSmall.configureBackground()
 
-            handler.postDelayed({
                 action()
                 onClickListener?.invoke()
-
-                // Restaura o background após o clique
-                if (originalBackgroundColor != null) {
-                    binding.mainContainer.styleBackground(
-                        backgroundColor = originalBackgroundColor,
-                        radius = 100f,
-                        borderWidth = borderWidth,
-                        borderColor = borderColor,
-                        widthInDp = DEFAULT_BUTTON_WIDTH_DP,
-                        heightInDp = DEFAULT_BUTTON_HEIGHT_DP
-                    )
-                }
-            }, 100)
+            }
         }
     }
 
@@ -259,8 +214,8 @@ class IconButton @JvmOverloads constructor(
     }
 
 
-    companion object {
+    /*companion object {
         private const val DEFAULT_BUTTON_WIDTH_DP = 60f
         private const val DEFAULT_BUTTON_HEIGHT_DP = 60f
-    }
+    }*/
 }

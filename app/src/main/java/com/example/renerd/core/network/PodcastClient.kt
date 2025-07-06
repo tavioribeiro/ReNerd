@@ -1,5 +1,6 @@
 package com.example.renerd.core.network
 
+import com.example.renerd.BuildConfig
 import com.example.renerd.core.network.api.PodcastApi
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -8,8 +9,7 @@ import java.util.concurrent.TimeUnit
 
 
 object PodcastClient {
-
-    private const val BASE_URL = "https://api.jovemnerd.com.br/"
+    private val BASE_URL = BuildConfig.BASE_URL_DEV
 
     private val okHttpClient = OkHttpClient.Builder()
         //.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)) // Log das requisições (opcional)

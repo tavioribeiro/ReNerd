@@ -1,8 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("app.cash.sqldelight")
 }
+
+val localProps = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
+
 
 android {
     namespace = "com.example.renerd"
@@ -21,6 +28,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        //LOCAL PROPERTIES
+        buildConfigField(
+            "String",
+            "BASE_URL_DEV",
+            "\"${localProps.getProperty("BASE_URL_DEV")}\""
+        )
+        buildConfigField(
+            "String",
+            "BASE_ROUTE_DEV",
+            "\"${localProps.getProperty("BASE_ROUTE_DEV")}\""
+        )
     }
 
     buildTypes {

@@ -41,8 +41,9 @@ class EpisodesRepository : EpisodesContract.Repository {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchEpisodesFromNetwork(): MutableList<EpisodeViewModel> {
-        val after = URLDecoder.decode(getAfter(), "UTF-8")
-        val response = PodcastClient.api.getNerdcasts(after = after, before = "").execute()
+        //val after = URLDecoder.decode(getAfter(), "UTF-8")
+        val response = PodcastClient.api.getNerdcasts(after = getAfter(), before = "").execute()
+
         val episodesViewModel = mutableListOf<EpisodeViewModel>()
         if (response.isSuccessful) {
             val podcasts = response.body()
@@ -112,6 +113,8 @@ class EpisodesRepository : EpisodesContract.Repository {
                 val localEpisodes = dbHelper.getAllEpisodes().toMutableList()
                 val after = URLDecoder.decode(getAfter(), "UTF-8")
                 val response = PodcastClient.api.getNerdcasts(after = after, before = "").execute()
+                log(response)
+
                 if (response.isSuccessful) {
                     val podcasts = response.body()
                     podcasts?.forEach { episode ->
@@ -135,7 +138,7 @@ class EpisodesRepository : EpisodesContract.Repository {
                         dbHelper.insertEpisode(episodeViewModel)
                         localEpisodes.add(episodeViewModel)
                     }
-                    setAfter()
+                    this@EpisodesRepository.setAfter()
                 }
                 localEpisodes
             } catch (e: SocketTimeoutException) {
@@ -151,7 +154,7 @@ class EpisodesRepository : EpisodesContract.Repository {
     private fun getAfter(): String {
         var after = sharedPref.getString("current_after_search", "") ?: ""
         if (after.isEmpty()) {
-            after = "2000-01-01%2000%3A00%3A00"
+            after = "2000-01-01 00:00:00"
         }
         return after
     }

@@ -5,30 +5,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_container"
     android:tag="action_button"
-    android:layout_width="64dp"
-    android:layout_height="64dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:focusable="true"
-    android:layout_margin="4dp"
     android:clickable="true"
     android:orientation="horizontal"
     android:gravity="center">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="4dp">
 
         <ImageView
             android:id="@+id/imageView_icon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_gravity="center"
             app:tint="@color/gray_light"/>
 
 
         <ProgressBar
             android:id="@+id/loading"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:indeterminateTint="@color/color5"
             android:layout_gravity="center"
             android:visibility="gone"/>

@@ -27,6 +27,7 @@ import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.fadeOutAnimationNoRepeat
 import core.extensions.getPalletColors
 import core.extensions.getSizes
+import core.extensions.gone
 import core.extensions.resize
 import core.extensions.startSkeletonAnimation
 import core.extensions.stopSkeletonAnimation
@@ -59,7 +60,6 @@ class FloatingPlayer @JvmOverloads constructor(
     init {
         binding.mainContainer.visibility = View.GONE
 
-
         presenter.attachView(this)
         presenter.getCurrentPlayingEpisode()
     }
@@ -72,7 +72,6 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
     override fun updateInfosUi(episode: EpisodeViewModel){
-        // Atualizar a UI do floating_player
         binding.miniPlayerTitle.text = episode.title
         binding.mainPlayerTitle.text = episode.title
 
@@ -239,10 +238,14 @@ class FloatingPlayer @JvmOverloads constructor(
 
         binding.miniPlayerPlayPauseButton.setOnClickListener {
             playPauseClicked()
+
+            binding.miniPlayerPlayPauseButton.showLoading(isPlaying)
         }
 
         binding.mainPlayerPlayPauseButton.setOnClickListener {
             playPauseClicked()
+
+            binding.mainPlayerPlayPauseButton.showLoading(isPlaying)
         }
 
         binding.mainPlayerSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -252,6 +255,7 @@ class FloatingPlayer @JvmOverloads constructor(
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+
 
         binding.buttomJumpTo.setOnClickListener(){
             this.seekTo(currentEpisode.jumpToTime * 1000)
@@ -306,6 +310,9 @@ class FloatingPlayer @JvmOverloads constructor(
 
 
     fun startEpisode(episode: EpisodeViewModel) {
+        binding.miniPlayerPlayPauseButton.showLoading(true)
+        binding.mainPlayerPlayPauseButton.showLoading(true)
+
         currentEpisode = episode
 
         presenter.setCurrentPlayingEpisodeId(episode)
@@ -350,14 +357,18 @@ class FloatingPlayer @JvmOverloads constructor(
      override fun updateButtonsUi(isPlaying: Boolean, currentTime: Int, totalTime: Int) {
         this.isPlaying = isPlaying
         if (isPlaying) {
-            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.icon_pause)
+            binding.miniPlayerPlayPauseButton.setIconResource(R.drawable.icon_pause)
             binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.icon_pause)
             //binding.mainPlayerPlayPauseButton.setLabel("Pause")
 
+            binding.miniPlayerPlayPauseButton.showLoading(false)
+            binding.mainPlayerPlayPauseButton.showLoading(false)
 
             if(currentTime > 500){
-                binding.buttomJumpTo.fadeInAnimationNoRepeat {
-                    binding.buttomJumpTo.visibility = View.VISIBLE
+                if(currentEpisode.jumpToTime != 0){
+                    binding.buttomJumpTo.fadeInAnimationNoRepeat {
+                        binding.buttomJumpTo.visibility = View.VISIBLE
+                    }
                 }
 
                 binding.buttomFoward15.fadeInAnimationNoRepeat {
@@ -368,8 +379,10 @@ class FloatingPlayer @JvmOverloads constructor(
                     binding.buttomReplay15.visibility = View.VISIBLE
                 }
             }else{
-                binding.buttomJumpTo.fadeOutAnimationNoRepeat {
-                    binding.buttomJumpTo.visibility = View.GONE
+                if(currentEpisode.jumpToTime != 0) {
+                    binding.buttomJumpTo.fadeOutAnimationNoRepeat {
+                        binding.buttomJumpTo.visibility = View.GONE
+                    }
                 }
 
                 binding.buttomFoward15.fadeOutAnimationNoRepeat {
@@ -382,12 +395,17 @@ class FloatingPlayer @JvmOverloads constructor(
                 }
             }
         } else {
-            binding.miniPlayerPlayPauseButton.setImageResource(R.drawable.icon_play)
+            binding.miniPlayerPlayPauseButton.setIconResource(R.drawable.icon_play)
             binding.mainPlayerPlayPauseButton.setIconResource(R.drawable.icon_play)
             //binding.mainPlayerPlayPauseButton.setLabel("Play")
 
-            binding.buttomJumpTo.fadeOutAnimationNoRepeat {
-                binding.buttomJumpTo.visibility = View.GONE
+            binding.miniPlayerPlayPauseButton.showLoading(false)
+            binding.mainPlayerPlayPauseButton.showLoading(false)
+
+            if(currentEpisode.jumpToTime != 0) {
+                binding.buttomJumpTo.fadeOutAnimationNoRepeat {
+                    binding.buttomJumpTo.visibility = View.GONE
+                }
             }
 
             binding.buttomFoward15.fadeOutAnimationNoRepeat {
