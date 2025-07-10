@@ -2,6 +2,9 @@
 
 **ReNerd** é um projeto de um aplicativo Android (Kotlin) desenvolvido para fins de aprimorar habiilidades técnicas. Ele demonstra a construção de um cliente móvel capaz de consumir, exibir e filtrar um catálogo de mídias a partir de uma API com um contrato de dados específico.
 
+![renerd](https://github.com/user-attachments/assets/031c45ae-73c8-40ed-b201-1ed7f7fbb208)
+
+
 **Aviso:** Este repositório contém apenas o código-fonte da aplicação. Ele não é um produto funcional pronto para uso, pois não inclui a API ou a base de dados necessárias para popular o conteúdo. O projeto deve ser analisado estritamente como uma demonstração de arquitetura e implementação técnica.
 
 ## Visão Geral do Projeto
@@ -17,7 +20,8 @@ A lógica do aplicativo é construída em torno de um modelo de dados principal,
 data class EpisodeModel(
     val id: Int,
     val title: String,
-    val description: String,
+    val description: String,![renerd](https://github.com/user-attachments/assets/daf5b2b9-12d5-4162-9d7a-8e75334e0515)
+
     val subject: String,
     @SerializedName("published_at") val publishedAt: String,
     val guests: String, // Campo de texto com nomes para serem parseados
