@@ -2,12 +2,12 @@ package com.example.renerd.features.episodes.components.floating_player
 
 import android.content.Context
 import com.example.renerd.core.database.DatabaseHelper
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.singletons.ContextManager
 import com.example.renerd.view_models.EpisodeViewModel
 
 
 class FloatingPlayerRepository: FloatingPlayerContract.Repository {
-    val context = ContextManager.getGlobalContext()
+    val context = ContextManager.getContext()
 
     val sharedPref = context.getSharedPreferences("SharedPrefsReNerd", Context.MODE_PRIVATE)
     val editor = sharedPref.edit()

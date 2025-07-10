@@ -20,11 +20,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.view.animation.LinearInterpolator
-import androidx.core.graphics.drawable.toBitmap
-import com.example.renerd.core.extentions.ContextManager
-
-
-
+import com.example.renerd.core.singletons.ColorsManager
 
 
 private const val SKELETON_ANIMATOR_TAG = -123456
@@ -229,7 +225,7 @@ fun ImageView.resetColorFilter(finalMatriz: FloatArray = defaultFinalMatriz) {
  */
 fun ImageView.getPalletColors(onCompletation: ((Pair<String, String>) -> Unit)? = null) {
 
-    val defaultColor = ContextManager.getColorHex(1)
+    val defaultColor = ColorsManager.getColorHex(1)
     var color1Hex = defaultColor
     var color2Hex = defaultColor
     if (this.drawable is BitmapDrawable) {

@@ -12,16 +12,15 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import com.example.renerd.R
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.extentions.blockDPadActions
 import com.example.renerd.core.extentions.dpToPx
-import com.example.renerd.core.utils.log
+import com.example.renerd.core.extentions.setHeightInDp
+import com.example.renerd.core.extentions.setWidthInDp
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.databinding.LayoutDefaultButtonBinding
-import core.extensions.blockDPadActions
 import core.extensions.darkenColor
 import core.extensions.lightenColor
-import core.extensions.setHeightInDp
-import core.extensions.setWidthInDp
-import core.extensions.styleBackground
 
 
 class DefaultButton @JvmOverloads constructor(
@@ -60,9 +59,9 @@ class DefaultButton @JvmOverloads constructor(
                 label = getString(R.styleable.DefaultButton_label) ?: ""
                 width = width ?: getFloat(R.styleable.DefaultButton_width, 0f)
                 default_width = default_width ?: getBoolean(R.styleable.DefaultButton_default_width, true)
-                backgroundColor = backgroundColor ?: getString(R.styleable.DefaultButton_bgdColor) ?: ContextManager.getColorHex(2)
-                labelColor = labelColor ?: getString(R.styleable.DefaultButton_labelColor) ?: ContextManager.getColorHex(5)
-                borderColorOnFocus = borderColorOnFocus ?: getString(R.styleable.DefaultButton_borderColorOnFocus) ?: ContextManager.getColorHex(5)
+                backgroundColor = backgroundColor ?: getString(R.styleable.DefaultButton_bgdColor) ?: ColorsManager.getColorHex(2)
+                labelColor = labelColor ?: getString(R.styleable.DefaultButton_labelColor) ?: ColorsManager.getColorHex(5)
+                borderColorOnFocus = borderColorOnFocus ?: getString(R.styleable.DefaultButton_borderColorOnFocus) ?: ColorsManager.getColorHex(5)
                 iconColor = iconColor ?: getString(R.styleable.DefaultButton_iconColor)
                 nextFocusLeftId = if (nextFocusLeftId == 0) getResourceId(R.styleable.DefaultButton_nextFocusLeft, 0) else nextFocusLeftId
                 nextFocusRightId = if (nextFocusRightId == 0) getResourceId(R.styleable.DefaultButton_nextFocusRight, 0) else nextFocusRightId
@@ -168,7 +167,7 @@ class DefaultButton @JvmOverloads constructor(
             val lightenBackgroundColor = backgroundColor?.let { lightenColor(it, 5.toDouble()) }
 
             val borderWidth = if (hasFocus) 3 else 0
-            val borderColor = if (hasFocus) borderColorOnFocus ?: ContextManager.getColorHex(0) else "#00000000"
+            val borderColor = if (hasFocus) borderColorOnFocus ?: ColorsManager.getColorHex(0) else "#00000000"
 
             // Simula o "click" visualmente clareando o fundo
             if (lightenBackgroundColor != null) {

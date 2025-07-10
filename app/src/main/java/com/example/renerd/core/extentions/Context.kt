@@ -29,7 +29,7 @@ val colorsMap = mapOf(
 )
 
 
-object ContextManager {
+object ContextManagerdd {
     lateinit var appContext: Context
 
     fun init(context: Context) {

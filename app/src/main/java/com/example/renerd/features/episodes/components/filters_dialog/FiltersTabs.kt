@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.features.episodes.components.filters_dialog.adapters.TabsAdapter
-import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.databinding.FragmentTabListHeadBinding
 import com.example.renerd.view_models.FiltersTabsListModel
-import core.extensions.styleBackground
 
 
 
@@ -55,7 +55,7 @@ class FiltersTabs(
 
     private fun setUpInitialSelectedTabStyle(){
         binding.textViewButtonProduct.styleBackground(
-            backgroundColor = ContextManager.getColorHex(2),
+            backgroundColor = ColorsManager.getColorHex(2),
             radius = 100f
         )
     }
@@ -80,28 +80,28 @@ class FiltersTabs(
                 when(position){
                     0 -> {
                         binding.textViewButtonProduct.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(2),
+                            backgroundColor = ColorsManager.getColorHex(2),
                             radius = 100f
                         )
                         scrollTo(binding.textViewButtonProduct)
                     }
                     1 -> {
                         binding.textViewButtonSubject.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(2),
+                            backgroundColor = ColorsManager.getColorHex(2),
                             radius = 100f
                         )
                         scrollTo(binding.textViewButtonSubject)
                     }
                     2 -> {
                         binding.textViewButtonGuest.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(2),
+                            backgroundColor = ColorsManager.getColorHex(2),
                             radius = 100f
                         )
                         scrollTo(binding.textViewButtonGuest)
                     }
                     3 -> {
                         binding.textViewButtonYear.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(2),
+                            backgroundColor = ColorsManager.getColorHex(2),
                             radius = 100f
                         )
                         scrollTo(binding.textViewButtonYear)
@@ -125,7 +125,7 @@ class FiltersTabs(
         binding.textViewButtonProduct.setOnClickListener(){
             this.setDefaultStyle()
             binding.textViewButtonProduct.styleBackground(
-                backgroundColor = ContextManager.getColorHex(2),
+                backgroundColor = ColorsManager.getColorHex(2),
                 radius = 50f
             )
 
@@ -135,7 +135,7 @@ class FiltersTabs(
         binding.textViewButtonSubject.setOnClickListener(){
             this.setDefaultStyle()
             binding.textViewButtonSubject.styleBackground(
-                backgroundColor = ContextManager.getColorHex(2),
+                backgroundColor = ColorsManager.getColorHex(2),
                 radius = 50f
             )
 
@@ -145,7 +145,7 @@ class FiltersTabs(
         binding.textViewButtonGuest.setOnClickListener(){
             this.setDefaultStyle()
             binding.textViewButtonGuest.styleBackground(
-                backgroundColor = ContextManager.getColorHex(2),
+                backgroundColor = ColorsManager.getColorHex(2),
                 radius = 50f
             )
 
@@ -155,7 +155,7 @@ class FiltersTabs(
         binding.textViewButtonYear.setOnClickListener(){
             this.setDefaultStyle()
             binding.textViewButtonYear.styleBackground(
-                backgroundColor = ContextManager.getColorHex(2),
+                backgroundColor = ColorsManager.getColorHex(2),
                 radius = 50f
             )
 
@@ -173,25 +173,25 @@ class FiltersTabs(
                     0 -> {
                         setDefaultStyle()
                         binding.textViewButtonProduct.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(0)
+                            backgroundColor = ColorsManager.getColorHex(0)
                         )
                     }
                     1 -> {
                         setDefaultStyle()
                         binding.textViewButtonProduct.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(0)
+                            backgroundColor = ColorsManager.getColorHex(0)
                         )
                     }
                     2 -> {
                         setDefaultStyle()
                         binding.textViewButtonProduct.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(0)
+                            backgroundColor = ColorsManager.getColorHex(0)
                         )
                     }
                     3 -> {
                         setDefaultStyle()
                         binding.textViewButtonProduct.styleBackground(
-                            backgroundColor = ContextManager.getColorHex(0)
+                            backgroundColor = ColorsManager.getColorHex(0)
                         )
                     }
                 }*/
@@ -204,16 +204,16 @@ class FiltersTabs(
 
     private fun setDefaultStyle(){
         binding.textViewButtonProduct.styleBackground(
-            backgroundColor = ContextManager.getColorHex(0)
+            backgroundColor = ColorsManager.getColorHex(0)
         )
         binding.textViewButtonSubject.styleBackground(
-            backgroundColor = ContextManager.getColorHex(0)
+            backgroundColor = ColorsManager.getColorHex(0)
         )
         binding.textViewButtonGuest.styleBackground(
-            backgroundColor = ContextManager.getColorHex(0)
+            backgroundColor = ColorsManager.getColorHex(0)
         )
         binding.textViewButtonYear.styleBackground(
-            backgroundColor = ContextManager.getColorHex(0)
+            backgroundColor = ColorsManager.getColorHex(0)
         )
     }
 

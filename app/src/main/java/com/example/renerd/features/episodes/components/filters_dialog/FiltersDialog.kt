@@ -12,13 +12,12 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.example.renerd.R
-import com.example.renerd.core.extentions.ContextManager
-import com.example.renerd.core.utils.log
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.databinding.CLayoutFilterModalBinding
 import com.example.renerd.view_models.FiltersTabsItemModel
 import com.example.renerd.view_models.FiltersTabsListModel
 import core.extensions.hexToArgb
-import core.extensions.styleBackground
 
 class FiltersDialog(
     private val context: Context,
@@ -43,7 +42,7 @@ class FiltersDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mainContainer.background = ColorDrawable(hexToArgb(30, ContextManager.getColorHex(0)))
+        binding.mainContainer.background = ColorDrawable(hexToArgb(30, ColorsManager.getColorHex(0)))
 
         binding.mainContainer.setOnClickListener(){
            this.dismissModal()
@@ -52,8 +51,8 @@ class FiltersDialog(
 
 
         binding.boxContainer.styleBackground(
-            backgroundColor = ContextManager.getColorHex(1),
-            borderColor = ContextManager.getColorHex(2),
+            backgroundColor = ColorsManager.getColorHex(1),
+            borderColor = ColorsManager.getColorHex(2),
             borderWidth = 5,
             radius = 80f
         )

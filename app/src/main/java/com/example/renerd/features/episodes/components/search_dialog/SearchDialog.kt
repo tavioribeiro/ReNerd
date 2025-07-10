@@ -14,14 +14,14 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.CLayoutSearchModalBinding
 import com.example.renerd.features.episodes.EpisodesContract
 import com.example.renerd.features.episodes.components.search_dialog.adapters.SearchEpisodesAdapter
 import com.example.renerd.view_models.EpisodeViewModel
 import core.extensions.hexToArgb
-import core.extensions.styleBackground
 import org.koin.android.ext.android.inject
 
 class SearchDialog(
@@ -59,7 +59,7 @@ class SearchDialog(
 
 
     private fun styleCenterBox(){
-        binding.mainContainer.background = ColorDrawable(hexToArgb(30, ContextManager.getColorHex(0)))
+        binding.mainContainer.background = ColorDrawable(hexToArgb(30, ColorsManager.getColorHex(0)))
 
         binding.mainContainer.setOnClickListener(){
             this.dismissModal()
@@ -67,8 +67,8 @@ class SearchDialog(
         binding.boxContainer.setOnClickListener(){}
 
         binding.boxContainer.styleBackground(
-            backgroundColor = ContextManager.getColorHex(1),
-            borderColor = ContextManager.getColorHex(2),
+            backgroundColor = ColorsManager.getColorHex(1),
+            borderColor = ColorsManager.getColorHex(2),
             borderWidth = 5,
             radius = 80f
         )
@@ -76,10 +76,10 @@ class SearchDialog(
 
     private fun setyleInputBox(){
         binding.seachInput.styleBackground(
-            backgroundColor = ContextManager.getColorHex(2),
+            backgroundColor = ColorsManager.getColorHex(2),
             radius = 12f,
             borderWidth = 1,
-            borderColor = ContextManager.getColorHex(5)
+            borderColor = ColorsManager.getColorHex(5)
         )
     }
 

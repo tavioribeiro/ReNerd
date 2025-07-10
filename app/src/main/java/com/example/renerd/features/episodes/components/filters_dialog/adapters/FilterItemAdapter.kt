@@ -4,13 +4,12 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.renerd.R
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.view_models.FiltersTabsItemModel
-import core.extensions.styleBackground
 import core.extensions.toTitleCase
 
 class FilterItemAdapter(
@@ -49,16 +48,16 @@ class FilterItemAdapter(
     private fun styleOnStatus(status: Boolean, holder: FilterItemViewHolder){
         if (status) {
             holder.textView.styleBackground(
-                backgroundColor = ContextManager.getColorHex(6),
+                backgroundColor = ColorsManager.getColorHex(6),
                 radius = 100f
             )
-            holder.textView.setTextColor(Color.parseColor(ContextManager.getColorHex(1)))
+            holder.textView.setTextColor(Color.parseColor(ColorsManager.getColorHex(1)))
         } else {
             holder.textView.styleBackground(
-                backgroundColor = ContextManager.getColorHex(2),
+                backgroundColor = ColorsManager.getColorHex(2),
                 radius = 100f
             )
-            holder.textView.setTextColor(Color.parseColor(ContextManager.getColorHex(5)))
+            holder.textView.setTextColor(Color.parseColor(ColorsManager.getColorHex(5)))
         }
     }
 
