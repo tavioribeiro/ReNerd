@@ -10,13 +10,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.renerd.R
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.extentions.getSizes
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.view_models.EpisodeViewModel
 import core.extensions.cropCenterSection
 import core.extensions.getSizes
 import core.extensions.startSkeletonAnimation
 import core.extensions.stopSkeletonAnimation
-import core.extensions.styleBackground
 import core.extensions.toAllRoundedDrawable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,19 +83,19 @@ class SearchEpisodesAdapter(
     private fun simulateClickEffect(holder:FilterItemViewHolder){
         CoroutineScope(Dispatchers.Main).launch {
             holder.mainContainer.styleBackground(
-                backgroundColor = ContextManager.getColorHex(2),
+                backgroundColor = ColorsManager.getColorHex(2),
                 radius = 12f,
                 borderWidth = 2,
-                borderColor = ContextManager.getColorHex(5)
+                borderColor = ColorsManager.getColorHex(5)
             )
 
             delay(70)
 
             holder.mainContainer.styleBackground(
-                backgroundColor = ContextManager.getColorHex(0),
+                backgroundColor = ColorsManager.getColorHex(0),
                 radius = 0f,
                 borderWidth = 0,
-                borderColor = ContextManager.getColorHex(0)
+                borderColor = ColorsManager.getColorHex(0)
             )
         }
 

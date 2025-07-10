@@ -1,10 +1,12 @@
-package core.extensions
+package com.example.renerd.core.extentions
 
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.UnderlineSpan
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.example.renerd.core.extentions.fadeInAnimation
+import com.example.renerd.core.extentions.fadeOutAnimation
 
 fun TextView.setTextAnimation(text: String, duration: Long = 100, completion: (() -> Unit)? = null) {
     fadeOutAnimation(duration) {

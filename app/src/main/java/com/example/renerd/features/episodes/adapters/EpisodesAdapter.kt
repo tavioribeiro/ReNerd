@@ -12,20 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.components.buttons.IconButtonSmall
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.extentions.fadeInAnimationNoRepeat
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
-import core.extensions.cropCenterSection
 import core.extensions.darkenColor
-import core.extensions.fadeInAnimation
-import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.getPalletColors
-import core.extensions.getSizes
-import core.extensions.resize
-import core.extensions.startSkeletonAnimation
-import core.extensions.stopSkeletonAnimation
-import core.extensions.styleBackground
-import core.extensions.toAllRoundedDrawable
 import core.extensions.toTopRoundedDrawable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,8 +43,8 @@ class EpisodesAdapter(
         val texView_name: TextView = itemView.findViewById(R.id.texView_name)
         val texView_info : TextView = itemView.findViewById(R.id.texView_info)
 
-        var imageColor1: String = ContextManager.getColorHex(2)
-        var imageColor2: String = ContextManager.getColorHex(2)
+        var imageColor1: String = ColorsManager.getColorHex(2)
+        var imageColor2: String = ColorsManager.getColorHex(2)
     }
 
 

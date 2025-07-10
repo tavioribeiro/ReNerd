@@ -10,15 +10,15 @@ import com.example.renerd.databinding.ActivityEpisodesBinding
 import com.example.renerd.features.episodes.adapters.EpisodesAdapter
 import com.example.renerd.features.episodes.components.filters_dialog.FiltersDialog
 import com.example.renerd.features.episodes.components.search_dialog.SearchDialog
-import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.view_models.EpisodeViewModel
 import com.example.renerd.view_models.FiltersTabsListModel
-import core.extensions.fadeInAnimationNoRepeat
 import core.extensions.toast
 import org.koin.android.ext.android.inject
 import android.content.pm.ActivityInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.renerd.core.extentions.fadeInAnimationNoRepeat
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.features.episodes.components.last_episodes_dialog.LastEpisodesDialog
 
 class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
@@ -45,11 +45,11 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
 
     private fun setupUI() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(1))
+        window.navigationBarColor = Color.parseColor(ColorsManager.getColorHex(1))
         window.apply {
             decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            statusBarColor = Color.parseColor(ContextManager.getColorHex(0))
+            statusBarColor = Color.parseColor(ColorsManager.getColorHex(0))
         }
     }
 

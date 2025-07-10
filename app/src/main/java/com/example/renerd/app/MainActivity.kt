@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.RequiresApi
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.databinding.ActivityMainBinding
 import com.example.renerd.features.episodes.EpisodesActivity
 
@@ -31,11 +31,11 @@ class MainActivity : AppCompatActivity() {
     private fun setUpUi(){
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        window.navigationBarColor = Color.parseColor(ContextManager.getColorHex(1))
+        window.navigationBarColor = Color.parseColor(ColorsManager.getColorHex(1))
         window.apply {
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 
-            statusBarColor = Color.parseColor(ContextManager.getColorHex(0))
+            statusBarColor = Color.parseColor(ColorsManager.getColorHex(0))
         }
     }
 

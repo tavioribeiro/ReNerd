@@ -14,6 +14,11 @@ import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.load
 import com.example.renerd.R
+import com.example.renerd.core.extentions.fadeInAnimation
+import com.example.renerd.core.extentions.fadeInAnimationNoRepeat
+import com.example.renerd.core.extentions.fadeOutAnimationNoRepeat
+import com.example.renerd.core.extentions.getSizes
+import com.example.renerd.core.extentions.styleBackground
 import com.example.renerd.core.utils.convertMillisecondsToTime
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.CFloatingPlayerLayoutBinding
@@ -22,16 +27,11 @@ import com.example.renerd.view_models.EpisodeViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import core.extensions.cropCenterSection
 import core.extensions.darkenColor
-import core.extensions.fadeInAnimation
-import core.extensions.fadeInAnimationNoRepeat
-import core.extensions.fadeOutAnimationNoRepeat
 import core.extensions.getPalletColors
 import core.extensions.getSizes
-import core.extensions.gone
 import core.extensions.resize
 import core.extensions.startSkeletonAnimation
 import core.extensions.stopSkeletonAnimation
-import core.extensions.styleBackground
 import core.extensions.toAllRoundedDrawable
 import org.koin.java.KoinJavaComponent.inject
 

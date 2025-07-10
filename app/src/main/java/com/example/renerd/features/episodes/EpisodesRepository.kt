@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.renerd.core.database.DatabaseHelper
-import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.network.PodcastClient
+import com.example.renerd.core.singletons.ContextManager
 import com.example.renerd.core.utils.getCurrentDateFormatted
 import com.example.renerd.core.utils.log
 import com.example.renerd.view_models.EpisodeViewModel
@@ -16,7 +16,7 @@ import java.net.SocketTimeoutException
 import java.net.URLDecoder
 
 class EpisodesRepository : EpisodesContract.Repository {
-    private val context: Context = ContextManager.getGlobalContext()
+    private val context: Context = ContextManager.getContext()
     private val sharedPref = context.getSharedPreferences("SharedPrefsReNerd", Context.MODE_PRIVATE)
     private val editor = sharedPref.edit()
     private val dbHelper = DatabaseHelper(context)

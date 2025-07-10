@@ -1,15 +1,12 @@
-package core.extensions
+package com.example.renerd.core.extentions
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.LayerDrawable
 import android.os.Handler
 import android.os.Looper
-import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
@@ -18,16 +15,8 @@ import android.view.ViewTreeObserver
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
-import androidx.annotation.ColorInt
-import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
-import com.example.renerd.R
-import com.example.renerd.core.extentions.ContextManager
 import com.example.renerd.core.extentions.dpToPx
-import java.util.concurrent.atomic.AtomicLong
-
-
+import com.example.renerd.core.singletons.ColorsManager
 
 
 fun View.genId(minValue: Int = 0): Int {
@@ -356,8 +345,8 @@ fun View.setHeightInDp(heightInDp: Float) {
 fun View.changeBackgroundColorWithGradient(
     color1: String,
     color2: String,
-    originalColor1 : String = ContextManager.getColorHex(0),
-    originalColor2 : String = ContextManager.getColorHex(1)
+    originalColor1 : String = ColorsManager.getColorHex(0),
+    originalColor2 : String = ColorsManager.getColorHex(1)
 ) {
     // Obtenção das cores atuais a partir da lógica existente (ou você pode passar como parâmetros, se necessário)
     val startColors = intArrayOf(

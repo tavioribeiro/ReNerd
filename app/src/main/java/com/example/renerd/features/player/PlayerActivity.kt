@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.example.renerd.R
 import com.example.renerd.core.database.DatabaseHelper
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.core.utils.formatTime
 import com.example.renerd.core.utils.log
 import com.example.renerd.databinding.ActivityPlayerBinding
@@ -84,7 +84,7 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor = Color.parseColor(ContextManager.getColorHex(1))
+        window.statusBarColor = Color.parseColor(ColorsManager.getColorHex(1))
 
 
         presenter.attachView(this)

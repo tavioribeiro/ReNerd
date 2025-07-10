@@ -15,13 +15,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.renerd.core.extentions.ContextManager
-import com.example.renerd.core.utils.log
+import com.example.renerd.core.extentions.styleBackground
+import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.databinding.CLayoutLastEpisodesModalBinding
 import com.example.renerd.features.episodes.components.last_episodes_dialog.adapters.LastEpisodesEpisodesAdapter
 import com.example.renerd.view_models.EpisodeViewModel
 import core.extensions.hexToArgb
-import core.extensions.styleBackground
 import org.koin.android.ext.android.inject
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -59,12 +58,12 @@ class LastEpisodesDialog(
     }
 
     private fun styleCenterBox(){
-        binding.mainContainer.background = hexToArgb(30, ContextManager.getColorHex(0)).toDrawable()
+        binding.mainContainer.background = hexToArgb(30, ColorsManager.getColorHex(0)).toDrawable()
         binding.mainContainer.setOnClickListener { this.dismissModal() }
         binding.boxContainer.setOnClickListener {}
         binding.boxContainer.styleBackground(
-            backgroundColor = ContextManager.getColorHex(1),
-            borderColor = ContextManager.getColorHex(2),
+            backgroundColor = ColorsManager.getColorHex(1),
+            borderColor = ColorsManager.getColorHex(2),
             borderWidth = 5,
             radius = 80f
         )
