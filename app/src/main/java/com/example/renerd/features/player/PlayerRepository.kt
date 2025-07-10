@@ -2,11 +2,11 @@ package com.example.renerd.features.player
 
 import android.content.Context
 import com.example.renerd.core.database.DatabaseHelper
-import com.example.renerd.core.extentions.ContextManager
+import com.example.renerd.core.singletons.ContextManager
 
 
 class PlayerRepository: PlayerContract.Repository {
-    val context = ContextManager.getGlobalContext()
+    val context = ContextManager.getContext()
 
     val sharedPref = context.getSharedPreferences("SharedPrefsReNerd", Context.MODE_PRIVATE)
     val editor = sharedPref.edit()
