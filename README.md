@@ -1,6 +1,6 @@
 # ReNerd
 
-**ReNerd** é um projeto de um aplicativo Android (Kotlin) desenvolvido para fins de aprimorar habiilidades técnicas. Ele demonstra a construção de um cliente móvel capaz de consumir, exibir e filtrar um catálogo de mídias a partir de uma API com um contrato de dados específico.
+**ReNerd** é um projeto de um aplicativo Android desenvolvido para fins de aprimorar habiilidades técnicas. Ele demonstra a construção de um cliente móvel capaz de consumir, exibir e filtrar um catálogo de mídias a partir de uma API com um contrato de dados específico.
 
 ![renerd](https://github.com/user-attachments/assets/031c45ae-73c8-40ed-b201-1ed7f7fbb208)
 
