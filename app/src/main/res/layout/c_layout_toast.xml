@@ -3,6 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/toast_overlay_view"
+    android:layout_marginTop="80dp"
     android:background="@color/color0">
 
     <LinearLayout
@@ -36,7 +37,7 @@
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18.66dp"
+                android:textSize="16.66dp"
                 android:fontFamily="@font/geist_regular_fontfamily"/>
 
             <TextView

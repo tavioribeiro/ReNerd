@@ -1,289 +1,123 @@
 package com.example.renerd.services
 
-import android.app.Service
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.media.MediaPlayer
-import android.os.Binder
 import android.os.Build
-import android.os.IBinder
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
+import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
-import com.example.renerd.R
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
 import com.example.renerd.features.episodes.components.floating_player.FloatingPlayer
-import com.example.renerd.core.extentions.loadBitmapFromUrl
-import com.example.renerd.core.utils.log
-import com.example.renerd.helpers.audio_focus.AudioFocusHelper
-import com.example.renerd.helpers.media_session.MediaSessionHelper
-import com.example.renerd.helpers.notification_compact.NotificationHelper
 import com.example.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.*
 
-class AudioService3 : Service() {
+class AudioService3 : MediaSessionService() {
 
-    private var player: MediaPlayer? = null
-    private var isPlaying: Boolean = false
-    private var job: Job? = null
-
+    private var mediaSession: MediaSession? = null
+    private lateinit var player: ExoPlayer
+    private var progressUpdateJob: Job? = null
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var currentEpisode = EpisodeViewModel()
-    private lateinit var albumArt: Bitmap
-    private lateinit var albumArtBitmap: Bitmap
 
-    private lateinit var notificationHelper: NotificationHelper
-    private lateinit var audioFocusHelper: AudioFocusHelper
-    private lateinit var mediaSessionHelper: MediaSessionHelper
-
-    private var isPaused = false
-    private var isFirstTime = true
-
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return Binder()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
+    @OptIn(UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
-        albumArt = BitmapFactory.decodeResource(resources, R.drawable.background)
+        player = ExoPlayer.Builder(this).build()
+        player.addListener(playerListener)
+        mediaSession = MediaSession.Builder(this, player).build()
+    }
 
-        notificationHelper = NotificationHelper(this)
-        notificationHelper.createNotificationChannel()
-
-        audioFocusHelper = AudioFocusHelper(this)
-        audioFocusHelper.onPause = ::pausePlaying
-        audioFocusHelper.onDuck = { player?.setVolume(0.2f, 0.2f) }
-        audioFocusHelper.onGain = {
-            player?.setVolume(1.0f, 1.0f)
-            if (!isPlaying && !isPaused) player?.start()
-        }
-
-        mediaSessionHelper = MediaSessionHelper(this)
-        val mediaSession = mediaSessionHelper.createMediaSession()
-        mediaSession.setCallback(mediaSessionCallback)
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
+        return mediaSession
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
         val tempEpisode = EpisodeViewModel(
-            id = intent?.getIntExtra("id", 0) ?: currentEpisode.id,
-            audioUrl = intent?.getStringExtra("audioUrl") ?: currentEpisode.audioUrl,
-            title = intent?.getStringExtra("title") ?: currentEpisode.title,
-            productName = intent?.getStringExtra("productName") ?: currentEpisode.productName,
-            imageUrl = intent?.getStringExtra("imageUrl") ?: currentEpisode.imageUrl,
+            id = intent?.getIntExtra("id", 0) ?: 0,
+            audioUrl = intent?.getStringExtra("audioUrl") ?: "",
+            title = intent?.getStringExtra("title") ?: "",
+            productName = intent?.getStringExtra("productName") ?: "",
+            imageUrl = intent?.getStringExtra("imageUrl") ?: "",
             elapsedTime = intent?.getIntExtra("elapsedTime", 0) ?: 0
         )
 
-
         when (intent?.action) {
-            "PLAY" -> when {
-                tempEpisode.id != currentEpisode.id && tempEpisode.id != 0 -> {
+            "PLAY" -> {
+                val isNewEpisode = tempEpisode.id != 0 && tempEpisode.id != currentEpisode.id
+                if (isNewEpisode) {
                     currentEpisode = tempEpisode
-                    this.uptadeCurrentEpisodeInfo(intent)
-                    this.stopPlaying()
-                    this.startPlaying()
-                }
-                isFirstTime -> {
-                    currentEpisode = tempEpisode
-                    this.uptadeCurrentEpisodeInfo(intent)
-                    this.startPlaying()
-                    isFirstTime = false
-                }
-                else -> {
-                    //tempEpisode = currentEpisode
-                    this.uptadeCurrentEpisodeInfo(intent)
-                    this.startPlaying()
-                    //this.resumePlaying()
+                    startPlaying()
+                } else {
+                    player.play()
                 }
             }
-            "PAUSE" -> this.pausePlaying()
-            "STOP" -> this.stopPlaying()
-            "SEEK_TO" -> this.seekTo(intent.getIntExtra("position", 0))
+            "PAUSE" -> player.pause()
+            "STOP" -> stopPlaying()
+            "SEEK_TO" -> player.seekTo(intent.getIntExtra("position", 0).toLong())
         }
-        return START_NOT_STICKY
+        return super.onStartCommand(intent, flags, startId)
     }
 
-
-    private fun uptadeCurrentEpisodeInfo(intent: Intent?) {
-        currentEpisode.id = intent?.getIntExtra("id", 0) ?: currentEpisode.id
-        currentEpisode.audioUrl = intent?.getStringExtra("audioUrl") ?: currentEpisode.audioUrl
-        currentEpisode.title = intent?.getStringExtra("title") ?: currentEpisode.title
-        currentEpisode.productName = intent?.getStringExtra("productName") ?: currentEpisode.productName
-        currentEpisode.imageUrl = intent?.getStringExtra("imageUrl") ?: currentEpisode.imageUrl
+    private val playerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            if (isPlaying) {
+                startProgressUpdateJob()
+            } else {
+                stopProgressUpdateJob()
+            }
+            sendPlayerStatusUpdate()
+        }
     }
 
-
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun startPlaying() {
-        audioFocusHelper.requestAudioFocus()
-
-        if (player != null) {
-            player?.stop()
-            player?.reset()
-            player?.release()
-        }
-
-        player = MediaPlayer().apply {
-            log(currentEpisode)
-            try {
-                setDataSource(currentEpisode.audioUrl)
-                setOnPreparedListener {
-                    // Use a posição salva em currentEpisode.elapsedTime
-                    it.seekTo(currentEpisode.elapsedTime)
-                    it.start()
-                    this@AudioService3.isPlaying = true
-                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, currentEpisode.elapsedTime)
-                    showNotification()
-                    startProgressUpdateJob()
-                    sendPlayerStatusUpdate()
-                }
-                prepareAsync()
-            } catch (e: Exception) {
-                // Lidar com erro
-            }
-        }
+        val mediaItem = MediaItem.fromUri(currentEpisode.audioUrl)
+        player.setMediaItem(mediaItem)
+        player.seekTo(currentEpisode.elapsedTime.toLong())
+        player.prepare()
+        player.play()
     }
 
-
-
-
-
-    private fun pausePlaying() {
-        if (isPlaying && player != null) {
-            currentEpisode.elapsedTime = player!!.currentPosition // Salva a posição atual
-            player?.pause()
-            isPlaying = false
-            isPaused = true
-            player?.currentPosition?.let { updatePlaybackState(PlaybackStateCompat.STATE_PAUSED, it) }
-            showNotification()
-            sendPlayerStatusUpdate()
-        }
-    }
-
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun resumePlaying() {
-        if (player == null) {
-            // Se o floating_player for nulo, inicie uma nova reprodução
-            startPlaying()
-            return
-        }
-
-        if (isPaused) {
-            // Garante que a posição correta seja mantida
-            val savedPosition = currentEpisode.elapsedTime
-            player?.seekTo(savedPosition)
-            player?.start()
-            isPaused = false
-            isPlaying = true
-            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, savedPosition)
-            showNotification()
-            sendPlayerStatusUpdate()
-            startProgressUpdateJob()
-        }
-    }
-
-
-
-
-    private fun seekTo(position: Int) {
-        if (player == null) return
-        player?.seekTo(position)
-        updatePlaybackState(PlaybackStateCompat.STATE_PLAYING, position)
-        sendPlayerStatusUpdate()
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun stopPlaying() {
-        player?.let {
-            it.stop()
-            it.reset()
-            isPlaying = false
-            updatePlaybackState(PlaybackStateCompat.STATE_STOPPED, 0)
-            showNotification()
-        }
-        stopProgressUpdateJob()
-        audioFocusHelper.abandonAudioFocus()
-        stopForeground(true)
+        player.stop()
+        player.clearMediaItems()
     }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onDestroy() {
-        currentEpisode = EpisodeViewModel()
-        isFirstTime = true
-        super.onDestroy()
-        stopPlaying()
-        stopProgressUpdateJob()
-        mediaSessionHelper.release()
-    }
-
 
     private fun startProgressUpdateJob() {
-        job = CoroutineScope(Dispatchers.Default).launch {
+        stopProgressUpdateJob()
+        progressUpdateJob = serviceScope.launch {
             while (isActive) {
-                if (isPlaying) {
-                    currentEpisode.elapsedTime = player?.currentPosition ?: 0
-                    sendPlayerStatusUpdate()
-                }
+                sendPlayerStatusUpdate()
                 delay(1000L)
             }
         }
     }
 
-
     private fun stopProgressUpdateJob() {
-        job?.cancel()
+        progressUpdateJob?.cancel()
+        progressUpdateJob = null
     }
-
 
     private fun sendPlayerStatusUpdate() {
         val intent = Intent(FloatingPlayer.PLAYER_STATUS_UPDATE).apply {
-            putExtra(FloatingPlayer.IS_PLAYING, isPlaying)
-            putExtra(FloatingPlayer.CURRENT_TIME, player?.currentPosition ?: 0)
-            putExtra(FloatingPlayer.TOTAL_TIME, player?.duration ?: 10000)
+            putExtra(FloatingPlayer.IS_PLAYING, player.isPlaying)
+            putExtra(FloatingPlayer.CURRENT_TIME, player.currentPosition.toInt())
+            putExtra(FloatingPlayer.TOTAL_TIME, player.duration.toInt())
         }
         sendBroadcast(intent)
     }
 
-
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun showNotification() {
-        GlobalScope.launch(Dispatchers.Main) {
-            //albumArtBitmap = currentEpisode.imageUrl?.let { loadBitmapFromUrl(it, this@AudioService3) } ?: albumArt
-            albumArtBitmap = withContext(Dispatchers.IO) {
-                currentEpisode.imageUrl?.let { loadBitmapFromUrl(it, this@AudioService3) } ?: albumArt
-            }
-            val notification = mediaSessionHelper.mediaSession?.let {
-                notificationHelper.createNotification(
-                    currentEpisode,
-                    albumArtBitmap,
-                    isPlaying,
-                    it
-                )
-            }
-            startForeground(1, notification)
+    override fun onDestroy() {
+        player.removeListener(playerListener)
+        mediaSession?.run {
+            player.release()
+            release()
+            mediaSession = null
         }
-    }
-
-
-    private fun updatePlaybackState(state: Int, position: Int) {
-        mediaSessionHelper.updatePlaybackState(state, position)
-    }
-
-
-    private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
-        @RequiresApi(Build.VERSION_CODES.O)
-        override fun onPlay() {
-            startPlaying()
-        }
-
-        override fun onPause() {
-            pausePlaying()
-        }
+        serviceScope.cancel()
+        super.onDestroy()
     }
 }

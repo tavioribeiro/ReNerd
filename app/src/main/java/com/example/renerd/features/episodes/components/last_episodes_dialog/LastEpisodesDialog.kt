@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.renerd.components.toast.ToastManager
 import com.example.renerd.core.extentions.styleBackground
 import com.example.renerd.core.singletons.ColorsManager
 import com.example.renerd.databinding.CLayoutLastEpisodesModalBinding
@@ -22,6 +23,7 @@ import com.example.renerd.features.episodes.components.last_episodes_dialog.adap
 import com.example.renerd.view_models.EpisodeViewModel
 import core.extensions.hexToArgb
 import org.koin.android.ext.android.inject
+import ui.components.toast.ToastType
 
 @RequiresApi(Build.VERSION_CODES.O)
 class LastEpisodesDialog(
@@ -35,6 +37,8 @@ class LastEpisodesDialog(
     private var newEpisodesList: List<EpisodeViewModel> = emptyList()
     private lateinit var lastEpisodesAdapter: LastEpisodesEpisodesAdapter
 
+    private lateinit var toastManager: ToastManager
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,6 +51,9 @@ class LastEpisodesDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         this.initView()
+
+        toastManager = ToastManager(requireActivity())
+
         presenter.loadNewEpisodes()
     }
 
@@ -89,7 +96,16 @@ class LastEpisodesDialog(
     }
 
     override fun showFeedbackMessage(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        toastManager.showToast(
+            type = ToastType.TYPE_SUCCESS,
+            title = "Opss \uD83E\uDEE4",
+            description = message,
+            time = 5000,
+            onFinish = {
+                this.dismissModal()
+            }
+        )
+
     }
 
     override fun displayNewEpisodes(episodes: List<EpisodeViewModel>) {
