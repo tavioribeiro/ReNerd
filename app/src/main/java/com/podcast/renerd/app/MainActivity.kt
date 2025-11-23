@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun goTo(destiny: Class<EpisodesActivity>){
         val intent = Intent(this, destiny)
-        // Usando FLAG para evitar que MainActivity permaneça na pilha
+        // usando flag para evitar que MainActivity permaneça na pilha
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
