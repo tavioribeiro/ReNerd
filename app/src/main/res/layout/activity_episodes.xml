@@ -23,7 +23,7 @@
             android:layout_gravity="center_vertical"
             android:layout_height="40dp">
 
-            <com.example.renerd.components.buttons.IconButtonSmall
+            <com.podcast.renerd.components.buttons.IconButtonSmall
                 android:id="@+id/icon_update"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                 android:orientation="horizontal"
                 android:layout_alignParentEnd="true">
 
-                <com.example.renerd.components.buttons.IconButtonSmall
+                <com.podcast.renerd.components.buttons.IconButtonSmall
                     android:id="@+id/icon_filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
                     android:visibility="gone"
                     app:icon="@drawable/icon_filter"/>
 
-                <com.example.renerd.components.buttons.IconButtonSmall
+                <com.podcast.renerd.components.buttons.IconButtonSmall
                     android:id="@+id/icon_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
         </FrameLayout>
     </LinearLayout>
 
-    <com.example.renerd.features.episodes.components.floating_player.FloatingPlayer
+    <com.podcast.renerd.features.episodes.components.floating_player.FloatingPlayer
         android:id="@+id/floating_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

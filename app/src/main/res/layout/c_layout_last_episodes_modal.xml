@@ -78,7 +78,7 @@
                     android:layout_marginVertical="20dp"
                     android:background="@color/color3"/>
 
-                <com.example.renerd.components.buttons.DefaultButton
+                <com.podcast.renerd.components.buttons.DefaultButton
                     android:id="@+id/save_buttom"
                     android:layout_width="match_parent"
                     app:default_width="false"

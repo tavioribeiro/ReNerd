@@ -22,7 +22,6 @@
 
     <application
         android:name=".app.MyApplication"
-        android:allowBackup="true"
         android:screenOrientation="portrait"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -56,7 +55,12 @@
 
         <service
             android:name=".services.AudioService3"
-            android:foregroundServiceType="mediaPlayback"
-            android:exported="false"/>
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService"/>
+            </intent-filter>
+        </service>
+
     </application>
 </manifest>
