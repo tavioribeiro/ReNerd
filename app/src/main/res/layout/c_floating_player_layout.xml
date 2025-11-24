@@ -66,7 +66,7 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
-                <com.example.renerd.components.buttons.IconButton
+                <com.podcast.renerd.components.buttons.IconButton
                     android:id="@+id/mini_player_play_pause_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -194,7 +194,7 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <com.example.renerd.components.buttons.IconButton
+            <com.podcast.renerd.components.buttons.IconButton
                 android:id="@+id/buttom_jump_to"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -202,7 +202,7 @@
                 android:visibility="gone"
                 app:icon="@drawable/icon_jump"/>
 
-            <com.example.renerd.components.buttons.IconButton
+            <com.podcast.renerd.components.buttons.IconButton
                 android:id="@+id/buttom_replay_15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -210,14 +210,14 @@
                 android:visibility="gone"
                 app:icon="@drawable/icon_backward"/>
 
-            <com.example.renerd.components.buttons.IconButton
+            <com.podcast.renerd.components.buttons.IconButton
                 android:id="@+id/main_player_play_pause_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
                 app:icon="@drawable/icon_play"/>
 
-            <com.example.renerd.components.buttons.IconButton
+            <com.podcast.renerd.components.buttons.IconButton
                 android:id="@+id/buttom_foward_15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

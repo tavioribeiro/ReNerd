@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.components"
+    namespace = "com.podcast.components"
     compileSdk = 34
 
     defaultConfig {

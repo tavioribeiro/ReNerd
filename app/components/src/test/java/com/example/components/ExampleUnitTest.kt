@@ -1,4 +1,4 @@
-package com.example.components
+package com.podcast.components
 
 import org.junit.Test
 

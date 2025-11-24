@@ -12,7 +12,7 @@ val localProps = Properties().apply {
 
 
 android {
-    namespace = "com.example.renerd"
+    namespace = "com.podcast.renerd"
     compileSdk = 35
 
     buildFeatures {
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.renerd"
+        applicationId = "com.podcast.renerd"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
