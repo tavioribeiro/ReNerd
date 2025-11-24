@@ -42,15 +42,15 @@ class FloatingPlayer @JvmOverloads constructor(
     private var onCollapsedCallback: (() -> Unit)? = null
     private var onBackgroundCollorsChangeCallback: ((String, String) -> Unit)? = null
 
-    // Media3
+
     private var mediaController: MediaController? = null
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private val TAG = "[RENERD_DEBUG] FloatingPlayer"
 
-    // Controle de Loading e Sync
+
     private var pendingAudioUrl: String? = null
 
-    // Timer UI
+
     private val handler = Handler(Looper.getMainLooper())
     private val updateProgressRunnable = object : Runnable {
         override fun run() {
@@ -124,8 +124,7 @@ class FloatingPlayer @JvmOverloads constructor(
         val isPlaying = controller.isPlaying
         val currentMediaId = controller.currentMediaItem?.mediaId
 
-        // --- LÓGICA DE LOADING ---
-        // Só mostra loading se estiver Bufferizando OU se estivermos esperando sincronizar o ID do áudio novo
+
         var isLoading = state == Player.STATE_BUFFERING
 
         if (pendingAudioUrl != null) {
@@ -179,28 +178,22 @@ class FloatingPlayer @JvmOverloads constructor(
         }
     }
 
-    // --- CORREÇÃO PRINCIPAL AQUI ---
+
     private fun togglePlayPause() {
         val controller = mediaController ?: return
 
         if (controller.isPlaying) {
-            // Se está tocando, pausa imediatamente
             controller.pause()
-            // Atualiza UI otimista para Pause
             updateButtonsUi(false, controller.currentPosition.toInt(), controller.duration.toInt())
         } else {
-            // Se está pausado, verifica se já está pronto (Resume) ou se precisa carregar
             if (controller.playbackState == Player.STATE_READY) {
-                // Áudio já carregado, RESUME instantâneo
                 binding.miniPlayerPlayPauseButton.showLoading(false)
                 binding.mainPlayerPlayPauseButton.showLoading(false)
 
-                // Atualiza UI otimista para Play
                 updateButtonsUi(true, controller.currentPosition.toInt(), controller.duration.toInt())
 
                 controller.play()
             } else {
-                // Áudio não está pronto (Ex: Idle, Ended ou Buffering), mostra loading
                 binding.miniPlayerPlayPauseButton.showLoading(true)
                 binding.mainPlayerPlayPauseButton.showLoading(true)
                 controller.play()
@@ -209,7 +202,6 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
     fun startEpisode(episode: EpisodeViewModel) {
-        // Começando NOVO episódio: Trava o ID e força loading
         pendingAudioUrl = episode.audioUrl
 
         binding.miniPlayerPlayPauseButton.showLoading(true)
@@ -238,7 +230,7 @@ class FloatingPlayer @JvmOverloads constructor(
         }
     }
 
-    // ... [O restante dos métodos: showUi, updateInfosUi, updateButtonsUi, etc, permanecem iguais] ...
+
     override fun showUi() {
         binding.mainContainer.fadeInAnimation {
             binding.mainContainer.visibility = View.VISIBLE
