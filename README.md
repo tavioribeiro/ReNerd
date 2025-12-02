@@ -2,7 +2,14 @@
 
 **ReNerd** é um projeto de um app Android desenvolvido para fins pessoais e para aprimorar habiilidades técnicas. Ele demonstra a construção de um cliente móvel capaz de consumir, exibir e filtrar um catálogo de mídias a partir de uma API com um contrato de dados específico.
 
-![renerd](https://github.com/user-attachments/assets/031c45ae-73c8-40ed-b201-1ed7f7fbb208)
+
+![MixCollage-02-Dec-2025-05-30-PM-8940](https://github.com/user-attachments/assets/0f3cd626-e32b-425f-9faf-d1cf2c3a0a33)
+<p><em>Tela de episódios, player e notificação.</em></p>
+<br>
+
+![MixCollage-02-Dec-2025-05-38-PM-426](https://github.com/user-attachments/assets/da3d41bc-1d1d-4eb5-b685-0cbb069f89ec)
+<p><em>Tela de filtros e pesquisa.</em></p>
+<br>
 
 
 **Aviso:** Este repositório contém apenas o código-fonte da aplicação. Ele não é um produto funcional pronto para uso, pois não inclui a API ou a base de dados necessárias para popular o conteúdo. O projeto deve ser analisado estritamente como uma demonstração de arquitetura e implementação técnica.
