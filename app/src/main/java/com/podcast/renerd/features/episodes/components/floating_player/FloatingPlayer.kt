@@ -42,14 +42,11 @@ class FloatingPlayer @JvmOverloads constructor(
     private var onCollapsedCallback: (() -> Unit)? = null
     private var onBackgroundCollorsChangeCallback: ((String, String) -> Unit)? = null
 
-
     private var mediaController: MediaController? = null
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private val TAG = "[RENERD_DEBUG] FloatingPlayer"
 
-
     private var pendingAudioUrl: String? = null
-
 
     private val handler = Handler(Looper.getMainLooper())
     private val updateProgressRunnable = object : Runnable {
@@ -114,6 +111,7 @@ class FloatingPlayer @JvmOverloads constructor(
             pendingAudioUrl = null
             binding.miniPlayerPlayPauseButton.showLoading(false)
             binding.mainPlayerPlayPauseButton.showLoading(false)
+            log("$TAG: Player Error: ${error.message}")
         }
     }
 
@@ -123,7 +121,6 @@ class FloatingPlayer @JvmOverloads constructor(
         val state = controller.playbackState
         val isPlaying = controller.isPlaying
         val currentMediaId = controller.currentMediaItem?.mediaId
-
 
         var isLoading = state == Player.STATE_BUFFERING
 
@@ -182,22 +179,26 @@ class FloatingPlayer @JvmOverloads constructor(
     private fun togglePlayPause() {
         val controller = mediaController ?: return
 
+        if (currentEpisode.audioUrl.isEmpty()) return
+
+        val currentMediaId = controller.currentMediaItem?.mediaId
+        if (currentMediaId != currentEpisode.audioUrl) {
+            startEpisode(currentEpisode)
+            return
+        }
+
         if (controller.isPlaying) {
             controller.pause()
             updateButtonsUi(false, controller.currentPosition.toInt(), controller.duration.toInt())
         } else {
-            if (controller.playbackState == Player.STATE_READY) {
-                binding.miniPlayerPlayPauseButton.showLoading(false)
-                binding.mainPlayerPlayPauseButton.showLoading(false)
-
-                updateButtonsUi(true, controller.currentPosition.toInt(), controller.duration.toInt())
-
-                controller.play()
-            } else {
-                binding.miniPlayerPlayPauseButton.showLoading(true)
-                binding.mainPlayerPlayPauseButton.showLoading(true)
-                controller.play()
+            if (controller.playbackState == Player.STATE_IDLE || controller.playbackState == Player.STATE_ENDED) {
+                controller.prepare()
             }
+
+            controller.play()
+
+            binding.miniPlayerPlayPauseButton.showLoading(controller.playbackState == Player.STATE_BUFFERING)
+            binding.mainPlayerPlayPauseButton.showLoading(controller.playbackState == Player.STATE_BUFFERING)
         }
     }
 
@@ -229,7 +230,6 @@ class FloatingPlayer @JvmOverloads constructor(
             context.startService(intent)
         }
     }
-
 
     override fun showUi() {
         binding.mainContainer.fadeInAnimation {
@@ -290,7 +290,7 @@ class FloatingPlayer @JvmOverloads constructor(
     override fun updatePlayerTimerUI(currentTime: Int, totalTime: Int) {
         binding.mainPlayerCurrentTime.text = convertMillisecondsToTime(currentTime)
         binding.mainPlayerTotalTime.text = convertMillisecondsToTime(totalTime)
-        if (!isUserSeeking) {
+        if (!isUserSeeking && totalTime > 0) {
             binding.mainPlayerSeekBar.max = totalTime
             binding.mainPlayerSeekBar.progress = currentTime
         }

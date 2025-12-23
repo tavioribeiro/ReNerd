@@ -36,15 +36,9 @@ class AudioService3 : MediaSessionService() {
 
         player.setAudioAttributes(audioAttributes, true)
 
+
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
-                val stateName = when(playbackState) {
-                    Player.STATE_IDLE -> "IDLE"
-                    Player.STATE_BUFFERING -> "BUFFERING"
-                    Player.STATE_READY -> "READY"
-                    Player.STATE_ENDED -> "ENDED"
-                    else -> "UNKNOWN"
-                }
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -78,9 +72,13 @@ class AudioService3 : MediaSessionService() {
             val id = intent.getIntExtra("id", 0)
             val title = intent.getStringExtra("title") ?: "Sem Titulo"
             val audioUrl = intent.getStringExtra("audioUrl") ?: ""
+            val imageUrl = intent.getStringExtra("imageUrl") ?: ""
+            val product = intent.getStringExtra("product") ?: ""
             val elapsedTime = intent.getLongExtra("elapsedTime", 0L)
 
-            playEpisode(title, intent.getStringExtra("product") ?: "", audioUrl, intent.getStringExtra("imageUrl") ?: "", elapsedTime)
+            if (audioUrl.isNotEmpty()) {
+                playEpisode(title, product, audioUrl, imageUrl, elapsedTime)
+            }
         }
 
         return START_STICKY
@@ -95,11 +93,16 @@ class AudioService3 : MediaSessionService() {
         if (currentItem?.mediaId == audioUrl) {
             if (player.playbackState != Player.STATE_IDLE && player.playbackState != Player.STATE_ENDED) {
                 if (!player.isPlaying) {
-
                     player.play()
                 }
                 return
             }
+            player.prepare()
+            if (startTime > 0 && player.currentPosition < 1000) {
+                player.seekTo(startTime)
+            }
+            player.play()
+            return
         }
 
 

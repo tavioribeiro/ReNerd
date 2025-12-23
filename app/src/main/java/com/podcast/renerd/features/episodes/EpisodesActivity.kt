@@ -30,6 +30,7 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
     private lateinit var episodesList: List<EpisodeViewModel>
     private var currentRecyclerViewPosition = 0
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEpisodesBinding.inflate(layoutInflater)
@@ -58,6 +59,7 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
         binding.recyclerviewEpisodes.recyclerviewEpisodesMonitor()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupListeners() {
         binding.iconFilter.fadeInAnimationNoRepeat(1000) {
             binding.iconFilter.setOnClickListener {
