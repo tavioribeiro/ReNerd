@@ -3,6 +3,7 @@ package com.podcast.renerd.features.episodes.components.last_episodes_dialog
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.podcast.renerd.core.utils.log
+import com.podcast.renerd.features.episodes.utils.EpisodeFilterUtil
 import com.podcast.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,15 +27,21 @@ class LastEpisodesDialogPresenter(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun loadNewEpisodes() {
+    override fun loadNewEpisodes(activeProducts: List<String>) {
         presenterScope.launch {
             view?.showLoading(true)
             try {
                 val newEpisodes = repository.fetchLastEpisodesSinceLastUpdate()
                 view?.showLoading(false)
 
-                if (newEpisodes.isNotEmpty()) {
-                    view?.displayNewEpisodes(newEpisodes)
+                val filtered = if (activeProducts.isEmpty()) {
+                    newEpisodes
+                } else {
+                    EpisodeFilterUtil.filterEpisodesByProductsInclude(newEpisodes, activeProducts)
+                }
+
+                if (filtered.isNotEmpty()) {
+                    view?.displayNewEpisodes(filtered)
                     view?.setSaveButtonEnabled(true)
                 } else {
                     view?.displayNewEpisodes(emptyList())

@@ -28,6 +28,7 @@ import ui.components.toast.ToastType
 @RequiresApi(Build.VERSION_CODES.O)
 class LastEpisodesDialog(
     private val context: Context,
+    private val activeProducts: List<String>,
     private val onClick: (EpisodeViewModel) -> Unit
 ) : DialogFragment(), LastEpisodesDialogContract.View {
 
@@ -54,7 +55,7 @@ class LastEpisodesDialog(
 
         toastManager = ToastManager(requireActivity())
 
-        presenter.loadNewEpisodes()
+        presenter.loadNewEpisodes(activeProducts)
     }
 
     private fun initView() {

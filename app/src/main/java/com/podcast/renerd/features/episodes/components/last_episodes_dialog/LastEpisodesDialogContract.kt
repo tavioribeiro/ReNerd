@@ -15,7 +15,7 @@ interface LastEpisodesDialogContract {
     interface Presenter {
         fun attachView(view: View)
         fun detachView()
-        fun loadNewEpisodes()
+        fun loadNewEpisodes(activeProducts: List<String>)
         fun onSaveButtonClicked(episodesToSave: List<EpisodeViewModel>)
     }
 

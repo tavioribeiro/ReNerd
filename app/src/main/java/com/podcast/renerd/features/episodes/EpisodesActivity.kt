@@ -20,6 +20,7 @@ import androidx.annotation.RequiresApi
 import com.podcast.renerd.core.extentions.fadeInAnimationNoRepeat
 import com.podcast.renerd.core.singletons.ColorsManager
 import com.podcast.renerd.features.episodes.components.last_episodes_dialog.LastEpisodesDialog
+import com.podcast.renerd.features.episodes.utils.EpisodeFilterUtil
 
 class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
 
@@ -123,8 +124,14 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setUpLastEpisodesModal() {
+        val activeProducts = if (::filtersTabsListModel.isInitialized) {
+            EpisodeFilterUtil.getActiveLabels(filtersTabsListModel.productsList)
+        } else {
+            emptyList()
+        }
         val lastEpisodesDialog = LastEpisodesDialog(
             context = this,
+            activeProducts = activeProducts,
             onClick = {
                 this.goToEpisode(it)
             }
