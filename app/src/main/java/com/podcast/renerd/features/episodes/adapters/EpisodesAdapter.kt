@@ -61,7 +61,11 @@ class EpisodesAdapter(
 
         holder.texView_name.isSelected = true
         holder.texView_name.text = episode.title
-        holder.texView_info.text = episode.productName
+        holder.texView_info.text = if (episode.episode.isNotEmpty()) {
+            "${episode.productName} - ${episode.episode}"
+        } else {
+            episode.productName
+        }
 
         holder.bottom_info.styleBackground(
             backgroundColor = ColorsManager.getColorHex(2),

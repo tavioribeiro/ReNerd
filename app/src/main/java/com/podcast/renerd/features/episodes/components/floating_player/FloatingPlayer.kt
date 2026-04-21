@@ -238,10 +238,15 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
     override fun updateInfosUi(episode: EpisodeViewModel) {
+        val episodeLabel = if (episode.episode.isNotEmpty()) {
+            "${episode.productName} - ${episode.episode}"
+        } else {
+            episode.productName
+        }
         binding.miniPlayerTitle.text = episode.title
         binding.mainPlayerTitle.text = episode.title
-        binding.miniPlayerProductName.text = episode.productName
-        binding.mainPlayerProductName.text = episode.productName
+        binding.miniPlayerProductName.text = episodeLabel
+        binding.mainPlayerProductName.text = episodeLabel
         binding.mainPlayerDescription.text = Html.fromHtml("${episode.description}")
 
         binding.miniPlayer.isSelected = true
