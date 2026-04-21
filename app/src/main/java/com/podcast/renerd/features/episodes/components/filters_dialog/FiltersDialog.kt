@@ -63,7 +63,13 @@ class FiltersDialog(
             this.dismiss()
         }
 
-        val mainTabFragmentPhone = FiltersTabs.newInstance(filtersList, this)
+        val workingFilters = FiltersTabsListModel(
+            productsList = filtersList.productsList.map { it.copy() }.toMutableList(),
+            subjectsList = filtersList.subjectsList.map { it.copy() }.toMutableList(),
+            guestsList = filtersList.guestsList.map { it.copy() }.toMutableList(),
+            yearsList = filtersList.yearsList.map { it.copy() }.toMutableList()
+        )
+        val mainTabFragmentPhone = FiltersTabs.newInstance(workingFilters, this)
 
         childFragmentManager.beginTransaction()
             .replace(R.id.fragmentContent, mainTabFragmentPhone)
