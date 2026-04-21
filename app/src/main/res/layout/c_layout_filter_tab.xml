@@ -5,7 +5,6 @@
     android:id="@+id/main_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
     android:orientation="vertical">
 
     <TextView
@@ -15,11 +14,22 @@
         android:text="Filtros"
         style="@style/TS_Title3"
         android:visibility="gone"
-        android:textColor="@color/color5"
-        android:layout_alignParentTop="true"/>
+        android:textColor="@color/color5"/>
+
+    <com.podcast.renerd.components.buttons.DefaultButton
+        android:id="@+id/button_toggle_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        app:icon="@drawable/icon_check"
+        app:label="Selecionar todos"
+        app:default_width="false"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_base"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
 </LinearLayout>

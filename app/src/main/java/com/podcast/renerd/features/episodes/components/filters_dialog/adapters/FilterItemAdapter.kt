@@ -61,6 +61,16 @@ class FilterItemAdapter(
         }
     }
 
+    fun areAllSelected(): Boolean = filtersTabsListItemModel.all { it.status }
+
+    fun selectAll(allSelected: Boolean) {
+        filtersTabsListItemModel.forEach { item ->
+            item.status = allSelected
+            onClick(item)
+        }
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         return filtersTabsListItemModel.size
     }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.podcast.renerd.R
 import com.podcast.renerd.features.episodes.components.filters_dialog.FilterTabListener
 import com.podcast.renerd.features.episodes.components.filters_dialog.adapters.FilterItemAdapter
 import com.podcast.renerd.databinding.CLayoutFilterTabBinding
@@ -18,6 +19,7 @@ class FiltersGuestTabFragment(
 ) : Fragment() {
 
     private lateinit var binding: CLayoutFilterTabBinding
+    private lateinit var filterItemAdapter: FilterItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,6 +40,7 @@ class FiltersGuestTabFragment(
     private fun initView() {
         this.setUpTitle()
         this.setUpRecyclerView()
+        this.setUpToggleButton()
     }
 
 
@@ -51,7 +54,7 @@ class FiltersGuestTabFragment(
     private fun setUpRecyclerView(){
         binding.recyclerviewBase.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
-        val filterItemAdapter = FilterItemAdapter(
+        filterItemAdapter = FilterItemAdapter(
             filtersTabsListItemModel = guestsList,
             onClick = { filtersTabsListItemModel ->
                 filterTabListener.onItemValeuChange(filtersTabsListItemModel)
@@ -59,6 +62,24 @@ class FiltersGuestTabFragment(
         )
 
         binding.recyclerviewBase.adapter = filterItemAdapter
+    }
+
+    private fun setUpToggleButton() {
+        updateToggleButton()
+        binding.buttonToggleAll.setOnClickListener {
+            filterItemAdapter.selectAll(!filterItemAdapter.areAllSelected())
+            updateToggleButton()
+        }
+    }
+
+    private fun updateToggleButton() {
+        if (filterItemAdapter.areAllSelected()) {
+            binding.buttonToggleAll.setLabel("Desmarcar todos")
+            binding.buttonToggleAll.setIconResource(R.drawable.icon_stop)
+        } else {
+            binding.buttonToggleAll.setLabel("Selecionar todos")
+            binding.buttonToggleAll.setIconResource(R.drawable.icon_check)
+        }
     }
 
 
