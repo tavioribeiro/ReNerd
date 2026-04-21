@@ -147,7 +147,7 @@ class EpisodesActivity : AppCompatActivity(), EpisodesContract.View {
     }
 
     override fun onBackPressed() {
-        if (false) {
+        if (binding.floatingPlayer.isExpanded()) {
             binding.floatingPlayer.collapse()
         } else {
             super.onBackPressed()

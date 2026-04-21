@@ -335,6 +335,7 @@ class FloatingPlayer @JvmOverloads constructor(
     }
 
     fun expand() { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
+    fun isExpanded() = bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED
     fun setOnExpandedCallback(callback: () -> Unit) { this.onExpandedCallback = callback }
     fun collapse() { bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED }
     fun setOnCollapsedCallback(callback: () -> Unit) { this.onCollapsedCallback = callback }

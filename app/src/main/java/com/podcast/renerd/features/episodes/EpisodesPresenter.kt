@@ -152,14 +152,8 @@ class EpisodesPresenter(
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val episodes = repository.getLastEpisodes()
-                val filteredEpisodes = episodes
-                    .let { EpisodeFilterUtil.filterEpisodesByProductsInclude(it, listOf("nerdcast", "nerdtech")) }
-                    .let { EpisodeFilterUtil.filterEpisodesBySubjectInclude(it, listOf("Ciências", "Cinema")) }
-                    .let { EpisodeFilterUtil.filterEpisodesByGuestInclude(it, listOf("Affonso Solano")) }
-                    .toMutableList()
-
                 val currentPosition = repository.getRecyclerviewEpisodesCurrentPosition().toIntOrNull() ?: 0
-                view?.showEpisodes(filteredEpisodes, currentPosition)
+                view?.showEpisodes(episodes.toMutableList(), currentPosition)
             } catch (e: Exception) {
                 view?.showError("Erro ao carregar episódios")
                 log(e)

@@ -12,7 +12,6 @@ import com.podcast.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
-import java.net.URLDecoder
 
 class LastEpisodesDialogRepository : LastEpisodesDialogContract.Repository {
 
@@ -25,7 +24,7 @@ class LastEpisodesDialogRepository : LastEpisodesDialogContract.Repository {
     override suspend fun fetchLastEpisodesSinceLastUpdate(): List<EpisodeViewModel> {
         return withContext(Dispatchers.IO) {
             try {
-                val after = URLDecoder.decode(getAfterDate(), "UTF-8")
+                val after = getAfterDate()
                 val response = PodcastClient.api.getNerdcasts(after = after, before = "").execute()
                 val newEpisodes = mutableListOf<EpisodeViewModel>()
 
@@ -79,7 +78,7 @@ class LastEpisodesDialogRepository : LastEpisodesDialogContract.Repository {
     private fun getAfterDate(): String {
         var after = sharedPref.getString("current_after_search", "") ?: ""
         if (after.isEmpty()) {
-            after = "2000-01-01%2000%3A00%3A00"
+            after = "2000-01-01 00:00:00"
         }
         return after
     }
