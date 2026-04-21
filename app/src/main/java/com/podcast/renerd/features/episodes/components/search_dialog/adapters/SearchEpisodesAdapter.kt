@@ -35,6 +35,8 @@ class SearchEpisodesAdapter(
         val posterImageView: ImageView = itemView.findViewById(R.id.mini_player_poster)
         val titleTextView: TextView = itemView.findViewById(R.id.mini_player_title)
         val productNameTextView: TextView = itemView.findViewById(R.id.mini_player_product_name)
+
+        var boundEpisodeId: Int = -1
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterItemViewHolder {
@@ -43,13 +45,17 @@ class SearchEpisodesAdapter(
     }
 
     override fun onViewRecycled(holder: FilterItemViewHolder) {
+        holder.boundEpisodeId = -1
         holder.posterImageView.stopSkeletonAnimation()
+        holder.posterImageView.setImageDrawable(null)
         super.onViewRecycled(holder)
     }
 
     override fun onBindViewHolder(holder: FilterItemViewHolder, position: Int) {
         val episode = episodesList[position]
+        val episodeId = episode.id
 
+        holder.boundEpisodeId = episodeId
         holder.titleTextView.text = episode.title
         holder.titleTextView.isSelected = true
         holder.productNameTextView.text = episode.productName
@@ -58,7 +64,9 @@ class SearchEpisodesAdapter(
         holder.posterImageView.load(episode.imageUrl) {
             target(
                 onSuccess = { drawable ->
+                    if (holder.boundEpisodeId != episodeId) return@target
                     holder.posterImageView.post {
+                        if (holder.boundEpisodeId != episodeId) return@post
                         holder.posterImageView.getSizes { width, height ->
                             val crop = drawable.cropCenterSection(widthDp = width, heightDp = height, resources = resources)
                             holder.posterImageView.stopSkeletonAnimation()
@@ -67,20 +75,20 @@ class SearchEpisodesAdapter(
                     }
                 },
                 onError = {
+                    if (holder.boundEpisodeId != episodeId) return@target
                     holder.posterImageView.setImageResource(R.drawable.background)
                     holder.posterImageView.stopSkeletonAnimation()
                 }
             )
         }
 
-
         holder.itemView.setOnClickListener {
-            this.simulateClickEffect(holder)
+            simulateClickEffect(holder)
             onClick(episode)
         }
     }
 
-    private fun simulateClickEffect(holder:FilterItemViewHolder){
+    private fun simulateClickEffect(holder: FilterItemViewHolder) {
         CoroutineScope(Dispatchers.Main).launch {
             holder.mainContainer.styleBackground(
                 backgroundColor = ColorsManager.getColorHex(2),
@@ -98,7 +106,6 @@ class SearchEpisodesAdapter(
                 borderColor = ColorsManager.getColorHex(0)
             )
         }
-
     }
 
     override fun getItemCount(): Int {
