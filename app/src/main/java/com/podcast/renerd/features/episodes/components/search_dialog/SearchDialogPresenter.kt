@@ -5,26 +5,30 @@ import com.podcast.renerd.features.episodes.EpisodesContract
 import com.podcast.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.text.Normalizer
 
 class SearchDialogPresenter(private val repository: EpisodesContract.Repository) : SearchDialogContract.Presenter {
 
     private var view: SearchDialogContract.View? = null
-    private var allEpisodes: List<EpisodeViewModel> = emptyList() // Cache para todos os episódios
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var allEpisodes: List<EpisodeViewModel> = emptyList()
 
     override fun attachView(view: SearchDialogContract.View) {
         this.view = view
-        loadAllEpisodes() // Carrega todos os episódios ao attachar a view para a busca
+        loadAllEpisodes()
     }
 
     override fun detachView() {
         this.view = null
+        scope.cancel()
     }
 
     private fun loadAllEpisodes() {
         view?.showLoading()
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
             try {
                 allEpisodes = repository.getEpisodes() // Carrega todos os episódios
                 view?.hideLoading() // Esconde loading após carregar inicialmente
@@ -44,7 +48,7 @@ class SearchDialogPresenter(private val repository: EpisodesContract.Repository)
         }
 
         view?.showLoading()
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
             try {
                 val filteredEpisodes = filterEpisodesByName(allEpisodes, query)
                 view?.showEpisodes(filteredEpisodes, 0) // Posição 0 para nova busca

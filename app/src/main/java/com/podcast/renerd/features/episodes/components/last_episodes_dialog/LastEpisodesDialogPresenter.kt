@@ -8,6 +8,7 @@ import com.podcast.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -24,6 +25,7 @@ class LastEpisodesDialogPresenter(
 
     override fun detachView() {
         this.view = null
+        presenterScope.cancel()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

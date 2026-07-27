@@ -7,6 +7,8 @@ import com.podcast.renerd.view_models.FiltersTabsListModel
 import com.podcast.renerd.features.episodes.utils.EpisodeFilterUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class EpisodesPresenter(
@@ -14,6 +16,7 @@ class EpisodesPresenter(
 ): EpisodesContract.Presenter {
 
     private var view: EpisodesContract.View? = null
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var filtersTabsListModel: FiltersTabsListModel = FiltersTabsListModel(
         productsList = mutableListOf(),
         subjectsList = mutableListOf(),
@@ -27,11 +30,12 @@ class EpisodesPresenter(
 
     override fun detachView() {
         this.view = null
+        scope.cancel()
     }
 
     override fun loadData() {
         view?.showLoading()
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
             try {
                 val filtersModel = loadOrInitializeFilters()
 
@@ -65,7 +69,7 @@ class EpisodesPresenter(
 
     override fun updateFiltersTabsItemList(mixedFiltersTabsItemModel: MutableList<FiltersTabsItemModel>) {
         view?.showLoading()
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
             try {
                 mixedFiltersTabsItemModel.forEach { repository.updateFilterTabItem(it) }
                 // Após atualizar os filtros, recarrega os dados
@@ -136,7 +140,7 @@ class EpisodesPresenter(
     }
 
     override fun updateFiltersTabsList(tempFiltersTabsListModel: FiltersTabsListModel) {
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
             try {
                 tempFiltersTabsListModel.productsList.forEach { repository.insertFilterTabItem(it) }
                 tempFiltersTabsListModel.subjectsList.forEach { repository.insertFilterTabItem(it) }
@@ -149,7 +153,7 @@ class EpisodesPresenter(
     }
 
     override fun loadLastEpisodes() {
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
             try {
                 val episodes = repository.getLastEpisodes()
                 val currentPosition = repository.getRecyclerviewEpisodesCurrentPosition().toIntOrNull() ?: 0

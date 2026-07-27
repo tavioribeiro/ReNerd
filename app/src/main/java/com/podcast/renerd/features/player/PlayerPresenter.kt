@@ -3,12 +3,15 @@ package com.podcast.renerd.features.player
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-
-
-class PlayerPresenter(private val repository: PlayerContract.Repository): PlayerContract.Presenter {
+class PlayerPresenter(
+    private val repository: PlayerContract.Repository
+) : PlayerContract.Presenter {
     private var view: PlayerContract.View? = null
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun attachView(view: PlayerContract.View) {
         this.view = view
@@ -16,10 +19,11 @@ class PlayerPresenter(private val repository: PlayerContract.Repository): Player
 
     override fun detachView() {
         this.view = null
+        scope.cancel()
     }
 
-    override fun setCurrentEpisodePlaying(url: String){
-        CoroutineScope(Dispatchers.Main).launch {
+    override fun setCurrentEpisodePlaying(url: String) {
+        scope.launch {
             repository.setCurrentEpisodePlaying(url)
         }
     }
