@@ -3,6 +3,7 @@ package com.podcast.renerd.services
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.OptIn
@@ -14,7 +15,12 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
+import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaSessionService
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionResult
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import com.podcast.renerd.features.episodes.EpisodesActivity
 
 class AudioService3 : MediaSessionService() {
@@ -33,13 +39,63 @@ class AudioService3 : MediaSessionService() {
         }
     }
 
+    private val seekBackCommand = SessionCommand("seek_back", Bundle.EMPTY)
+    private val seekForwardCommand = SessionCommand("seek_forward", Bundle.EMPTY)
+
+    private val sessionCallback = object : MediaSession.Callback {
+        @OptIn(UnstableApi::class)
+        override fun onConnect(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo
+        ): MediaSession.ConnectionResult {
+            val sessionCommands = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS
+                .buildUpon()
+                .add(seekBackCommand)
+                .add(seekForwardCommand)
+                .build()
+
+            return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
+                .setAvailableSessionCommands(sessionCommands)
+                .setCustomLayout(
+                    listOf(
+                        CommandButton.Builder(CommandButton.ICON_SKIP_BACK_15)
+                            .setSessionCommand(seekBackCommand)
+                            .setDisplayName("Retroceder 15s")
+                            .build(),
+                        CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD_15)
+                            .setSessionCommand(seekForwardCommand)
+                            .setDisplayName("Avançar 15s")
+                            .build()
+                    )
+                )
+                .build()
+        }
+
+        override fun onCustomCommand(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            customCommand: SessionCommand,
+            args: Bundle
+        ): ListenableFuture<SessionResult> {
+            val player = session.player
+            when (customCommand.customAction) {
+                "seek_back" -> player.seekTo(maxOf(0, player.currentPosition - 15000))
+                "seek_forward" -> player.seekTo(minOf(player.duration, player.currentPosition + 15000))
+            }
+            return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         initializePlayer()
     }
 
     private fun initializePlayer() {
-        val player = ExoPlayer.Builder(this).build()
+        val player = ExoPlayer.Builder(this)
+            .setSeekBackIncrementMs(15000)
+            .setSeekForwardIncrementMs(15000)
+            .build()
         exoPlayer = player
 
         val audioAttributes = AudioAttributes.Builder()
@@ -76,6 +132,7 @@ class AudioService3 : MediaSessionService() {
 
         mediaSession = MediaSession.Builder(this, player)
             .setSessionActivity(pendingIntent)
+            .setCallback(sessionCallback)
             .build()
     }
 
