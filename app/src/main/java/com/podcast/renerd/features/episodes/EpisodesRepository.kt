@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.podcast.renerd.core.database.DatabaseHelper
-import com.podcast.renerd.core.network.PodcastClient
+import com.podcast.renerd.core.network.api.PodcastApi
 import com.podcast.renerd.core.singletons.ContextManager
 import com.podcast.renerd.core.utils.getCurrentDateFormatted
 import com.podcast.renerd.core.utils.log
@@ -15,7 +15,9 @@ import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 import java.net.URLDecoder
 
-class EpisodesRepository : EpisodesContract.Repository {
+class EpisodesRepository(
+    private val api: PodcastApi
+) : EpisodesContract.Repository {
     private val context: Context = ContextManager.getContext()
     private val sharedPref = context.getSharedPreferences("SharedPrefsReNerd", Context.MODE_PRIVATE)
     private val editor = sharedPref.edit()
@@ -42,7 +44,7 @@ class EpisodesRepository : EpisodesContract.Repository {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchEpisodesFromNetwork(): MutableList<EpisodeViewModel> {
         //val after = URLDecoder.decode(getAfter(), "UTF-8")
-        val response = PodcastClient.api.getNerdcasts(after = getAfter(), before = "").execute()
+        val response = api.getNerdcasts(after = getAfter(), before = "").execute()
 
         val episodesViewModel = mutableListOf<EpisodeViewModel>()
         if (response.isSuccessful) {
@@ -112,7 +114,7 @@ class EpisodesRepository : EpisodesContract.Repository {
             try {
                 val localEpisodes = dbHelper.getAllEpisodes().toMutableList()
                 val after = URLDecoder.decode(getAfter(), "UTF-8")
-                val response = PodcastClient.api.getNerdcasts(after = after, before = "").execute()
+                val response = api.getNerdcasts(after = after, before = "").execute()
                 log(response)
 
                 if (response.isSuccessful) {

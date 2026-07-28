@@ -17,7 +17,7 @@ object EpisodesModule {
 
     val instance = module {
         factory<EpisodesContract.Repository> {
-            EpisodesRepository()
+            EpisodesRepository(get())
         }
         factory<EpisodesContract.Presenter> {
             EpisodesPresenter(get())
@@ -33,7 +33,7 @@ object EpisodesModule {
 
 
         factory<LastEpisodesDialogContract.Repository> {
-            LastEpisodesDialogRepository()
+            LastEpisodesDialogRepository(get())
         }
 
 

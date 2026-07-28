@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.podcast.renerd.core.database.DatabaseHelper
-import com.podcast.renerd.core.network.PodcastClient
+import com.podcast.renerd.core.network.api.PodcastApi
 import com.podcast.renerd.core.singletons.ContextManager
 import com.podcast.renerd.core.utils.getCurrentDateFormatted
 import com.podcast.renerd.core.utils.log
@@ -13,7 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
 
-class LastEpisodesDialogRepository : LastEpisodesDialogContract.Repository {
+class LastEpisodesDialogRepository(
+    private val api: PodcastApi
+) : LastEpisodesDialogContract.Repository {
 
     private val context: Context = ContextManager.getContext()
     private val dbHelper = DatabaseHelper(context)
@@ -25,7 +27,7 @@ class LastEpisodesDialogRepository : LastEpisodesDialogContract.Repository {
         return withContext(Dispatchers.IO) {
             try {
                 val after = getAfterDate()
-                val response = PodcastClient.api.getNerdcasts(after = after, before = "").execute()
+                val response = api.getNerdcasts(after = after, before = "").execute()
                 val newEpisodes = mutableListOf<EpisodeViewModel>()
 
                 if (response.isSuccessful) {
