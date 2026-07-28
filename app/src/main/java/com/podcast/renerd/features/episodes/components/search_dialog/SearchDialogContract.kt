@@ -18,4 +18,8 @@ interface SearchDialogContract {
         fun detachView()
         fun searchEpisodesByName(query: String)
     }
+
+    interface Repository {
+        suspend fun getEpisodes(): List<EpisodeViewModel>
+    }
 }

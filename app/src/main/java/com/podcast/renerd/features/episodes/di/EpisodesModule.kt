@@ -10,6 +10,7 @@ import com.podcast.renerd.features.episodes.components.last_episodes_dialog.Last
 import com.podcast.renerd.features.episodes.components.last_episodes_dialog.LastEpisodesDialogRepository
 import com.podcast.renerd.features.episodes.components.search_dialog.SearchDialogContract
 import com.podcast.renerd.features.episodes.components.search_dialog.SearchDialogPresenter
+import com.podcast.renerd.features.episodes.components.search_dialog.SearchDialogRepository
 import org.koin.dsl.module
 
 object EpisodesModule {
@@ -22,10 +23,12 @@ object EpisodesModule {
             EpisodesPresenter(get())
         }
 
+        factory<SearchDialogContract.Repository> {
+            SearchDialogRepository()
+        }
+
         factory<SearchDialogContract.Presenter> {
-            SearchDialogPresenter(
-                repository = get()
-            )
+            SearchDialogPresenter(repository = get())
         }
 
 
@@ -36,12 +39,6 @@ object EpisodesModule {
 
         factory<LastEpisodesDialogContract.Presenter> {
             LastEpisodesDialogPresenter(repository = get())
-        }
-
-        factory<LastEpisodesDialogContract.Presenter> {
-            LastEpisodesDialogPresenter(
-                repository = get()
-            )
         }
     }
 }

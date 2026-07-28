@@ -1,7 +1,5 @@
 package com.podcast.renerd.features.episodes.components.search_dialog
 
-import com.podcast.renerd.core.utils.log
-import com.podcast.renerd.features.episodes.EpisodesContract
 import com.podcast.renerd.view_models.EpisodeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +8,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.text.Normalizer
 
-class SearchDialogPresenter(private val repository: EpisodesContract.Repository) : SearchDialogContract.Presenter {
+class SearchDialogPresenter(private val repository: SearchDialogContract.Repository) : SearchDialogContract.Presenter {
 
     private var view: SearchDialogContract.View? = null
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -34,7 +32,6 @@ class SearchDialogPresenter(private val repository: EpisodesContract.Repository)
                 view?.hideLoading() // Esconde loading após carregar inicialmente
             } catch (e: Exception) {
                 view?.showError("Erro ao carregar episódios para busca.")
-                log(e)
                 view?.hideLoading()
             }
         }
@@ -54,7 +51,6 @@ class SearchDialogPresenter(private val repository: EpisodesContract.Repository)
                 view?.showEpisodes(filteredEpisodes, 0) // Posição 0 para nova busca
             } catch (e: Exception) {
                 view?.showError("Erro ao buscar episódios.")
-                log(e)
             } finally {
                 view?.hideLoading()
             }
