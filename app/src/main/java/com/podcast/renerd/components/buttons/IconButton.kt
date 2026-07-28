@@ -201,21 +201,17 @@ class IconButton @JvmOverloads constructor(
     fun showLoading(show: Boolean){
         if (show){
             binding.mainContainer.isClickable = false
-
-            binding.imageViewIcon.fadeOutAnimationNoRepeat(200){
-                binding.imageViewIcon.gone()
-                binding.loading.fadeInAnimationNoRepeat(200)
-            }
+            binding.imageViewIcon.animate().cancel()
+            binding.loading.animate().cancel()
+            binding.imageViewIcon.gone()
+            binding.loading.show()
         }
         else{
-            binding.loading.fadeOutAnimationNoRepeat(200){
-                binding.loading.gone()
-                binding.imageViewIcon.fadeInAnimationNoRepeat(200){
-                    binding.imageViewIcon.show()
-                }
-
-                binding.mainContainer.isClickable = true
-            }
+            binding.imageViewIcon.animate().cancel()
+            binding.loading.animate().cancel()
+            binding.loading.gone()
+            binding.imageViewIcon.show()
+            binding.mainContainer.isClickable = true
         }
     }
 

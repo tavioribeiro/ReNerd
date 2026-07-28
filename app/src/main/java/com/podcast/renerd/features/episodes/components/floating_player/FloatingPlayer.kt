@@ -21,7 +21,6 @@ import com.google.common.util.concurrent.MoreExecutors
 import com.podcast.renerd.R
 import com.podcast.renerd.core.extentions.*
 import com.podcast.renerd.core.utils.convertMillisecondsToTime
-import com.podcast.renerd.core.utils.log
 import com.podcast.renerd.databinding.CFloatingPlayerLayoutBinding
 import com.podcast.renerd.services.AudioService3
 import com.podcast.renerd.view_models.EpisodeViewModel
@@ -44,7 +43,6 @@ class FloatingPlayer @JvmOverloads constructor(
 
     private var mediaController: MediaController? = null
     private var controllerFuture: ListenableFuture<MediaController>? = null
-    private val TAG = "[RENERD_DEBUG] FloatingPlayer"
 
     private var pendingAudioUrl: String? = null
 
@@ -96,8 +94,7 @@ class FloatingPlayer @JvmOverloads constructor(
                 mediaController = controllerFuture?.get()
                 mediaController?.addListener(playerListener)
                 updateUiState("InitialConnection")
-            } catch (e: Exception) {
-                log("$TAG: Erro conexão: ${e.message}")
+            } catch (_: Exception) {
             }
         }, MoreExecutors.directExecutor())
     }
@@ -107,11 +104,28 @@ class FloatingPlayer @JvmOverloads constructor(
             updateUiState("onEvents")
         }
 
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            updateUiState("onPlaybackStateChanged")
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            updateUiState("onIsPlayingChanged")
+        }
+
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int
+        ) {
+            if (reason == Player.DISCONTINUITY_REASON_SEEK) {
+                updateUiState("seek")
+            }
+        }
+
         override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
             pendingAudioUrl = null
             binding.miniPlayerPlayPauseButton.showLoading(false)
             binding.mainPlayerPlayPauseButton.showLoading(false)
-            log("$TAG: Player Error: ${error.message}")
         }
     }
 
@@ -160,18 +174,24 @@ class FloatingPlayer @JvmOverloads constructor(
             override fun onStartTrackingTouch(seekBar: SeekBar?) { isUserSeeking = true }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 isUserSeeking = false
-                mediaController?.seekTo(seekBar?.progress?.toLong() ?: 0)
+                val seekPos = seekBar?.progress?.toLong() ?: 0
+                mediaController?.seekTo(seekPos)
             }
         })
 
         binding.buttomJumpTo.setOnClickListener {
-            mediaController?.seekTo(currentEpisode.jumpToTime * 1000L)
+            val jumpPos = currentEpisode.jumpToTime * 1000L
+            mediaController?.seekTo(jumpPos)
         }
         binding.buttomReplay15.setOnClickListener {
-            mediaController?.let { it.seekTo(it.currentPosition - 15000) }
+            val currentPos = mediaController?.currentPosition ?: 0L
+            val newPos = currentPos - 15000
+            mediaController?.let { it.seekTo(newPos) }
         }
         binding.buttomFoward15.setOnClickListener {
-            mediaController?.let { it.seekTo(it.currentPosition + 15000) }
+            val currentPos = mediaController?.currentPosition ?: 0L
+            val newPos = currentPos + 15000
+            mediaController?.let { it.seekTo(newPos) }
         }
     }
 
@@ -277,7 +297,7 @@ class FloatingPlayer @JvmOverloads constructor(
                                 topRightRadius = 40f
                             )
                             onBackgroundCollorsChangeCallback?.invoke(darkenColor(color1, 90.0), darkenColor(color2, 70.0))
-                        } catch (e: Exception) { log(e) }
+                        } catch (_: Exception) { }
                     }
                 },
                 onError = {

@@ -172,11 +172,14 @@ class PlayerActivity: AppCompatActivity(), PlayerContract.View {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter("MY_ACTION")
-        registerReceiver(myReceiver, intentFilter, Context.RECEIVER_EXPORTED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(myReceiver, intentFilter, Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(myReceiver, intentFilter)
+        }
     }
 
     override fun onPause() {
