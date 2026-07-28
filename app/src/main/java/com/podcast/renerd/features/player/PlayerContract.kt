@@ -17,7 +17,7 @@ interface PlayerContract {
 
 
     interface Repository {
-        suspend fun setCurrentEpisodePlaying(url: String)
+        fun setCurrentEpisodePlaying(url: String)
         fun getCurrentEpisodePlaying(): String
         fun setCurrentEpisodePosition(url: String)
         fun getCurrentEpisodePosition(): String

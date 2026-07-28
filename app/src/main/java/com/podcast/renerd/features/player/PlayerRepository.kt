@@ -14,7 +14,7 @@ class PlayerRepository: PlayerContract.Repository {
 
 
 
-    override suspend fun setCurrentEpisodePlaying(url: String){
+    override fun setCurrentEpisodePlaying(url: String){
         editor.putString("current_media_playing", url)
         editor.apply()
     }
