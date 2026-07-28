@@ -142,10 +142,10 @@ class EpisodesPresenter(
     override fun updateFiltersTabsList(tempFiltersTabsListModel: FiltersTabsListModel) {
         scope.launch {
             try {
-                tempFiltersTabsListModel.productsList.forEach { repository.insertFilterTabItem(it) }
-                tempFiltersTabsListModel.subjectsList.forEach { repository.insertFilterTabItem(it) }
-                tempFiltersTabsListModel.guestsList.forEach { repository.insertFilterTabItem(it) }
-                tempFiltersTabsListModel.yearsList.forEach { repository.insertFilterTabItem(it) }
+                tempFiltersTabsListModel.productsList.forEach { repository.updateFilterTabItem(it) }
+                tempFiltersTabsListModel.subjectsList.forEach { repository.updateFilterTabItem(it) }
+                tempFiltersTabsListModel.guestsList.forEach { repository.updateFilterTabItem(it) }
+                tempFiltersTabsListModel.yearsList.forEach { repository.updateFilterTabItem(it) }
             } catch (e: Exception) {
                 log(e)
             }
