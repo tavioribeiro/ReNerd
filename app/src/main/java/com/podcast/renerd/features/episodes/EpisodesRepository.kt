@@ -63,7 +63,7 @@ class EpisodesRepository(
                     product = episode.product ?: "",
                     productName = episode.productName ?: "",
                     subject = episode.subject ?: "",
-                    jumpToTime = episode.jumpToTime.startTime,
+                    jumpToTime = if(episode.jumpToTime.endTime > episode.jumpToTime.startTime) episode.jumpToTime.endTime else episode.jumpToTime.startTime,
                     guests = episode.guests ?: "",
                     postTypeClass = episode.postTypeClass ?: ""
                 )
